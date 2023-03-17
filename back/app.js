@@ -4,7 +4,7 @@ const app = express();
 app.set('port', process.env.PORT || 8080);
 
 app.get('/', (req, res) => {
-    res.send('Hello, Express/webhooktest')
+    res.send('Hello, Express/webhooktest2')
 })
 
 app.listen(app.get('port'), () => {
