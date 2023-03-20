@@ -1,4 +1,5 @@
 import './App.css';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import StartPage from './routes/start/StartPage';
 import MainPage from './routes/main/MainPage';
@@ -13,6 +14,7 @@ const App = () => {
   return (
     <div className='App'>
       <BrowserRouter>
+
       <ScrollToTop />
         <Routes>
           {/* 시작화면 */}
