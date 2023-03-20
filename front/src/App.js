@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import StartPage from './routes/start/StartPage';
+import StartPage from './routes/Start/StartPage';
 import MainPage from './routes/main/MainPage';
 import PlantList from './routes/plant/PlantList';
 import PlantListItem from './routes/plant/PlantListItem';
@@ -10,9 +10,9 @@ import Header from './components/header/Header';
 
 const App = () => {
   return (
-    <>
+    <div className='App'>
       <BrowserRouter>
-      <Header />
+      
       <ScrollToTop />
         <Routes>
           {/* 시작화면 */}
@@ -26,7 +26,7 @@ const App = () => {
           <Route path='/diary' element={<Diary />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </div>
   )
 };
 
