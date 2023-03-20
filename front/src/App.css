@@ -1,7 +1,5 @@
 .content {
   margin: 16px;
-}
-
-.App {
-  text-align: center;
+  position: relative;
+  height: 100vh;
 }
