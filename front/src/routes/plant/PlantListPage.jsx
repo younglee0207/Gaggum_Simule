@@ -5,8 +5,9 @@ import PlantList from "./PlantList";
 const PlantListPage = () => {
   return (
     <>
-      <div className="content">
+      <div className="PlantListPage">
         <PlantList />
+        <NavBar />
       </div>
     </>
   )

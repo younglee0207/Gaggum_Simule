@@ -4,7 +4,7 @@ import PlantDetail from "./PlantDetail";
 
 const PlantDetailPage = () => {
   return (
-    <div className="content">
+    <div className="PlantDetailPage">
       <PlantDetail />
       <NavBar />
     </div>
