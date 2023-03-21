@@ -1,6 +1,8 @@
 // PlantList
 .PlantList {
   text-align: center;
+  height: 90vh;
+  padding: 16px;
 }
 
 // PlantListItem
@@ -47,6 +49,7 @@
 // PlantDetail
 
 .PlantDetail {
+  padding: 16px;
 
   .detail-image-div {
     display: flex;
