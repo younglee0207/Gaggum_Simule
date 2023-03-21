@@ -23,10 +23,7 @@ const PlantDetail = () => {
           color="#FF6B00"
         />
         <p className="detail-top-title">치치페그린 미니선인장</p>
-        <ReactSwitch 
-          onChange={handleChange}
-          checked={checked}
-        />
+        <button>물</button>
       </div>
       <h2 className="detail-name">쀼쀼</h2>
       <div className="detail-content">

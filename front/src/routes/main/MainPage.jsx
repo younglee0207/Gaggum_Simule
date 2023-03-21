@@ -1,9 +1,18 @@
 import NavBar from "../../components/navbar/NavBar"
+import MainPlantList from "./MainPlantList";
+import MapScan from "./MapScan";
+import TodayFlower from "./TodayFlower";
+import Weather from "./Weather";
 
 const MainPage = () => {
   return (
     <div className="MainPage">
-      <h1>메인 페이지</h1>
+      <div className="main-content">
+        <MainPlantList />
+        <Weather />
+        <TodayFlower />
+        <MapScan />
+      </div>
       <NavBar />
     </div>
   )
