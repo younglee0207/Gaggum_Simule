@@ -1,3 +1,68 @@
 .MainPage {
-  height: 100vh;
+
+  text-align: center;
+
+  .main-content {
+    padding: 16px;
+    min-height: 90vh;
+
+    .Weather {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      background-color: #DEF5E5;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      padding: 16px;
+
+      div {
+        h3, h4 {
+          margin: 0;
+        }
+      }
+    }
+
+    .TodayFlower {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: 30vh;
+      padding: 16px;
+      background-color: #DEF5E5;
+      border-radius: 16px;
+      margin-bottom: 16px;
+
+      .flower-content {
+
+        display: flex;
+        justify-content: space-evenly;
+
+        .flower-img {
+          width: 100px;
+          height: 100px;
+        }
+
+        .flower-text {
+          p {
+            margin: 0;
+          }
+        }
+
+      }
+    }
+
+    .MapScan {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 10vh;
+      background-color: #30C7A4;
+      border-radius: 16px;
+
+      span h2 {
+        margin: 0;
+      }
+    }
+  }
+
 }

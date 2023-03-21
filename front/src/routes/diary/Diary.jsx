@@ -52,7 +52,7 @@ const Diary = () => {
     // <div className="content">
     <div className="Diary">
       <div className="justify">
-        <Link to={"/"} className="diary-item">
+        <Link to={"/home"} className="diary-item">
           {/* <FontAwesomeIcon icon={faArrowLeft} size="xl" color="#C1B5A9" /> */}
           <AiOutlineArrowLeft size="24" color="#022a17" />
         </Link>
