@@ -31,7 +31,7 @@ const dummyData = [
 
 const PlantList = () => {
   return (
-    <div className="PlantList content">
+    <div className="PlantList">
       {dummyData.map((item) => (
       <PlantListItem
         item={item}

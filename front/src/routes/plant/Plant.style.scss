@@ -1,6 +1,8 @@
 // PlantList
 .PlantList {
   text-align: center;
+  height: 90vh;
+  padding: 16px;
 }
 
 // PlantListItem
@@ -40,6 +42,84 @@
       margin-top: 0;
     }
 
+  }
+
+}
+
+// PlantDetail
+
+.PlantDetail {
+  padding: 16px;
+
+  .detail-image-div {
+    display: flex;
+    justify-content: center;
+    width: 90vw;
+    height: 400px;
+    background: url("../../assets/plant/mokoko_01.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .detail-top {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+    .detail-top-title {
+      color: gray;
+      font-weight: bold;
+    }
+
+  }
+
+  .detail-name {
+    text-align: center;
+    margin-top: 0;
+  }
+
+  .detail-content {
+    background-color: #DEF5E5;
+    text-align: center;
+    padding: 8px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+
+    hr {
+      border: 1px solid #87DEC4;
+    }
+  }
+
+  .detail-bottom {
+    background-color: #DEF5E5;
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    border-radius: 16px;
+
+    .detail-bottom-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 80px;
+
+      p {
+        margin-top: 0;
+      }
+
+      .detail-bottom-item-circle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 70px;
+        height: 70px;
+        background-color: #87DEC4;
+        color: white;
+        border-radius: 50px;
+      }
+    }
   }
 
 }
