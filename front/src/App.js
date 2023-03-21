@@ -1,7 +1,6 @@
 import './App.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import StartPage from './routes/start/StartPage';
 import MainPage from './routes/main/MainPage';
 import PlantList from './routes/plant/PlantList';
 import Diary from './routes/diary/Diary';
@@ -9,12 +8,12 @@ import ScrollToTop from './components/scrolltotop/ScrollToTop';
 import PlantDetail from './routes/plant/PlantDetail';
 import NavBar from './components/navbar/NavBar';
 import Register from './routes/register/Register';
+import StartPage from './routes/start/StartPage';
 
 const App = () => {
   return (
     <div className='App'>
       <BrowserRouter>
-
       <ScrollToTop />
         <Routes>
           {/* 시작화면 */}
