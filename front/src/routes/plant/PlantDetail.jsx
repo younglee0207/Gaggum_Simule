@@ -7,13 +7,13 @@ import { useState } from "react";
 const PlantDetail = () => {
 
   const [checked, setChecked] = useState(false);
-
+  
   const handleChange = () => {
     setChecked(!checked)
   };
 
   return (
-    <div className="PlantDetail content">
+    <div className="PlantDetail">
       {/* 식물 사진 */}
       <div className="detail-image-div">
       </div>
@@ -53,8 +53,6 @@ const PlantDetail = () => {
             03.10
           </div>
         </div>
-      </div>
-      <div style={{ height: 116 }}>
       </div>
     </div>
   )

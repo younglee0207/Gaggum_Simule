@@ -2,13 +2,13 @@ import './App.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainPage from './routes/main/MainPage';
-import PlantList from './routes/plant/PlantList';
 import Diary from './routes/diary/Diary';
 import ScrollToTop from './components/scrolltotop/ScrollToTop';
-import PlantDetail from './routes/plant/PlantDetail';
 import NavBar from './components/navbar/NavBar';
 import Register from './routes/register/Register';
 import StartPage from './routes/start/StartPage';
+import PlantListPage from './routes/plant/PlantListPage';
+import PlantDetailPage from './routes/plant/PlantDetailPage';
 
 const App = () => {
   return (
@@ -21,15 +21,14 @@ const App = () => {
           {/* 메인화면 */}
           <Route path='/home' element={<MainPage />} />
           {/* 내 식물 */}
-          <Route path='/plant' element={<PlantList />} />
-          <Route path='/plant/:id' element={<PlantDetail />} />
+          <Route path='/plant' element={<PlantListPage />} />
+          <Route path='/plant/:id' element={<PlantDetailPage />} />
           {/* 식물 일지 */}
           <Route path='/diary' element={<Diary />} />
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
         </Routes>
         {/* 로그인 되어있어야 navbar 보이는 로직 추가하기 */}
-        <NavBar />
       </BrowserRouter>
     </div>
   )
