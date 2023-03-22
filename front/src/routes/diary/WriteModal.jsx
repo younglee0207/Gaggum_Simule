@@ -7,12 +7,12 @@ import {
   AiOutlineClose,
   AiOutlineCheck,
 } from "react-icons/ai";
-import plantImg from "../../assets/plant/mokoko_01.gif";
+import plantImg from "../../assets/plant/mush.gif";
 import { useNavigate } from "react-router-dom"; //dom 아닌가?
 import axios from "axios";
 import { useRef } from "react";
 
-const WriteModal = ({ onClose }) => {
+const WriteModal = ({ onClose, item }) => {
   //   const handleItemClick = (e) => {
   //     onItemClick(e.target.textContent);
   //   };
@@ -65,7 +65,7 @@ const WriteModal = ({ onClose }) => {
         </div>
         <div className={classes.pageTitle}>식물 일지 등록</div>
 
-        <img className="img-plant" src={plantImg} alt="식물 사진" />
+        <img className="img-plant" src={item.diary_img} alt="식물 사진" />
 
         <div className={classes.writeTitle}>메모</div>
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft, AiFillPlusCircle } from "react-icons/ai";
-import plantImg from "../../assets/plant/mokoko_01.gif";
+import plantImg from "../../assets/plant/mush.gif";
 import classes from "../diary/WriteModal.module.scss";
 import {
   FaArrowAltCircleDown,
