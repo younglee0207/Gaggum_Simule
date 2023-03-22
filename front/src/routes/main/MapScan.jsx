@@ -9,6 +9,7 @@ const MapScan = () => {
   return (
     <div 
       className="MapScan"
+      onClick={() => navigate("/loading")}
     >
       <span>
         <SlMagnifier 
