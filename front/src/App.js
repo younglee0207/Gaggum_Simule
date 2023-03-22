@@ -9,7 +9,7 @@ import Register from './routes/register/Register';
 import StartPage from './routes/start/StartPage';
 import PlantListPage from './routes/plant/PlantListPage';
 import PlantDetailPage from './routes/plant/PlantDetailPage';
-
+import DiaryPage from './routes/diary/DiaryPage';
 const App = () => {
   return (
     <div className='App'>
@@ -24,7 +24,7 @@ const App = () => {
           <Route path='/plant' element={<PlantListPage />} />
           <Route path='/plant/:id' element={<PlantDetailPage />} />
           {/* 식물 일지 */}
-          <Route path='/diary' element={<Diary />} />
+          <Route path='/diary' element={<DiaryPage />} />
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
         </Routes>

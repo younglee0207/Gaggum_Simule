@@ -7,10 +7,24 @@
 // git clone을 했는데 branch
 // 고통
 
+.DiaryPage {
+  height: 100%; /* 페이지의 높이 설정 */
+
+}
+
+.Diary {
+  text-align: center;
+  padding-bottom: 100px;
+ 
+}
+
+
 .justify {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 16px;
+  
 
   .diary-item {
     //   flex-basis: calc(33.33% - 10px);
@@ -19,6 +33,7 @@
     background-color: #ffffff;
     border-radius: 5px;
     align-items: center;
+    // margin: 16;
   }
 }
 
