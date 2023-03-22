@@ -25,6 +25,38 @@ const dummyData = [
     plant_species: "몰?루",
     plant_watering_amount: 500,
     plant_sunlight: true
+  },
+  {
+    id: 4,
+    plant_img: plantImg,
+    plant_name: "몰?로코",
+    plant_species: "몰?루",
+    plant_watering_amount: 500,
+    plant_sunlight: true
+  },
+  {
+    id: 5,
+    plant_img: plantImg,
+    plant_name: "몰?로코",
+    plant_species: "몰?루",
+    plant_watering_amount: 500,
+    plant_sunlight: true
+  },
+  {
+    id: 6,
+    plant_img: plantImg,
+    plant_name: "몰?로코",
+    plant_species: "몰?루",
+    plant_watering_amount: 500,
+    plant_sunlight: true
+  },
+  {
+    id: 7,
+    plant_img: plantImg,
+    plant_name: "몰?로코",
+    plant_species: "몰?루",
+    plant_watering_amount: 500,
+    plant_sunlight: true
   }
 ]
 

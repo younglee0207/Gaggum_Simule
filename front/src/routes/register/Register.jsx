@@ -1,17 +1,31 @@
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft, AiFillPlusCircle } from "react-icons/ai";
 import plantImg from "../../assets/plant/mokoko_01.gif";
+import classes from "../diary/WriteModal.module.scss";
 import {
   FaArrowAltCircleDown,
   FaArrowAltCircleLeft,
   FaArrowAltCircleUp,
   FaArrowAltCircleRight,
 } from "react-icons/fa";
+import { useState } from "react";
+import RegisterModal from "./RegisterModal";
 const Register = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  // const handleItemClick = (itemName) => {
+  //   setModalButtonName(itemName);
+  //   closeModal();
+  // };
   return (
     <div className="Register">
       <div className="justify" style={{ margin: 16 }}>
-        <Link to={"/"} className="diary-item">
+        <Link to={"/home"} className="diary-item">
           {/* <FontAwesomeIcon icon={faArrowLeft} size="xl" color="#C1B5A9" /> */}
           <AiOutlineArrowLeft size="24" color="#022a17" />
         </Link>
@@ -20,7 +34,7 @@ const Register = () => {
         </div>
         <div></div>
       </div>
-
+      {/* hr 위로 */}
       <hr style={{ margin: 0 }} />
       {/* hr밑으로 */}
       <div style={{ margin: 16 }}>
@@ -32,20 +46,19 @@ const Register = () => {
         </div>
 
         <div className="justify">
-          <button>들기</button>
+          <button className={classes.registerButton}>
+            들기
+          </button>
 
-          {/* <div>
-            <button
-              className="diary-item"
-              style={{ border: 0 }}
-              onClick={openWriteModal}
-            >
+          <div>
+            <button className={classes.registerButton} onClick={openModal}>
               놓기
             </button>
-            {isWriteModalOpen && <WriteModal onClose={closeWriteModal} />}
-          </div> */}
+            {isModalOpen && <RegisterModal onClose={closeModal} />}
+          </div>
         </div>
-
+      </div>
+      <div className={classes.controller}>
         <div
           style={{
             display: "flex",

@@ -80,29 +80,30 @@ const WriteModal = ({ onClose }) => {
           />
         </div> */}
 
-<div className="note">
-        <textarea
-          value={text}
-          onChange={handleChange}
-          style={{
-            backgroundImage: "linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px)",
-            backgroundSize: "100% 1.2em",
-            lineHeight: "1.2em",
-            padding: "0.6em",
-            paddingTop: "0",
-            resize: "none",
-            width: "100%",
-            height: "300px",
-            border: "1px solid #ccc",
-            fontFamily: "monospace",
-            fontSize: "24px",
-            fontWeight: "bold",
-            overflow: "auto",
-          }}
-          className="note__textarea"
-          placeholder="Write your note here"
-        />
-      </div>
+        <div className="note">
+          <textarea
+            value={text}
+            onChange={handleChange}
+            style={{
+              backgroundImage:
+                "linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px)",
+              backgroundSize: "100% 1.2em",
+              lineHeight: "1.2em",
+              padding: "0.6em",
+              paddingTop: "0",
+              resize: "none",
+              width: "100%",
+              height: "300px",
+              border: "1px solid #ccc",
+              fontFamily: "monospace",
+              fontSize: "24px",
+              fontWeight: "bold",
+              overflow: "auto",
+            }}
+            className="note__textarea"
+            placeholder="Write your note here"
+          />
+        </div>
       </div>
     </div>,
     document.getElementById("modal-root")
