@@ -15,7 +15,19 @@ async function getTurtle(page = 1){
     meta
   }
 }
+async function getTurtleByKey(body){
+    console.log(body.turtle_key);
+    const rows = await db.query(
+      `SELECT COUNT(*) AS valid from turtles WHERE turtle_key = "${body.turtle_key}"`
+    );
+    const data = helper.emptyOrRows(rows);
+    console.log(rows);
+    return {
+      data
+    }
+  }
 
 module.exports = {
-  getTurtle
+  getTurtle,
+  getTurtleByKey
 }
