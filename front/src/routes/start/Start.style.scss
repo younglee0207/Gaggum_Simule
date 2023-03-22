@@ -1,0 +1,20 @@
+.StartPage {
+  text-align: center;
+  height: 100vh;
+  background-image: url("../../assets/start/mokoko_background.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  .start-content {
+    height: 100%;
+
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 60vh;
+      padding-top: 100px;
+    }
+  }
+
+
+}
