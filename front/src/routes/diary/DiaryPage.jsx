@@ -3,12 +3,10 @@ import Diary from "./Diary";
 
 const DiaryPage = () => {
   return (
-    <>
-      <div className="DiaryPage">
-        <Diary />
-        <NavBar />
-      </div>
-    </>
+    <div className="DiaryPage">
+      <Diary />
+      <NavBar />
+    </div>
   );
 };
 
