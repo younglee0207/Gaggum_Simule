@@ -1,0 +1,18 @@
+.LoadingPage {
+  min-height: 100vh;
+  background-color: #3466AD;
+  margin-bottom: 0;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .loading-content {
+    padding-top: 16px;
+    padding-left: 32px;
+    padding-right: 32px;
+    text-align: center;
+  }
+}

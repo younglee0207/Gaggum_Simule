@@ -3,3 +3,7 @@
   position: relative;
   min-height: 100vh;
 }
+
+.App {
+  min-height: 100vh;
+}
