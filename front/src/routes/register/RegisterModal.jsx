@@ -7,7 +7,7 @@ import {
   AiOutlineClose,
   AiOutlineCheck,
 } from "react-icons/ai";
-import plantImg from "../../assets/plant/mokoko_01.gif";
+import plantImg from "../../assets/plant/mush.gif";
 
 const RegisterModal = ({ onClose }) => {
   const [isChecked, setIsChecked] = useState(false);
@@ -24,9 +24,10 @@ const RegisterModal = ({ onClose }) => {
           <AiOutlineCheck onClick={onClose} size="24" color="#022a17" />
         </div>
         <div className={classes.pageTitle}>나의 식물 등록</div>
-
+        <div 
+          style={{ display: "flex", justifyContent: "center" }}>
         <img className="img-plant" src={plantImg} alt="식물 사진" />
-
+        </div>
         <div className={classes.writeTitle}>식물 이름</div>
         <input
           type="text"
