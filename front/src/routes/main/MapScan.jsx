@@ -1,9 +1,15 @@
 import "./Main.style.scss"
 import { SlMagnifier } from "react-icons/sl"
+import { useNavigate } from "react-router";
 
 const MapScan = () => {
+
+  const navigate = useNavigate()
+
   return (
-    <div className="MapScan">
+    <div 
+      className="MapScan"
+    >
       <span>
         <SlMagnifier 
           size="40"
