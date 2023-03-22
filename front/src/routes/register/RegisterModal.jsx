@@ -69,6 +69,13 @@ const RegisterModal = ({ onClose }) => {
             style={{margin:10}}
           />
         </label>
+
+        <div className={classes.writeTitle}>메모</div>
+        <input
+          type="text"
+          className={classes.singleLineInput}
+          placeholder="예시 : 주의사항, 효과 등"
+        />
       </div>
     </div>,
     document.getElementById("modal-root")
