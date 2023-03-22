@@ -23,8 +23,20 @@ async function getDiariesByDate(param){
       data
     }
   }
+  async function getDiariesByName(param){
+    console.log(param);
+    const rows = await db.query(
+      `SELECT * from diaries WHERE diary_date LIKE "${param}%"`
+    );
+    const data = helper.emptyOrRows(rows);
+    console.log(rows);
+    return {
+      data
+    }
+  }
 
 module.exports = {
   getDiaries,
-  getDiariesByDate
+  getDiariesByDate,
+  getDiariesByName
 }
