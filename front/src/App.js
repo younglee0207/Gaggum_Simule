@@ -10,6 +10,7 @@ import StartPage from './routes/start/StartPage';
 import PlantListPage from './routes/plant/PlantListPage';
 import PlantDetailPage from './routes/plant/PlantDetailPage';
 import DiaryPage from './routes/diary/DiaryPage';
+import LoadingPage from './routes/loading/LoadingPage';
 const App = () => {
   return (
     <div className='App'>
@@ -20,6 +21,8 @@ const App = () => {
           <Route path='/' element={<StartPage />} />
           {/* 메인화면 */}
           <Route path='/home' element={<MainPage />} />
+          {/* 로딩화면 */}
+          <Route path="/loading" element={<LoadingPage /> } />
           {/* 내 식물 */}
           <Route path='/plant' element={<PlantListPage />} />
           <Route path='/plant/:id' element={<PlantDetailPage />} />
