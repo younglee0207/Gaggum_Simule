@@ -118,89 +118,92 @@ const Diary = () => {
   };
 
   return (
-      <div className="Diary">
-        <div className="justify">
-          <div style={{width:"42px"}}>
-           
-          </div>
-          <div className="diary-item">
-            <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
-          </div>
-          <div>
-            <button
-              className="diary-item"
-              style={{ border: 0 }}
-              onClick={openWriteModal}
-            >
-              <AiFillPlusCircle size="30" color="#022a17" />
-            </button>
-            {isWriteModalOpen && <WriteModal onClose={closeWriteModal} />}
-          </div>
+    <div className="Diary">
+      <div className="justify">
+        <div style={{ width: "42px" }}></div>
+        <div className="diary-item">
+          <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
         </div>
-
-        <hr style={{ margin: 0 }} />
-
-        <div className="justify">
-          <div>
-            <button onClick={openModal}>
-              {modalButtonName}
-              <MdKeyboardArrowDown />
-            </button>
-            {isModalOpen && (
-              <Modal onClose={closeModal} onItemClick={handleItemClick} />
-            )}
-          </div>
-
-          <div>
-            <button onClick={openPlantModal}>
-              {modalPlantButtonName}
-              <MdKeyboardArrowDown />
-            </button>
-            {isPlantModalOpen && (
-              <PlantModal
-                children={dummyData}
-                onClose={closePlantModal}
-                onItemClick={handlePlantItemClick}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="PlantList content">
-          {dummyData
-            .filter(
-              (item) =>
-                (modalButtonName === "월" ||
-                  item.plant_diary_writedate === modalButtonName ||
-                  modalButtonName === "전체보기") &&
-                (modalPlantButtonName === item.plant_name ||
-                  modalPlantButtonName === "전체보기" ||
-                  modalPlantButtonName === "식물이름")
-            )
-            .map((item) => (
-              <div key={item.id}>
-                <div className="MyPlantListItem">
-                  <div className="img-div">
-                    <img
-                      className="img-plant"
-                      src={item.plant_img}
-                      alt={item.plant_name}
-                    />
-                  </div>
-
-                  <div className="content-div">
-                    <p className="plant-name">{item.plant_name}</p>
-                    <p>{item.plant_diary_content}</p>
-                    <p>{item.plant_diary_writedate}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-
+        <div>
+          <button
+            className="diary-item"
+            style={{ border: 0 }}
+            onClick={openWriteModal}
+          >
+            <AiFillPlusCircle size="30" color="#022a17" />
+          </button>
+          {isWriteModalOpen && <WriteModal onClose={closeWriteModal} />}
         </div>
       </div>
-  
-      
+
+      <hr style={{ margin: 0 }} />
+
+      <div className="justify">
+        <div>
+          <button onClick={openModal} className="diary-button">
+            {modalButtonName}
+            <MdKeyboardArrowDown />
+          </button>
+          {isModalOpen && (
+            <Modal onClose={closeModal} onItemClick={handleItemClick} />
+          )}
+        </div>
+        <div>
+          <button onClick={openModal} className="diary-button">
+            {modalButtonName}
+            <MdKeyboardArrowDown />
+          </button>
+          {isModalOpen && (
+            <Modal onClose={closeModal} onItemClick={handleItemClick} />
+          )}
+        </div>
+        <div>
+          <button onClick={openPlantModal} className="diary-button">
+            {modalPlantButtonName}
+            <MdKeyboardArrowDown />
+          </button>
+          {isPlantModalOpen && (
+            <PlantModal
+              children={dummyData}
+              onClose={closePlantModal}
+              onItemClick={handlePlantItemClick}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="PlantList content">
+        {dummyData
+          .filter(
+            (item) =>
+              (modalButtonName === "월" ||
+                item.plant_diary_writedate === modalButtonName ||
+                modalButtonName === "전체보기") &&
+              (modalPlantButtonName === item.plant_name ||
+                modalPlantButtonName === "전체보기" ||
+                modalPlantButtonName === "식물이름")
+          )
+          .map((item) => (
+            <div key={item.id}>
+              <div className="MyPlantListItem">
+                <div className="img-div">
+                  <img
+                    className="img-plant"
+                    src={item.plant_img}
+                    alt={item.plant_name}
+                  />
+                </div>
+
+                <div className="content-div">
+                  <p className="plant-name">{item.plant_name}</p>
+                  <p>{item.plant_diary_content}</p>
+                  <p>{item.plant_diary_writedate}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
   );
 };
 

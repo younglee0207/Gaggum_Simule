@@ -63,7 +63,7 @@ const WriteModal = ({ onClose }) => {
 
           <AiOutlineCheck onClick={onClose} size="24" color="#022a17" />
         </div>
-        <div className={classes.writeTitle}>식물 일지 등록</div>
+        <div className={classes.pageTitle}>식물 일지 등록</div>
 
         <img className="img-plant" src={plantImg} alt="식물 사진" />
 
