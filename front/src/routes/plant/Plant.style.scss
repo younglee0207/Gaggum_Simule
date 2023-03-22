@@ -1,9 +1,16 @@
-// PlantList
-.PlantList {
-  text-align: center;
-  height: 90vh;
-  padding: 16px;
+// PlantListPage
+.PlantListPage {
+  padding-bottom: 100px;
+
+  // PlantList
+  .PlantList {
+    text-align: center;
+    min-height: 90vh;
+    padding: 16px;
+  }
+
 }
+
 
 // PlantListItem
 

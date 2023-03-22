@@ -14,6 +14,7 @@ const MainPage = () => {
         <MapScan />
       </div>
       <NavBar />
+      <div></div>
     </div>
   )
 };
