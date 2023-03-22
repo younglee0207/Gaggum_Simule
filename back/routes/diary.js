@@ -16,7 +16,7 @@ router.get('/', async function(req, res, next) {
     try {
       res.json(await diraies.getDiariesByDate(diaryDate));
     } catch (err) {
-      console.error(`Error while getting turtle `, err.message);
+      console.error(`Error while getting diaries by date `, err.message);
       next(err);
     }
   });
