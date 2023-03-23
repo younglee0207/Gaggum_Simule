@@ -37,5 +37,13 @@ router.get('/', async function(req, res, next) {
       next(err);
     }
   });
+  router.post('/delete', async function(req, res, next) {
+    try {
+      res.json(await diraies.deleteDiary(req.body));
+    } catch (err) {
+      console.error(`Error while edit diary`, err.message);
+      next(err);
+    }
+  });
 
 module.exports = router;
