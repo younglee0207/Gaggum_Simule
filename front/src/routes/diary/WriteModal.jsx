@@ -16,6 +16,7 @@ const WriteModal = ({ onClose, item }) => {
   //   const handleItemClick = (e) => {
   //     onItemClick(e.target.textContent);
   //   };
+  // console.log(item.diary_memo)
   const [text, setText] = useState("");
 
   const handleChange = (e) => {
@@ -40,7 +41,7 @@ const WriteModal = ({ onClose, item }) => {
     // props.onAddInfo(userInfo);
 
     axios
-      .post("https://i8b201.p.ssafy.io/backend/notice/write", userInfo)
+      .post("https://j8b201.p.ssafy.io/api/diary/edit", userInfo)
       // console.log("성공")
       //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
@@ -69,20 +70,12 @@ const WriteModal = ({ onClose, item }) => {
 
         <div className={classes.writeTitle}>메모</div>
 
-        {/* <div className={classes.note}>
-          <textarea
-            placeholder="메모를 입력해주세요"
-            type="text"
-            ref={contentInputRef}
-            className={classes.note__textarea}
-            // required
-            // id="content"
-          />
-        </div> */}
+
 
         <div className="note">
           <textarea
-            value={text}
+            // value={text}
+            defaultValue={item.diary_memo}
             onChange={handleChange}
             style={{
               backgroundImage:
@@ -101,7 +94,7 @@ const WriteModal = ({ onClose, item }) => {
               overflow: "auto",
             }}
             className="note__textarea"
-            placeholder="Write your note here"
+            // placeholder="Write your note here"
           />
         </div>
       </div>
