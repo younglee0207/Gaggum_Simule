@@ -12,4 +12,14 @@ router.get('/', async function(req, res, next) {
     }
   });
 
+  router.get('/number', async function(req, res, next) {
+    let{plantNumber} = req.query;
+    try {
+      res.json(await plants.getPlants(plantNumber));
+    } catch (err) {
+      console.error(`Error while getting plant by number `, err.message);
+      next(err);
+    }
+  });
+
 module.exports = router;

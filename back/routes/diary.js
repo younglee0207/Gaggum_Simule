@@ -29,5 +29,13 @@ router.get('/', async function(req, res, next) {
       next(err);
     }
   });
+  router.post('/edit', async function(req, res, next) {
+    try {
+      res.json(await diraies.editDiary(req.body));
+    } catch (err) {
+      console.error(`Error while edit diary`, err.message);
+      next(err);
+    }
+  });
 
 module.exports = router;
