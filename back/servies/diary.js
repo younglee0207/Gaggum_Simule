@@ -26,7 +26,9 @@ async function getDiariesByDate(param){
   async function getDiariesByName(param){
     console.log(param);
     const rows = await db.query(
-      `SELECT * from diaries WHERE diary_date LIKE "${param}%"`
+      `select * from
+      diaries d join plants p ON d.plant_number = p.plant_number
+      WHERE p.plant_name LIKE "${param}%"`
     );
     const data = helper.emptyOrRows(rows);
     console.log(rows);

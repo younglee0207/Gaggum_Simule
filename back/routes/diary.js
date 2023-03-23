@@ -20,5 +20,14 @@ router.get('/', async function(req, res, next) {
       next(err);
     }
   });
+  router.get('/name', async function(req, res, next) {
+    let {plantName} = req.query;
+    try {
+      res.json(await diraies.getDiariesByName(plantName));
+    } catch (err) {
+      console.error(`Error while getting diaries by plantName `, err.message);
+      next(err);
+    }
+  });
 
 module.exports = router;
