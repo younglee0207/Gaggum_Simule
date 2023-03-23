@@ -3,12 +3,14 @@ const app = express();
 const cors = require('cors');
 const turtleRouter = require("./routes/turtle");
 const diaryRouter = require("./routes/diary");
+const plantRouter = require("./routes/plant");
 
 app.use(cors());
 app.use(express.json());
 //server configuration
 app.set('port', process.env.PORT || 8080);
 
+app.use('/plant',plantRouter);
 app.use('/turtle',turtleRouter);
 app.use('/diary',diaryRouter);
 app.listen(app.get('port'), () => {
