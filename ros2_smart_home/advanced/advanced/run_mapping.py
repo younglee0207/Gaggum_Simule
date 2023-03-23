@@ -33,7 +33,8 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    "MAP_CENTER": (-8.0, -4.0),
+    # "MAP_CENTER": (-8.0, -4.0), # map1용 좌표
+    "MAP_CENTER": (-7.0, 10.0), # map3용 좌표
     "MAP_SIZE": (17.5, 17.5),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
@@ -178,7 +179,7 @@ class Mapping:
 
     def __del__(self):
         self.save_map(())
-        ㄴ
+        
     def save_map(self):
         map_clone = self.map.copy()
         cv2.imwrite(self.map_filename, map_clone*255)
@@ -270,12 +271,13 @@ class Mapper(Node):
         self.map_pub.publish(self.map_msg)
 
 def save_map(node,file_path):
-    pkg_path =os.getcwd()
-    back_folder='..'
-    folder_name='map'
-    file_name=file_path
-    full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
-    print(full_path)
+
+    full_path = os.path.abspath(__file__)        
+    # full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\a_strun_mappingar.py', 'advanced\\map\\map.txt')
+
+
+    full_path = "C:\\Users\\SSAFY\\Desktop\\PJT2\\S08P22B310\\ros2_smart_home\\advanced\\map\\map.txt"
+    print('run_mapping', full_path)
     f=open(full_path,'w')
     data=''
     for pixel in node.map_msg.data :
@@ -296,7 +298,7 @@ def main(args=None):
 
     except :
         save_map(run_mapping,'map.txt')
-# 
+
 
 
 if __name__ == '__main__':

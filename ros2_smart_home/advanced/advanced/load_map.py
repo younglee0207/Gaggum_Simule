@@ -60,11 +60,10 @@ class loadMap(Node):
         '''
         로직 2. 맵 데이터 읽고, 2차원 행렬로 변환
         '''
-        pkg_path =os.getcwd()
-        back_folder='..'
-        folder_name='map'
-        file_name='map.txt'
-        full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
+        full_path = os.path.abspath(__file__)        
+        full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\load_map.py', 'advanced\\map\\map.txt')
+
+        print("load_map", full_path)
 
         self.f=open(full_path,'r')
 
