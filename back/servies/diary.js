@@ -36,9 +36,21 @@ async function getDiariesByDate(param){
       data
     }
   }
-
+async function editDiary(body){
+  const rows = await db.query(
+    `UPDATE diaries
+    SET diary_title = "${body.diary_title}", diary_memo = "${body.diary_memo}"
+    WHERE diary_number = ${body.diary_number}`
+  );
+  const data = helper.emptyOrRows(rows);
+  console.log(rows);
+  return {
+    data
+  }
+}
 module.exports = {
   getDiaries,
   getDiariesByDate,
-  getDiariesByName
+  getDiariesByName,
+  editDiary,
 }

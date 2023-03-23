@@ -11,6 +11,16 @@ async function getPlants(){
       data
     }
   }
+  async function getPlantByNumber(param){
+    const rows = await db.query(
+      `SELECT * from plants WHERE plant_number = ${param}`
+    );
+    const data = helper.emptyOrRows(rows);
+  
+    return {
+      data
+    }
+  }
 module.exports = {
     getPlants,
 
