@@ -270,13 +270,17 @@ class Mapper(Node):
         self.map_msg.data=list_map_data[0]
         self.map_pub.publish(self.map_msg)
 
-def save_map(node,file_path):
+def save_map(node,file_path):    
 
-    full_path = os.path.abspath(__file__)        
-    # full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\a_strun_mappingar.py', 'advanced\\map\\map.txt')
+    # 상대 경로로 파일 위치 탐색
+    pkg_path =os.getcwd()
+    back_folder='..'
+    folder_name='map'
+    file_name=file_path
+    full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
 
-
-    full_path = "C:\\Users\\SSAFY\\Desktop\\PJT2\\S08P22B310\\ros2_smart_home\\advanced\\map\\map.txt"
+    # 절대 경로로 파일 위치 탐색
+    # full_path = "C:\\Users\\SSAFY\\Desktop\\PJT2\\S08P22B310\\ros2_smart_home\\advanced\\map\\map3.txt"
     print('run_mapping', full_path)
     f=open(full_path,'w')
     data=''
@@ -296,8 +300,9 @@ def main(args=None):
         run_mapping.destroy_node()
         rclpy.shutdown()
 
+    # 노드의 실행이 종료 되면 map파일을 txt에 저장
     except :
-        save_map(run_mapping,'map.txt')
+        save_map(run_mapping,'map3.txt')
 
 
 

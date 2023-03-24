@@ -34,8 +34,8 @@ class loadMap(Node):
         self.map_size_x=350 
         self.map_size_y=350
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        self.map_offset_x=-7-8.75
+        self.map_offset_y=10-8.75
         self.map_data = [0 for i in range(self.map_size_x*self.map_size_y)]
         grid=np.array(self.map_data)
         grid=np.reshape(grid,(350, 350))
@@ -61,7 +61,7 @@ class loadMap(Node):
         로직 2. 맵 데이터 읽고, 2차원 행렬로 변환
         '''
         full_path = os.path.abspath(__file__)        
-        full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\load_map.py', 'advanced\\map\\map.txt')
+        full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\load_map.py', 'advanced\\map\\map3.txt')
 
         print("load_map", full_path)
 
