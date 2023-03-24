@@ -19,7 +19,12 @@
 
 }
 
-
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px;
+}
 .justify {
   display: flex;
   justify-content: space-between;
@@ -34,6 +39,7 @@
     background-color: #ffffff;
     border-radius: 5px;
     align-items: center;
+    justify-content: center;
     // margin: 16;
   }
 }
@@ -120,4 +126,9 @@
 
   }
 
+}
+
+.flex {
+  display: flex;
+  margin-left: 20px;
 }
