@@ -32,7 +32,7 @@ const Register = () => {
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>식물 등록하기</h1>
         </div>
-        <div></div>
+        
       </div>
       {/* hr 위로 */}
       <hr style={{ margin: 0 }} />
