@@ -9,6 +9,7 @@ import PlantListPage from './routes/plant/PlantListPage';
 import PlantDetailPage from './routes/plant/PlantDetailPage';
 import DiaryPage from './routes/diary/DiaryPage';
 import LoadingPage from './routes/loading/LoadingPage';
+import RedirectURI from './routes/start/RedirectURI';
 import Temp from "../src/routes/temp/Temp"
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
           <Route path='/diary' element={<DiaryPage />} />
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
+          <Route path="/auth/kakao/callback" element={<RedirectURI />} />
           {/* Socket 체크 */}
           <Route path='/socket' element={<Temp />} />
         </Routes>
