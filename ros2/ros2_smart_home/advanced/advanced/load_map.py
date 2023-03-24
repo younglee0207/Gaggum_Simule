@@ -61,7 +61,14 @@ class loadMap(Node):
         로직 2. 맵 데이터 읽고, 2차원 행렬로 변환
         '''
         full_path = os.path.abspath(__file__)        
-        full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\load_map.py', 'advanced\\map\\map3.txt')
+        full_path = full_path.replace('install\\advanced\\Lib\\site-packages\\advanced\\load_map.py', 'ros2_smart_home\\advanced\\map\\map3.txt')
+
+        # pkg_path =os.getcwd()
+        # print(pkg_path)
+        # back_folder='..'
+        # folder_name='map'
+        # file_name='map3.txt'
+        # full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
 
         print("load_map", full_path)
 

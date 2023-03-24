@@ -1,0 +1,88 @@
+.Register {
+  margin-top: 0;
+  height: 100vh;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  .register__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    padding-top: 16px;
+
+    .register__header__back {
+      width: 33%;
+    }
+
+    .register__header__title {
+      width: 33%;
+      margin: 0;
+      text-align: center;
+    }
+
+    .register__header__regist {
+      width: 33%;
+      margin: 0;
+      text-align: end;
+    }
+    
+  }
+
+  .RegisterCamera {
+
+    .camera__container {
+      height: 45vh;
+      margin-top: 16px;
+      margin-bottom: 16px;
+
+      .camera__screen {
+        width: 100%;
+        height: 100%;
+
+      }
+
+    }
+
+    .camera-buttons {
+      display: flex;
+      justify-content: space-around;
+      
+      .camera-button {
+
+          background-color: #30C7A4;
+          color: #fff;
+          border: none;
+          border-radius: 25px;
+          padding: 10px 20px;
+          font-size: 24px;
+          cursor: pointer;
+          text-decoration: none;
+          transition: background-color 0.3s, color 0.3s;
+
+      }
+
+    }
+
+  }
+
+  .RegisterController {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
+
+    .controller__up {
+      text-align: center;
+    }
+
+    .controller__down {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+  }
+
+}

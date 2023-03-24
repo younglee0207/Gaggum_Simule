@@ -42,6 +42,7 @@ params_map = {
 
 
 def createLineIterator(P1, P2, img):
+    # 브레젠험 알고리즘 사용
     """
     Produces and array that consists of the coordinates and intensities of each pixel in a line between two points
 

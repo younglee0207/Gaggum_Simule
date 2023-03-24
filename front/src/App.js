@@ -2,9 +2,7 @@ import './App.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainPage from './routes/main/MainPage';
-import Diary from './routes/diary/Diary';
 import ScrollToTop from './components/scrolltotop/ScrollToTop';
-import NavBar from './components/navbar/NavBar';
 import Register from './routes/register/Register';
 import StartPage from './routes/start/StartPage';
 import PlantListPage from './routes/plant/PlantListPage';
@@ -12,6 +10,8 @@ import PlantDetailPage from './routes/plant/PlantDetailPage';
 import DiaryPage from './routes/diary/DiaryPage';
 import LoadingPage from './routes/loading/LoadingPage';
 import RedirectURI from './routes/start/RedirectURI';
+import Temp from "../src/routes/temp/Temp"
+
 const App = () => {
   return (
     <div className='App'>
@@ -32,6 +32,8 @@ const App = () => {
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
+          {/* Socket 체크 */}
+          <Route path='/socket' element={<Temp />} />
         </Routes>
         {/* 로그인 되어있어야 navbar 보이는 로직 추가하기 */}
       </BrowserRouter>
