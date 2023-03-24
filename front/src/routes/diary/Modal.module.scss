@@ -1,0 +1,43 @@
+.modalOverlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  
+  .modalContent {
+    width: 80%;
+    height: 200px;
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 5px 5px 0 0;
+    padding: 20px;
+    margin-top: 50px;
+    animation: slideUp 0.5s ease-in-out;
+    animation-fill-mode: forwards;
+  }
+  
+  .modal-background {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
