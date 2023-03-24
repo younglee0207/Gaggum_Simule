@@ -43,7 +43,7 @@ const Weather = () => {
   const mapApi = async () => {
     console.log(nowLat, nowLon)
     try {
-      let response = await axios
+      const response = await axios
         .get(
           `https://dapi.kakao.com/v2/local/geo/coord2address.json?input_coord=WGS84&x=${nowLat}&y=${nowLon}`,
           {

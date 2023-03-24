@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { GiWaterDrop } from "react-icons/gi"
 import { useNavigate } from "react-router";
 
-const PlantListItem = ({ item, plantImg, plantName, plantSpecies, plantWateringAmount, plantSunlight }) => {
+const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plantWateringAmount, plantSunlight }) => {
 
   const navigate = useNavigate();
 
   const navigateToDetail = () => {
-    navigate(`/plant/${item.id}`, { state: item });
+    navigate(`/plant/${plantId}`, { state: item });
   };
   const needSunlight = plantSunlight ? 
   <img className="img-sunlight" src={sunlight} alt="햇빛 사진" /> : null

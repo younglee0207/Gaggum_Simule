@@ -14,3 +14,14 @@ export let guLocationState = atom({
   key: "guLocationState",
   default: null
 })
+
+export let getAllPlantListState = atom({
+  key: "getAllPlantList",
+  default: null
+})
+
+export let getPlantDetailState = atom({
+  key: "getPlantDetailState",
+  default: null
+})
+
