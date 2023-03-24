@@ -40,4 +40,22 @@ router.get('/', async function(req, res, next) {
     }
   });
 
+  router.post('/edit', async function(req, res, next) {
+    try {
+      res.json(await plants.editPlant(req.body));
+    } catch (err) {
+      console.error(`Error while watering plant`, err.message);
+      next(err);
+    }
+  });
+
+  router.post('/delete', async function(req, res, next) {
+    try {
+      res.json(await plants.deletePlant(req.body));
+    } catch (err) {
+      console.error(`Error while watering plant`, err.message);
+      next(err);
+    }
+  });
+
 module.exports = router;
