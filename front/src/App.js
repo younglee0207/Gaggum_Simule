@@ -2,9 +2,7 @@ import './App.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainPage from './routes/main/MainPage';
-import Diary from './routes/diary/Diary';
 import ScrollToTop from './components/scrolltotop/ScrollToTop';
-import NavBar from './components/navbar/NavBar';
 import Register from './routes/register/Register';
 import StartPage from './routes/start/StartPage';
 import PlantListPage from './routes/plant/PlantListPage';
