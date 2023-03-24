@@ -3,12 +3,15 @@ import { useState } from "react";
 import plantImg from "../../assets/plant/mush.gif";
 
 const RegisterCamera = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-  const openModal = () => {
-    setIsModalOpen(true);
+
+  const handleLift = () => {
+    console.log("들기")
+    // Socket 통신으로 들기 명령 보내기
   };
-  const closeModal = () => {
-    setIsModalOpen(false);
+
+  const handlePutDown = () => {
+    console.log("놓기")
+    // Socket 통신으로 놓기 명령 보내기
   };
 
   return (
@@ -21,13 +24,14 @@ const RegisterCamera = () => {
         />
       </div>
       <div className="camera-buttons">
-        <button className="camera-button">
-          들기
-        </button>
-        <button className="camera-button">
-          놓기
-        </button>
-        {/* {isModalOpen && <RegisterModal onClose={closeModal} />} */}
+        <button 
+          className="camera-button"
+          onClick={handleLift}
+        >들기</button>
+        <button 
+          className="camera-button"
+          onClick={handlePutDown}
+        >놓기</button>
       </div>
     </div>
   )
