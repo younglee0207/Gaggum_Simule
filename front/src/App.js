@@ -11,6 +11,8 @@ import PlantListPage from './routes/plant/PlantListPage';
 import PlantDetailPage from './routes/plant/PlantDetailPage';
 import DiaryPage from './routes/diary/DiaryPage';
 import LoadingPage from './routes/loading/LoadingPage';
+import Temp from "../src/routes/temp/Temp"
+
 const App = () => {
   return (
     <div className='App'>
@@ -30,6 +32,8 @@ const App = () => {
           <Route path='/diary' element={<DiaryPage />} />
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
+          {/* Socket 체크 */}
+          <Route path='/socket' element={<Temp />} />
         </Routes>
         {/* 로그인 되어있어야 navbar 보이는 로직 추가하기 */}
       </BrowserRouter>
