@@ -2,9 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom";
 import classes from "./Modal.module.scss";
 
-const PlantModal = ({ onClose, children, onItemClick }) => {
+const PlantModal = ({ onClose, children, onItemClick, GetNameDiaries, GetAllDiaries }) => {
+  console.log('이거프롭',children)
+  const handleAllItemClick = () => {
+    GetAllDiaries()
+    onClose()
+  }
+
   const handlePlantItemClick = (e) => {
     onItemClick(e.target.textContent);
+    GetNameDiaries(e.target.textContent)
   };
   return ReactDOM.createPortal(
     <div className={classes.modalOverlay} onClick={onClose}>
@@ -12,7 +19,7 @@ const PlantModal = ({ onClose, children, onItemClick }) => {
         className={classes.modalContent}
         onClick={(e) => e.stopPropagation()}
       >
-        <h1 onClick={handlePlantItemClick}>전체보기</h1>
+        <h1 onClick={handleAllItemClick}>전체보기</h1>
         {children
           .reduce((unique, item) => {
             if (!unique.some((u) => u.plant_name === item.plant_name)) {

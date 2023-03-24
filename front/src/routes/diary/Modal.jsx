@@ -7,6 +7,10 @@ const Modal = ({
   GetAllDiaries,
   GetYearDiaries,
 }) => {
+  const handleAllItemClick = () => {
+    GetAllDiaries()
+  }
+
   const handleItemClick = async (e) => {
     await onItemClick(e.target.textContent);
     await GetYearDiaries();
@@ -20,7 +24,7 @@ const Modal = ({
   return ReactDOM.createPortal(
     <div className={classes.modalOverlay} onClick={onClose}>
       <div className={classes.modalContent}>
-        <h1 onClick={handleItemClick} >전체보기</h1>
+        <h1 onClick={handleAllItemClick} >전체보기</h1>
         <h1 onClick={handleYearClick} >2020</h1>
         <h1 onClick={handleYearClick} >2021</h1>
         <h1 onClick={handleYearClick} >2022</h1>

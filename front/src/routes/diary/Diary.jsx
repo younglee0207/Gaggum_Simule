@@ -113,9 +113,6 @@ const Diary = () => {
     setIsModalMonthOpen(false);
   };
 
-
-
-
   const openWriteModal = () => {
     setIsWriteModalOpen(true);
   };
@@ -129,8 +126,6 @@ const Diary = () => {
   // const closeModalMonth = () => {
   //   setIsWriteModalOpen(false);
   // };
-
-
 
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
@@ -147,6 +142,7 @@ const Diary = () => {
   const navigate = useNavigate();
 
   const [loadedDiaries, setLoadedDiaries] = useState([]);
+  const [loadedPlants, setLoadedPlants] = useState([]);
 
   const GetAllDiaries = () => {
     axios
@@ -156,7 +152,69 @@ const Diary = () => {
       .then((response) => {
         console.log("이거", response.data.data);
         //then 대신에 asynce나 await가능
-        alert("일지 작성 성공.");
+        // alert("일지 작성 성공.");
+        // navigate.replace("/diary");
+        setLoadedDiaries(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("로딩에 실패하였습니다.");
+      });
+  };
+
+  const GetYearDiaries = (year) => {
+    console.log(year);
+    axios
+      .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=${year}`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
+      .then((response) => {
+        console.log("이거년도", response.data.data);
+        //then 대신에 asynce나 await가능
+        // alert("일지 작성 성공.");
+        // navigate.replace("/diary");
+        setLoadedDiaries(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("로딩에 실패하였습니다.");
+      });
+  };
+  const GetPlants = () => {
+    axios
+      .get(`https://j8b310.p.ssafy.io/api/plant`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
+      .then((response) => {
+        const plants = [];
+        console.log("이거전체식물", response);
+        for (const key in response.data.data) {
+          const plant = {
+            id: key,
+            plant_name: response.data.data[key].plant_name,
+          };
+          plants.push(plant);
+        }
+        //then 대신에 asynce나 await가능
+        // alert("정보로딩 성공.");
+        // navigate.replace("/diary");
+        setLoadedPlants(plants);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("작성에 실패하였습니다.");
+      });
+  };
+
+  const GetNameDiaries = (plant_name) => {
+    axios
+      .get(`https://j8b310.p.ssafy.io/api/diary/name?plantName=${plant_name}`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
+      .then((response) => {
+        console.log("이거전체식물", response);
+        //then 대신에 asynce나 await가능
+        // alert("정보로딩 성공.");
         // navigate.replace("/diary");
         setLoadedDiaries(response.data.data);
       })
@@ -166,37 +224,20 @@ const Diary = () => {
       });
   };
 
-  const GetYearDiaries = (year) => {
-    console.log(year)
+  const deleteDiary = (number) => {
+    console.log('넘버',number)
+
+    const deleteInfo = {
+      diary_number: number,
+      
+    };
+
     axios
-      .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=${year}`)
+      .post(`https://j8b310.p.ssafy.io/api/diary/delete`,deleteInfo)
       // console.log("성공")
       //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
-        
-        console.log("이거년도", response.data.data);
-        //then 대신에 asynce나 await가능
-        alert("일지 작성 성공.");
-        // navigate.replace("/diary");
-        setLoadedDiaries(response.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("작성에 실패하였습니다.");
-      });
-  };
-  const GetYearDiaries2 = () => {
-    console.log(modalButtonName)
-    axios
-      .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=2023`)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
-      .then((response) => {
-        console.log("이거년도", response);
-        //then 대신에 asynce나 await가능
-        alert("일지 작성 성공.");
-        // navigate.replace("/diary");
-        setLoadedDiaries(response.data.data);
+        alert("삭제 성공")
       })
       .catch((error) => {
         console.log(error);
@@ -205,34 +246,23 @@ const Diary = () => {
   };
 
   const check = () => {
-    console.log(modalButtonName)
-    
+    console.log(modalButtonName);
   };
 
   return (
     <div className="Diary">
-      <div className="justify">
-        <div style={{ width: "42px" }}></div>
+      <div className="center">
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
           {/* <button onClick={check}>겟</button> */}
+          {/* <button onClick={GetPlants}>hi</button> */}
         </div>
         <div>
-          {/* <button
-            className="diary-item"
-            style={{ border: 0 }}
-            
-          >
-            <AiFillPlusCircle size="30" color="#022a17" />
-          </button> */}
+
         </div>
       </div>
 
-
-
       <hr style={{ margin: 0 }} />
-
-
 
       {/* 모달 관리 */}
       <div className="justify">
@@ -242,7 +272,13 @@ const Diary = () => {
             <MdKeyboardArrowDown />
           </button>
           {isModalOpen && (
-            <Modal onClose={closeModal} onItemClick={handleItemClick} GetAllDiaries={GetAllDiaries} GetYearDiaries={GetYearDiaries} check={false}/>
+            <Modal
+              onClose={closeModal}
+              onItemClick={handleItemClick}
+              GetAllDiaries={GetAllDiaries}
+              GetYearDiaries={GetYearDiaries}
+              check={false}
+            />
           )}
         </div>
         <div>
@@ -251,25 +287,38 @@ const Diary = () => {
             <MdKeyboardArrowDown />
           </button>
           {isModalMonthOpen && (
-            <ModalMonth onClose={closeModalMonth} onItemClick={handleMonthItemClick} GetAllDiaries={GetAllDiaries} GetYearDiaries={GetYearDiaries} check={true}/>
+            <ModalMonth
+              onClose={closeModalMonth}
+              onItemClick={handleMonthItemClick}
+              GetAllDiaries={GetAllDiaries}
+              GetYearDiaries={GetYearDiaries}
+              check={true}
+            />
           )}
         </div>
         <div>
-          <button onClick={openPlantModal} className="diary-button">
+          <button
+            onClick={() => {
+              openPlantModal();
+              GetPlants();
+            }}
+            className="diary-button"
+          >
             {modalPlantButtonName}
             <MdKeyboardArrowDown />
           </button>
           {isPlantModalOpen && (
             <PlantModal
-              children={dummyData}
+              children={loadedPlants}
               onClose={closePlantModal}
               onItemClick={handlePlantItemClick}
+              GetNameDiaries={GetNameDiaries}
+              GetAllDiaries={GetAllDiaries}
+
             />
           )}
         </div>
       </div>
-
-
 
       {/* 일지 보이는 곳 */}
       <div className="PlantList content">
@@ -289,24 +338,31 @@ const Diary = () => {
                 <div className="img-div">
                   <img
                     className="img-plant"
-                    src={item.diary_img}
+                    // src={item.diary_img}
+                    src={plantImg}
                     alt="이미지 로딩 실패"
                   />
                 </div>
 
                 <div className="content-div">
-                  <p className="plant-name">{item.diary_title}</p>
-                  <p>{item.diary_memo
-}</p>
-                  <p>{item.diary_date}</p>
+                  <p className="flex">{item.diary_title}</p>
+                  <p className="flex">{item.diary_memo}</p>
+                  <p className="flex">{item.diary_date.substr(0, 10)}</p>
                 </div>
                 <div>
                   <button onClick={openWriteModal} className="modify-button">
                     수정
                   </button>
                   {isWriteModalOpen && (
-                    <WriteModal onClose={closeWriteModal} item={item} GetAllDiaries={GetAllDiaries}/>
+                    <WriteModal
+                      onClose={closeWriteModal}
+                      item={item}
+                      GetAllDiaries={GetAllDiaries}
+                      GetNameDiaries={GetNameDiaries}
+                      GetYearDiaries={GetYearDiaries}
+                    />
                   )}
+                  <button>삭제</button>
                 </div>
               </div>
             </div>

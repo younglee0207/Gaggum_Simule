@@ -1,22 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import classes from "./Modal.module.scss";
-const ModalMonth = ({ onClose, onItemClick, GetAllDiaries, GetYearDiaries }) => {
+const ModalMonth = ({
+  onClose,
+  onItemClick,
+  GetAllDiaries,
+  GetYearDiaries,
+}) => {
+  const handleAllItemClick = () => {
+    GetAllDiaries();
+  };
   const handleItemClick = async (e) => {
     await onItemClick(e.target.textContent);
     await GetYearDiaries();
   };
 
   const handleYearClick = (e) => {
-    GetYearDiaries(`2023-0${e.target.textContent}`)
+    GetYearDiaries(`2023-0${e.target.textContent}`);
     onItemClick(e.target.textContent);
-
-  }
+  };
 
   return ReactDOM.createPortal(
     <div className={classes.modalOverlay} onClick={onClose}>
       <div className={classes.modalContent}>
-        <h1 onClick={handleItemClick}>전체보기</h1>
+        <h1 onClick={handleAllItemClick}>전체보기</h1>
         <h1 onClick={handleYearClick}>1</h1>
         <h1 onClick={handleYearClick}>2</h1>
         <h1 onClick={handleYearClick}>3</h1>
