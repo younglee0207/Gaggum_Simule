@@ -6,6 +6,15 @@ async function getPlants(){
       `SELECT * from plants WHERE plant_isdelete=0`
     );
     const data = helper.emptyOrRows(rows);
+    return {
+      data
+    }
+  }
+  async function getWaterNeedPlant(){
+    const rows = await db.query(
+      `SELECT * from plants WHERE (curdate()-plant_last_watering_date)>=plant_watering_cycle;`
+    );
+    const data = helper.emptyOrRows(rows);
   
     return {
       data
@@ -36,5 +45,7 @@ async function getPlants(){
 module.exports = {
     getPlants,
     getPlantByNumber,
-    waterPlant
+    waterPlant,
+    getWaterNeedPlant,
+    
 }
