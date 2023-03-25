@@ -14,7 +14,7 @@ const RedirectURI = () => {
     console.log("인가코드", code);
     axios
       .post(
-        `https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${client_id}&redirect_uri=http://localhost:3000/auth/kakao/callback&code=${code}`,
+        `https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${client_id}&redirect_uri=https://j8b310.p.ssafy.io/auth/kakao/callback&code=${code}`,
         {},
         {
           headers: {
