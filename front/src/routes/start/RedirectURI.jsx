@@ -1,10 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const RedirectURI = () => {
   const [token, setToken] = useState(true);
-
   const [name, setName] = useState("");
+
+  const navigate = useNavigate()
+
+
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+  const handleClick = () => {
+    if (inputValue === 'gridwiz' || inputValue === '310') { navigate(`/home`) }
+    else { alert('제품키를 확인해주세요') }
+
+  }
   useEffect(() => {
     let params = new URL(document.location.toString()).searchParams;
     let code = params.get("code"); // 인가코드 받는 부분
@@ -12,6 +26,7 @@ const RedirectURI = () => {
     let client_id = "58acce2e1c5607a9310ef74870273737";
     console.log("파라미터스", params);
     console.log("인가코드", code);
+    console.log('인풋밸류',inputValue)
     axios
       .post(
         `https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${client_id}&redirect_uri=https://j8b310.p.ssafy.io/auth/kakao/callback&code=${code}`,
@@ -69,10 +84,10 @@ const RedirectURI = () => {
         <h1>{name}님 안녕하세요</h1>
         <h2>가꿈을 이용해주셔서 감사합니다.</h2>
         <h2>제품을 이용하시려면 제품 박스에 동봉된 인증키를 입력해주세요.</h2>
-        <input type="text" />
-        <Link to={"/home"} hidden={token}>
-          <button>입력</button>
-        </Link>
+        <input type="text" onChange={handleInputChange} />
+
+        <button onClick={handleClick}>입력</button>
+
 
         {/* <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} /> */}
       </div>
