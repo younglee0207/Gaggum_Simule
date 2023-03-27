@@ -37,11 +37,9 @@ const Weather = () => {
     let data = await response.json();
     // weather에 데이터 담기
     setNowWeather(data);
-    console.log(nowLat, nowLon)
   }
 
   const mapApi = async () => {
-    console.log(nowLat, nowLon)
     try {
       const response = await axios
         .get(
@@ -53,13 +51,11 @@ const Weather = () => {
           },
         )
         .then((res) => {
-          console.log(res)
           const location = res.data.documents[0].address
           setDoLocation(location.region_1depth_name)
           setGuLocation(location.region_2depth_name)
         })
     } catch (error) {
-      console.log("failed")
       setDoLocation(null)
       setGuLocation(null)
     }
