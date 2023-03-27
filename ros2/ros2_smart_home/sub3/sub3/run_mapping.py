@@ -14,7 +14,6 @@ import sub3.utils as utils
 import numpy as np
 import cv2
 import time
-
 # mapping node의 전체 로직 순서
 # 1. publisher, subscriber, msg 생성
 # 2. mapping 클래스 생성
@@ -33,7 +32,7 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    "MAP_CENTER": (-8.0, -4.0),
+    "MAP_CENTER": (-7, 10),
     "MAP_SIZE": (17.5, 17.5),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
@@ -275,7 +274,7 @@ def save_map(node,file_path):
     folder_name='map'
     file_name=file_path
     full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
-    print(full_path)
+    print('full_path', full_path)
     f=open(full_path,'w')
     data=''
     for pixel in node.map_msg.data :
