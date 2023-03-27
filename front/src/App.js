@@ -31,6 +31,7 @@ const App = () => {
           <Route path='/diary' element={<DiaryPage />} />
           {/* 식물 등록 */}
           <Route path='/register' element={<Register />} />
+          {/* 카카오 RedirectURI 페이지 */}
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
           {/* Socket 체크 */}
           <Route path='/socket' element={<Temp />} />
