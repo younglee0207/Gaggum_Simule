@@ -274,7 +274,7 @@ def save_map(node,file_path):
     folder_name='map'
     file_name=file_path
     full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
-    print(full_path)
+    print('full_path', full_path)
     f=open(full_path,'w')
     data=''
     for pixel in node.map_msg.data :
