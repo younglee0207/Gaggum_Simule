@@ -37,8 +37,21 @@ async function signUpUser(body){
   }
 }
 
+async function updateUserTurtle(body){
+  console.log(body);
+  const rows = await db.query(
+      `update users set turtle_number = (select turtle_number from turtles where turtle_key = '${body.turtle_key}') where user_number=${body.user_number}`
+  );
+  const data = helper.emptyOrRows(rows);
+  console.log(rows);
+  return {
+    data
+  }
+}
+
 module.exports = {
     getUserByEmail,
     signUpUser,
-    getUserByEmail2
+    getUserByEmail2,
+    updateUserTurtle
   }
