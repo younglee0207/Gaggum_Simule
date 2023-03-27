@@ -75,7 +75,7 @@ const RedirectURI = () => {
         }
       )
       .then((res) => {
-        console.log("토큰", res);
+        console.log("사용자정보", res); //집에갔으면
         setName(res.data.data[0].user_name);
         setUserNumber(res.data.data[0].user_number)
         if (res.data.data[0].turtle_number !== 0 ) {
