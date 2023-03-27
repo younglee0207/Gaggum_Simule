@@ -45,9 +45,7 @@ const RedirectURI = () => {
 
         if (access_token) {
           console.log(`Bearer ${access_token}`);
-
           axios
-
             .post(
               "https://kapi.kakao.com/v2/user/me",
               {},
@@ -63,16 +61,6 @@ const RedirectURI = () => {
               console.log("데이터성공 :");
               console.log(res);
               setName(testname);
-              if (
-                testname === "이영재" ||
-                testname === "장현혁" ||
-                testname === "김경섭" ||
-                testname === "이준호" ||
-                testname === "윤동민" ||
-                testname === "최상원"
-              ) {
-                setToken(false);
-              }
             });
         }
       });
