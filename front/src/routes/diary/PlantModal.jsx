@@ -10,6 +10,7 @@ const PlantModal = ({ onClose, children, onItemClick, GetNameDiaries, GetAllDiar
   }
 
   const handlePlantItemClick = (e) => {
+    
     onItemClick(e.target.textContent);
     GetNameDiaries(e.target.textContent)
   };

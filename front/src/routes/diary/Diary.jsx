@@ -120,13 +120,6 @@ const Diary = () => {
     setIsWriteModalOpen(false);
   };
 
-  // const openModalMonth = () => {
-  //   setIsWriteModalOpen(true);
-  // };
-  // const closeModalMonth = () => {
-  //   setIsWriteModalOpen(false);
-  // };
-
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
     closeModal();
@@ -147,13 +140,8 @@ const Diary = () => {
   const GetAllDiaries = () => {
     axios
       .get("https://j8b310.p.ssafy.io/api/diary")
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
-        console.log("이거", response.data.data);
-        //then 대신에 asynce나 await가능
-        // alert("일지 작성 성공.");
-        // navigate.replace("/diary");
+        // console.log("이거", response.data.data);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -166,13 +154,8 @@ const Diary = () => {
     console.log(year);
     axios
       .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=${year}`)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
-        console.log("이거년도", response.data.data);
-        //then 대신에 asynce나 await가능
-        // alert("일지 작성 성공.");
-        // navigate.replace("/diary");
+        // console.log("이거년도", response.data.data);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -183,11 +166,9 @@ const Diary = () => {
   const GetPlants = () => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/plant`)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         const plants = [];
-        console.log("이거전체식물", response);
+        // console.log("이거전체식물", response);
         for (const key in response.data.data) {
           const plant = {
             id: key,
@@ -195,9 +176,6 @@ const Diary = () => {
           };
           plants.push(plant);
         }
-        //then 대신에 asynce나 await가능
-        // alert("정보로딩 성공.");
-        // navigate.replace("/diary");
         setLoadedPlants(plants);
       })
       .catch((error) => {
@@ -209,13 +187,8 @@ const Diary = () => {
   const GetNameDiaries = (plant_name) => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/diary/name?plantName=${plant_name}`)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
-        console.log("이거전체식물", response);
-        //then 대신에 asynce나 await가능
-        // alert("정보로딩 성공.");
-        // navigate.replace("/diary");
+        console.log('이거이름로드',response)
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -226,36 +199,30 @@ const Diary = () => {
 
   const deleteDiary = (number) => {
     console.log('넘버',number)
-
     const deleteInfo = {
       diary_number: number,
-      
     };
-
     axios
       .post(`https://j8b310.p.ssafy.io/api/diary/delete`,deleteInfo)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         alert("삭제 성공")
+        GetYearDiaries(2023);
+
       })
       .catch((error) => {
         console.log(error);
-        alert("작성에 실패하였습니다.");
+        alert("삭제에 실패하였습니다.");
       });
   };
 
   const check = () => {
     console.log(modalButtonName);
   };
-
   return (
     <div className="Diary">
       <div className="center">
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
-          {/* <button onClick={check}>겟</button> */}
-          {/* <button onClick={GetPlants}>hi</button> */}
         </div>
         <div>
 
@@ -346,7 +313,7 @@ const Diary = () => {
 
                 <div className="content-div">
                   <p className="flex">{item.diary_title}</p>
-                  <p className="flex">{item.diary_memo}</p>
+                  <p className="flex memo">{item.diary_memo}</p>
                   <p className="flex">{item.diary_date.substr(0, 10)}</p>
                 </div>
                 <div>
@@ -362,7 +329,7 @@ const Diary = () => {
                       GetYearDiaries={GetYearDiaries}
                     />
                   )}
-                  <button>삭제</button>
+                  <button className ={"modify-button"} onClick={() => {deleteDiary(item.diary_number);  }}>삭제</button>
                 </div>
               </div>
             </div>
