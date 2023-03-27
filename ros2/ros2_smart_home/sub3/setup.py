@@ -30,7 +30,10 @@ setup(
             'iot_udp_skeleton = sub3.iot_udp_skeleton:main',
             'run_localization_skeleton = sub3.run_localization_skeleton:main',
             'run_mapping_skeleton = sub3.run_mapping_skeleton:main',
-            'yolov5 = sub3.yolov5:main'
+            'yolov5 = sub3.yolov5:main',
+            'wall_tracking = sub3.wall_tracking:main',
+            'yolov5_distance = sub3.yolov5_distance:main'
+
         ],
     },
 )

@@ -15,7 +15,7 @@ params_lidar = {
     "Block_SIZE": int(1206),
     "X": 0, # meter
     "Y": 0,
-    "Z": 0.4+0.19,
+    "Z": 0.4 + 0.19,
     "YAW": 0, # deg
     "PITCH": 0,
     "ROLL": 0
@@ -29,9 +29,9 @@ params_cam = {
     "localIP": "127.0.0.1",
     "localPort": 1232,
     "Block_SIZE": int(65000),
-    "X": 0, # meter
+    "X": 0.07, # meter
     "Y": 0,
-    "Z":  0.8,
+    "Z":  0.8 + 0.15,
     "YAW": 0, # deg
     "PITCH": 0.0,
     "ROLL": 0
