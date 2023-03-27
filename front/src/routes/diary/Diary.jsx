@@ -14,7 +14,6 @@ import ModalMonth from "./ModalMonth";
 
 import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
-import DiaryList from "./DiaryItem";
 import axios from "axios";
 
 const dummyData = [
@@ -225,7 +224,6 @@ const Diary = () => {
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
         </div>
         <div>
-
         </div>
       </div>
 
