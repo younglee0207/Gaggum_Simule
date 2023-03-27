@@ -61,12 +61,13 @@ router.get("/kakao/code", async function (req, res, next) {
     res.send(e);
   }
 });
-router.post("/", async function (req, res, next) {
+router.post("/turtle", async function (req, res, next) {
   try {
-    res.json(await turtles.getTurtleByKey(req.body));
+    res.json(await users.updateUserTurtle(req.body));
   } catch (err) {
     console.error(`Error while getting turtle `, err.message);
     next(err);
   }
 });
+
 module.exports = router;
