@@ -6,7 +6,6 @@ from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from math import pi,cos,sin,sqrt
-from collections import deque
 import heapq
 from std_msgs.msg import String
 # a_star 노드는  OccupancyGrid map을 받아 grid map 기반 최단경로 탐색 알고리즘을 통해 로봇이 목적지까지 가는 경로를 생성하는 노드입니다.
@@ -60,8 +59,6 @@ class a_star(Node):
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]
         self.dCost = [1,1,1,1,1.414,1.414,1.414,1.414]
-
-     
         
 
     def grid_update(self):
@@ -71,7 +68,6 @@ class a_star(Node):
         '''
         map_to_grid=np.array(self.map_msg.data)
         self.grid=np.reshape(map_to_grid, (350,350), order='F')
-
 
 
     def pose_to_grid_cell(self,x,y):
@@ -88,7 +84,6 @@ class a_star(Node):
         return map_point_x,map_point_y
         
 
-
     def grid_cell_to_pose(self,grid_cell):
         '''
         로직 5. map의 grid cell을 위치(x,y)로 변환
@@ -101,18 +96,20 @@ class a_star(Node):
         return [x,y]
         
 
-
     def odom_callback(self,msg):
         self.is_odom=True
         self.odom_msg=msg
+
 
     def map_callback(self,msg):
         self.is_map=True
         self.map_msg=msg
 
+
     def obs_callback(self, msg):
         if self.is_odom:
             print(msg.data)
+
 
     def goal_callback(self,msg):
         if msg.header.frame_id=='map':
@@ -126,46 +123,62 @@ class a_star(Node):
             self.goal = [goal_cell[0], goal_cell[1]]
 
     def timer_callback(self):
-        if self.is_map ==True and self.is_odom==True  :
-            if self.is_grid_update==False :
-                self.grid_update()
+        # 지도 받아왔고 odom 정보도 있는 상태에서 목적지가 정해졌다면
+            if self.is_map ==True and self.is_odom==True  :
+                
+                if self.is_grid_update == False:
+                    self.grid_update()
 
-    
-            self.final_path=[]
+                self.final_path=[]
 
-            x=self.odom_msg.pose.pose.position.x
-            y=self.odom_msg.pose.pose.position.y
-            start_grid_cell=self.pose_to_grid_cell(x,y)
-            # if start_grid_cell[start_grid_cell[0]] == 127 and start_grid_cell[start_grid_cell[1]]:
-                # 현재 위치는 dijkstra가 불가능함을 알리는 pub message를 path_tracking에 전달
+                # 현재 위치
+                x=self.odom_msg.pose.pose.position.x
+                y=self.odom_msg.pose.pose.position.y
+                # 터틀봇의 절대 위치를 그리드 위치로 변환하기 인 것 같다.
+                start_grid_cell = self.pose_to_grid_cell(x,y)
+                start_grid_cell = list(start_grid_cell)
 
-            self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
-            self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
+                # self.GRIDSIZE는 350이다.
+                # 0으로 채워진 350 X 350 행렬 만들기
+                self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
 
-            ## 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-            if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0 and start_grid_cell != self.goal :
-                self.dijkstra(start_grid_cell)
+                # 350 * 350 으로 채워진 350 X 350 행렬 만들기
+                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
 
+                # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
+                # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
+                # 0은 장애물이 없는 영역을 의미한다.
+                if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
+                    # 시작점을 넣어주었다.
+                    self.a_star(start_grid_cell)
 
+                self.global_path_msg=Path()
+                self.global_path_msg.header.frame_id='map'
 
-            self.global_path_msg=Path()
-            self.global_path_msg.header.frame_id='map'
-            for grid_cell in reversed(self.final_path) :
-                tmp_pose=PoseStamped()
-                waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
-                tmp_pose.pose.position.x=waypoint_x
-                tmp_pose.pose.position.y=waypoint_y
-                tmp_pose.pose.orientation.w=1.0
-                self.global_path_msg.poses.append(tmp_pose)
+                # 순서 바꿔주고
+                # 각 grid cell에 대해서
+                for grid_cell in reversed(self.final_path) :
+                    tmp_pose=PoseStamped()
+                    waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
+                    tmp_pose.pose.position.x=waypoint_x
+                    tmp_pose.pose.position.y=waypoint_y
+                    tmp_pose.pose.orientation.w=1.0
+                    
+                    # 차곡차곡 담기
+                    self.global_path_msg.poses.append(tmp_pose)
 
-            if len(self.final_path)!=0 :
-                self.a_star_pub.publish(self.global_path_msg)
+                # 경로가 존재한다면
+                if len(self.final_path)!=0 :
+                    self.a_star_pub.publish(self.global_path_msg)
+
 
     def heuristics(self, node):
+        # 스마트 홈은 경로상에서 특정한 가중치(교통 혼잡 등)을 생각할 필요가 없어서 맨하탄을 사용
         # return sqrt((node[0] - self.goal[0])**2+(node[1] - self.goal[1])**2) # 피타고라스
         return (abs(node[0] - self.goal[0]) + abs(node[1] - self.goal[1])) # 맨하탄
             
-    def dijkstra(self,start):
+            
+    def aStar(self,start):
         heap = []
         heapq.heappush(heap,(0,start))
         self.cost[start[0]][start[1]] = 1
@@ -173,9 +186,10 @@ class a_star(Node):
         '''
         로직 7. grid 기반 최단경로 탐색
         '''
-        # heap을 쓰는게 더 빠른듯 하여 heap 사용
+        # heap 큐 시간 복잡도는 O(log n) Vs 우선순위 큐 시간 복잡도는 삽입: O(1) 탐색: O(n)
+        # heap 큐를 사용
         while heap:
-            cost,current = heapq.heappop(heap) # heap.leftpop()
+            cost,current = heapq.heappop(heap) 
             if self.goal[0] == current[0] and self.goal[1] == current[1]:
                 found = True
                 break
