@@ -6,19 +6,20 @@ const RedirectURI = () => {
   const [token, setToken] = useState(true);
   const [name, setName] = useState("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
   const handleClick = () => {
-    if (inputValue === 'gridwiz' || inputValue === '310') { navigate(`/home`) }
-    else { alert('제품키를 확인해주세요') }
-
-  }
+    if (inputValue === "gridwiz" || inputValue === "310") {
+      navigate(`/home`);
+    } else {
+      alert("제품키를 확인해주세요");
+    }
+  };
   useEffect(() => {
     let params = new URL(document.location.toString()).searchParams;
     let code = params.get("code"); // 인가코드 받는 부분
@@ -26,7 +27,7 @@ const RedirectURI = () => {
     let client_id = "58acce2e1c5607a9310ef74870273737";
     console.log("파라미터스", params);
     console.log("인가코드", code);
-    console.log('인풋밸류',inputValue)
+    console.log("인풋밸류", inputValue);
     axios
       .get(
         `http://localhost:8080/user/kakao/code?code=${code}`,
@@ -39,30 +40,7 @@ const RedirectURI = () => {
       )
       .then((res) => {
         console.log("토큰", res);
-        // res에 포함된 토큰 받아서 원하는 로직을 하면된다.디비에다 디비에서
-        const { data } = res; 
-        const { access_token } = data;
-
-        if (access_token) {
-          console.log(`Bearer ${access_token}`);
-          axios
-            .post(
-              "https://kapi.kakao.com/v2/user/me",
-              {},
-              {
-                headers: {
-                  Authorization: `Bearer ${access_token}`,
-                  "Content-type": "apllication/x-www-form-urlencoded",
-                },
-              }
-            )
-            .then((res) => {
-              const testname = res.data.properties.nickname;
-              console.log("데이터성공 :");
-              console.log(res);
-              setName(testname);
-            });
-        }
+        setName(res.data.data[0].user_name);
       });
   }, []);
 
@@ -75,7 +53,6 @@ const RedirectURI = () => {
         <input type="text" onChange={handleInputChange} />
 
         <button onClick={handleClick}>입력</button>
-
 
         {/* <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} /> */}
       </div>
