@@ -29,7 +29,7 @@ const RedirectURI = () => {
     console.log('인풋밸류',inputValue)
     axios
       .get(
-        `http://localhost:8080/user/kakao/code&code=${code}`,
+        `http://localhost:8080/user/kakao/code?code=${code}`,
         {},
         {
           headers: {
