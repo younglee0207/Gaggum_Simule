@@ -4,7 +4,8 @@ const router = express.Router();
 const KAKAO_OAUTH_TOKEN_API_URL = "https://kauth.kakao.com/oauth/token";
 const KAKAO_GRANT_TYPE = "authorization_code";
 const KAKAO_CLIENT_id = "58acce2e1c5607a9310ef74870273737";
-const KAKAO_REDIRECT_URL = "http://localhost:3000/auth/kakao/callback";
+// const KAKAO_REDIRECT_URL = "http://localhost:3000/auth/kakao/callback";
+const KAKAO_REDIRECT_URL = "https://j8b310.p.ssafy.io/auth/kakao/callback";
 const users = require("../servies/user");
 
 router.get("/kakao/code", async function (req, res, next) {
