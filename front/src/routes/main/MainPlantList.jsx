@@ -1,9 +1,13 @@
 import "./Main.style.scss"
-import cardImg from "../../assets/plant/mokoko_01.gif"
+import { useRecoilState } from "recoil";
+import axios from "axios";
+import { useEffect } from "react";
+import { needWaterState } from "../../store";
 
 // import swiper
 import { Navigation, Pagination, Scrollbar, A11y, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
+
 
 // swiper styles
 import 'swiper/css';
@@ -19,7 +23,7 @@ const MainPlantList = () => {
     axios
       .get('https://j8b310.p.ssafy.io/api/plant/needwater')
       .then((res) => {
-        console.log(res)
+        setNeedWaterPlant(res.data.data)
       })
   }
 
@@ -36,7 +40,7 @@ const MainPlantList = () => {
         slidesPerView={3}
         loop={false}
       >
-        {dummy.map((item) => {
+        {needWaterPlant?.map((item) => {
           return (
             <SwiperSlide key={item.div}>
               <img
