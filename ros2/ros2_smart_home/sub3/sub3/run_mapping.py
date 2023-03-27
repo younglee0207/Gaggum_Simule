@@ -32,8 +32,7 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    # "MAP_CENTER": (-5.8185 - 2, 6.3981 + 4),
-    "MAP_CENTER": (-8, -4),
+    "MAP_CENTER": (-7, 10),
     "MAP_SIZE": (17.5, 17.5),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
