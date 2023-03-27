@@ -28,8 +28,8 @@ const RedirectURI = () => {
     console.log("인가코드", code);
     console.log('인풋밸류',inputValue)
     axios
-      .post(
-        `https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${client_id}&redirect_uri=https://j8b310.p.ssafy.io/auth/kakao/callback&code=${code}`,
+      .get(
+        `http://localhost:8080/user/kakao/code&code=${code}`,
         {},
         {
           headers: {
@@ -39,8 +39,8 @@ const RedirectURI = () => {
       )
       .then((res) => {
         console.log("토큰", res);
-        // res에 포함된 토큰 받아서 원하는 로직을 하면된다.
-        const { data } = res;
+        // res에 포함된 토큰 받아서 원하는 로직을 하면된다.디비에다 디비에서
+        const { data } = res; 
         const { access_token } = data;
 
         if (access_token) {
