@@ -11,35 +11,22 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
-const dummy = [
-  {
-    id: 1,
-    plant_img: cardImg,
-    plant_name: "1번 식물"
-  },
-  {
-    id: 2,
-    plant_img: cardImg,
-    plant_name: "2번 식물"
-  },
-  {
-    id: 3,
-    plant_img: cardImg,
-    plant_name: "3번 식물"
-  },
-  {
-    id: 4,
-    plant_img: cardImg,
-    plant_name: "4번 식물"
-  },
-  {
-    id: 5,
-    plant_img: cardImg,
-    plant_name: "5번 식물"
-  },
-]
-
 const MainPlantList = () => {
+
+  const [needWaterPlant, setNeedWaterPlant] = useRecoilState(needWaterState);
+
+  const getNeedWaterPlant = () => {
+    axios
+      .get('https://j8b310.p.ssafy.io/api/plant/needwater')
+      .then((res) => {
+        console.log(res)
+      })
+  }
+
+  useEffect(() => {
+    getNeedWaterPlant();
+  }, [])
+
   return (
     <div className="MainPlantList">
       <h2>물 줘</h2>
