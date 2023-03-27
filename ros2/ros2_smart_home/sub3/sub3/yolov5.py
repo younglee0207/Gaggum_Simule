@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage, LaserScan
@@ -15,9 +16,13 @@ class IMGParser(Node):
         # self.subscription_scan = self.create_subscription(LaserScan, '/scan', self.scan_callback, 3)
 
         # yolo v5
+        full_path = os.path.abspath(__file__)
+        full_path = full_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5.py', 
+                                      'ros2_smart_home\\sub3\\sub3\\model_weights\\gaggum_weight.pt')
+        
         remote_yolov5_path = "ultralytics/yolov5"
-        local_weight_path = "C:\\Users\\SSAFY\\Desktop\\ros2_sangwon\\sub3\\sub3\\model_weights\\gaggum_weight.pt"
-        self.model = torch.hub.load(remote_yolov5_path, 'custom', path=local_weight_path)
+        
+        self.model = torch.hub.load(remote_yolov5_path, 'custom', path=full_path)
         self.img_bgr = None
         self.timer_period = 0.05
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
