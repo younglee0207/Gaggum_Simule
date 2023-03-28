@@ -54,7 +54,7 @@ class a_star(Node):
         self.map_offset_y=-4-8.75
     
         self.GRIDSIZE=350 
-
+ 
         ## 주변 그리드를 탐색할 때 사용할 리스트
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]

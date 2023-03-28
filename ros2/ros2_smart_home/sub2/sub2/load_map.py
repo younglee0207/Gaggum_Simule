@@ -68,13 +68,9 @@ class loadMap(Node):
         self.map_msg.info=self.map_meta_data
         
         # 로직 2. 맵 데이터 읽고, 2차원 행렬로 변환
-
         full_path = os.path.abspath(__file__)
-        # print 찍어보면
-        # C:\Users\multicampus\Desktop\catkin_ws\install\sub2\Lib\site-packages\sub2\load_map.py
-
         # 상대경로로 작성
-        full_path = full_path.replace('install\\sub2\\Lib\\site-packages\\sub2\\load_map.py', 'sub2\\map\\map.txt')
+        full_path = full_path.replace('install\\sub2\\Lib\\site-packages\\sub2\\load_map.py', '\\ros2_smart_home\\sub2\\map\\map.txt')
         # 읽기 모드로 열기
         self.f = open(full_path, 'r')
 
