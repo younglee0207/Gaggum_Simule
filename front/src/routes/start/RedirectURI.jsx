@@ -28,7 +28,7 @@ const RedirectURI = () => {
     axios
       .post(`https://j8b310.p.ssafy.io/api/turtle`, turtle_key)
       .then((res) => {
-        
+        console.log('밸리드확인',res)
         if (res.data.data[0].valid === 0) {
           alert("잘못된 인증키입니다.");
         } else {
@@ -59,7 +59,7 @@ const RedirectURI = () => {
         }
       )
       .then((res) => {
-        console.log("사용자정보", res); //집에갔으면
+        console.log("사용자정보", res); 
         setName(res.data.data[0].user_name);
         setUserNumber(res.data.data[0].user_number);
         localStorage.setItem('turtle_number',res.data.data[0].turtle_number)
@@ -75,13 +75,8 @@ const RedirectURI = () => {
         <h1>{name}님 안녕하세요</h1>
         <h2>가꿈을 이용해주셔서 감사합니다.</h2>
         <h2>제품 박스에 동봉된 인증키를 입력해주세요.</h2>
-
         <input type="text" onChange={handleInputChange} />
-
         <button onClick={numberCheck}>입력</button>
-        <button onClick={test}>test</button>
-
-        {/* <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} /> */}
       </div>
     </div>
   );
