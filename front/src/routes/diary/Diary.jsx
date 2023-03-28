@@ -16,71 +16,7 @@ import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
 import axios from "axios";
 
-const dummyData = [
-  {
-    diary_number: 1,
-    diary_img: plantImg,
-    diary_title: "주벗",
-    plant_species: "버섯",
-    plant_diary_writedate: "12월",
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 2,
-    diary_img: plantImg,
-    diary_title: "주황버섯",
-    plant_species: "버섯",
-    plant_diary_writedate: "1월",
 
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 3,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 4,
-    diary_img: plantImg,
-    diary_title: "주?벗방",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 5,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content:
-      "오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 7,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 6,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-];
 
 const Diary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -208,7 +144,6 @@ const Diary = () => {
         alert("삭제에 실패하였습니다.");
       });
   };
-
   const check = () => {
     console.log(modalButtonName);
   };
@@ -314,8 +249,6 @@ const Diary = () => {
                   >
                     수정
                   </button>
-                  {item.diary_number}
-
                   <button
                     className={"modify-button"}
                     onClick={() => {
