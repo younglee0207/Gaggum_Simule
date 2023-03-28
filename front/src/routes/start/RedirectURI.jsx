@@ -13,7 +13,9 @@ const RedirectURI = () => {
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
-
+  const test = () => {
+    localStorage.setItem('turtle_number',1 )
+  }
   const numberCheck = () => {
     const turtle_key = {
       turtle_key: inputValue,
@@ -26,7 +28,7 @@ const RedirectURI = () => {
     axios
       .post(`https://j8b310.p.ssafy.io/api/turtle`, turtle_key)
       .then((res) => {
-        console.log('valid있는 값',res)
+        
         if (res.data.data[0].valid === 0) {
           alert("잘못된 인증키입니다.");
         } else {
@@ -60,6 +62,7 @@ const RedirectURI = () => {
         console.log("사용자정보", res); //집에갔으면
         setName(res.data.data[0].user_name);
         setUserNumber(res.data.data[0].user_number);
+        localStorage.setItem('turtle_number',res.data.data[0].turtle_number)
         if (res.data.data[0].turtle_number !== 0) {
           navigate("/home");
         }
@@ -76,6 +79,7 @@ const RedirectURI = () => {
         <input type="text" onChange={handleInputChange} />
 
         <button onClick={numberCheck}>입력</button>
+        <button onClick={test}>test</button>
 
         {/* <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} /> */}
       </div>
