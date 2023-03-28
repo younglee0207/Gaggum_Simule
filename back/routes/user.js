@@ -1,6 +1,7 @@
 var express = require("express");
 var axios = require("axios");
 const router = express.Router();
+const aws = require("../aws/s3");
 const KAKAO_OAUTH_TOKEN_API_URL = "https://kauth.kakao.com/oauth/token";
 const KAKAO_GRANT_TYPE = "authorization_code";
 const KAKAO_CLIENT_id = "58acce2e1c5607a9310ef74870273737";
