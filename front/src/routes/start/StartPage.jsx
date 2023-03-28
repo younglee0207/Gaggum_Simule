@@ -24,7 +24,6 @@ const StartPage = () => {
           onClick={handleLogin}
           style={{ marginTop: "60vh" }}
         />
-        <button onClick={setToken}>test</button>
       </div>
     </div>
   );
