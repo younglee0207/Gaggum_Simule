@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowLeft, AiFillCheckCircle } from "react-icons/ai";
 import classes from "../diary/WriteModal.module.scss";
-import Swal from "sweetalert2";
 
 import { useState } from "react";
 import RegisterModal from "./RegisterModal";
@@ -12,50 +11,20 @@ import RegisterController from "./RegisterController";
 const Register = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  
   // const handleItemClick = (itemName) => {
   //   setModalButtonName(itemName);
   //   closeModal();
   // };
 
-  const handleCancel = () => {
-    Swal.fire({
-      title: "등록 취소",
-      text: "등록을 취소하시겠습니까?", 
-      showDenyButton: true,
-      confirmButtonText: "네",
-      denyButtonText: "아니오"
-    }).then((res) => {
-      if (res.isConfirmed) {
-        navigate("/home")
-      }
-    })
-
-  };
-
   const handleRegist = () => {
-    Swal.fire({
-      title: "등록 확인",
-      text: "식물을 등록하시겠습니까?",
-      showDenyButton: true,
-      confirmButtonText: "네",
-      denyButtonText: "아니오"
-    }).then((res) => {
-      if (res.isConfirmed) {
-        // 등록 하기
-
-        // 모달 띄우기
-        setIsModalOpen(true)
-      }
-    })
-
-    // 눌렀을 때 사진찍기 -> 자동으로 이동하여 사진 찍게하기
+    console.log("regist")
   }
-
   return (
     <div className="Register">
       <div className="register__header">
@@ -63,7 +32,7 @@ const Register = () => {
           <AiOutlineArrowLeft 
             size="32" 
             color="#022a17"
-            onClick={handleCancel}
+            onClick={() => navigate("/home")}
           />
         </div>
         <h2 className="register__header__title">식물 등록</h2>
@@ -80,7 +49,6 @@ const Register = () => {
       {/* hr밑으로 */}
       <RegisterCamera />
       <RegisterController />
-      {isModalOpen && <RegisterModal onClose={closeModal} />}
     </div>
   );
 };

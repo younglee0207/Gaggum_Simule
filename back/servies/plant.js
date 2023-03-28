@@ -42,49 +42,10 @@ async function getPlants(){
       data
     }
   }
-  async function editPlant(body){
-    const rows = await db.query(
-      `UPDATE plants
-      SET plant_name = ${body.plant_name}, plant_memo = ${body.plant_memo}, plant_watering_cycle = ${body.plant_watering_cycle}, plant_watering_amount = ${body.plant_watering_amount} 
-      WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
-    );
-    const data = helper.emptyOrRows(rows);
-  
-    return {
-      data
-    }
-  }
-  async function deletePlant(body){
-    const rows = await db.query(
-      `UPDATE plants
-      SET plant_isdelete = 1
-      WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
-    );
-    const data = helper.emptyOrRows(rows);
-  
-    return {
-      data
-    }
-  }
-  async function createPlant(body){
-    const rows = await db.query(
-      `UPDATE plants
-      SET plant_isdelete = 1
-      WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
-    );
-    const data = helper.emptyOrRows(rows);
-  
-    return {
-      data
-    }
-  }
 module.exports = {
     getPlants,
     getPlantByNumber,
     waterPlant,
     getWaterNeedPlant,
-    editPlant,
-    deletePlant,
-    createPlant
     
 }

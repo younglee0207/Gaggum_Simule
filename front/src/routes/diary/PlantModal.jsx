@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import classes from "./Modal.module.scss";
 
 const PlantModal = ({ onClose, children, onItemClick, GetNameDiaries, GetAllDiaries }) => {
+  console.log('이거프롭',children)
   const handleAllItemClick = () => {
     GetAllDiaries()
     onClose()

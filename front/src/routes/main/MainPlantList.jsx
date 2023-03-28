@@ -1,13 +1,9 @@
 import "./Main.style.scss"
-import { useRecoilState } from "recoil";
-import axios from "axios";
-import { useEffect } from "react";
-import { needWaterState } from "../../store";
+import cardImg from "../../assets/plant/mokoko_01.gif"
 
 // import swiper
 import { Navigation, Pagination, Scrollbar, A11y, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-
 
 // swiper styles
 import 'swiper/css';
@@ -15,22 +11,35 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
+const dummy = [
+  {
+    id: 1,
+    plant_img: cardImg,
+    plant_name: "1번 식물"
+  },
+  {
+    id: 2,
+    plant_img: cardImg,
+    plant_name: "2번 식물"
+  },
+  {
+    id: 3,
+    plant_img: cardImg,
+    plant_name: "3번 식물"
+  },
+  {
+    id: 4,
+    plant_img: cardImg,
+    plant_name: "4번 식물"
+  },
+  {
+    id: 5,
+    plant_img: cardImg,
+    plant_name: "5번 식물"
+  },
+]
+
 const MainPlantList = () => {
-
-  const [needWaterPlant, setNeedWaterPlant] = useRecoilState(needWaterState);
-
-  const getNeedWaterPlant = () => {
-    axios
-      .get('https://j8b310.p.ssafy.io/api/plant/needwater')
-      .then((res) => {
-        setNeedWaterPlant(res.data.data)
-      })
-  }
-
-  useEffect(() => {
-    getNeedWaterPlant();
-  }, [])
-
   return (
     <div className="MainPlantList">
       <h2>물 줘</h2>
@@ -40,7 +49,7 @@ const MainPlantList = () => {
         slidesPerView={3}
         loop={false}
       >
-        {needWaterPlant?.map((item) => {
+        {dummy.map((item) => {
           return (
             <SwiperSlide key={item.div}>
               <img

@@ -14,6 +14,7 @@ import ModalMonth from "./ModalMonth";
 
 import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
+import DiaryList from "./DiaryItem";
 import axios from "axios";
 
 const dummyData = [
@@ -119,6 +120,13 @@ const Diary = () => {
     setIsWriteModalOpen(false);
   };
 
+  // const openModalMonth = () => {
+  //   setIsWriteModalOpen(true);
+  // };
+  // const closeModalMonth = () => {
+  //   setIsWriteModalOpen(false);
+  // };
+
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
     closeModal();
@@ -139,10 +147,13 @@ const Diary = () => {
   const GetAllDiaries = () => {
     axios
       .get("https://j8b310.p.ssafy.io/api/diary")
-
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         console.log("이거", response.data.data);
-
+        //then 대신에 asynce나 await가능
+        // alert("일지 작성 성공.");
+        // navigate.replace("/diary");
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -155,8 +166,13 @@ const Diary = () => {
     console.log(year);
     axios
       .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=${year}`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         console.log("이거년도", response.data.data);
+        //then 대신에 asynce나 await가능
+        // alert("일지 작성 성공.");
+        // navigate.replace("/diary");
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -167,6 +183,8 @@ const Diary = () => {
   const GetPlants = () => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/plant`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         const plants = [];
         console.log("이거전체식물", response);
@@ -177,6 +195,9 @@ const Diary = () => {
           };
           plants.push(plant);
         }
+        //then 대신에 asynce나 await가능
+        // alert("정보로딩 성공.");
+        // navigate.replace("/diary");
         setLoadedPlants(plants);
       })
       .catch((error) => {
@@ -188,8 +209,13 @@ const Diary = () => {
   const GetNameDiaries = (plant_name) => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/diary/name?plantName=${plant_name}`)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         console.log("이거전체식물", response);
+        //then 대신에 asynce나 await가능
+        // alert("정보로딩 성공.");
+        // navigate.replace("/diary");
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -208,6 +234,8 @@ const Diary = () => {
 
     axios
       .post(`https://j8b310.p.ssafy.io/api/diary/delete`,deleteInfo)
+      // console.log("성공")
+      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
       .then((response) => {
         alert("삭제 성공")
       })
@@ -226,8 +254,11 @@ const Diary = () => {
       <div className="center">
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
+          {/* <button onClick={check}>겟</button> */}
+          {/* <button onClick={GetPlants}>hi</button> */}
         </div>
         <div>
+
         </div>
       </div>
 
