@@ -44,8 +44,8 @@ const Temp = () => {
 
   const handleRequestSocket = () => {
     console.log("button clicked");
-    socket.emit("safety_status", {
-      data: "client to server",
+    socket.emit("run_mapping", {
+      data: "mapping start",
     });
   };
 

@@ -4,7 +4,7 @@ import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
 from ssafy_msgs.msg import TurtlebotStatus
 from sensor_msgs.msg import Imu,LaserScan
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Int8MultiArray
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path,OccupancyGrid,MapMetaData
 from math import pi,cos,sin,sqrt
@@ -127,6 +127,7 @@ class Mapping:
     Mapping Class
     """
     def __init__(self, params_map):
+
         self.map_resolution = params_map["MAP_RESOLUTION"]
         self.map_size = np.array(params_map["MAP_SIZE"]) / self.map_resolution
         self.map_center = params_map["MAP_CENTER"]
@@ -138,6 +139,7 @@ class Mapping:
         self.map_vis_resize_scale = params_map["MAPVIS_RESIZE_SCALE"]
 
         self.T_r_l = np.array([[0,-1,0],[1,0,0],[0,0,1]])
+
 
     def update(self, pose, laser):
         n_points = laser.shape[1]
@@ -177,7 +179,7 @@ class Mapping:
 
     def __del__(self):
         self.save_map(())
-        ㄴ
+        
     def save_map(self):
         map_clone = self.map.copy()
         cv2.imwrite(self.map_filename, map_clone*255)
@@ -236,11 +238,22 @@ class Mapper(Node):
 
         self.map_msg.info=self.map_meta_data
 
+        # socket에서 받아온 맵 만들기 실행 여부 정보 받기
+        self.create_map_sub = self.create_subscription(Int8MultiArray, '/create_map', self.create_map_callback, 100)
+
+        # is_map_create 변수가 True면 mapping 시작, std_msg에서 받아온 값으로 확인
+        self.is_map_create = False
+
         # 로직 2 : mapping 클래스 생성
         self.mapping = Mapping(params_map)
 
 
-    def scan_callback(self,msg):
+    def create_map_callback(self, msg):
+        self.is_map_create = msg.data[0]
+        print("runmapping의 데이터 값", msg)
+
+
+    def scan_callback(self, msg):
         
         pose_x=msg.range_min
         pose_y=msg.scan_time
@@ -251,24 +264,28 @@ class Mapper(Node):
         laser = np.vstack((x.reshape((1, -1)), y.reshape((1, -1))))
 
         pose = np.array([[pose_x],[pose_y],[heading]])
-        self.mapping.update(pose, laser)
 
-        np_map_data=self.mapping.map.reshape(1,self.map_size) 
-        list_map_data=np_map_data.tolist()
-        for i in range(self.map_size):
-            list_map_data[0][i]=100-int(list_map_data[0][i]*100)
-            if list_map_data[0][i] >100 :
-                list_map_data[0][i]=100
- 
-            if list_map_data[0][i] <0 :
-                list_map_data[0][i]=0
-  
+        # 소켓에서 들어온 map_create 변수가 1일 경우에만 lidar 이용해 mapping시작 
+        if self.is_map_create:
+            self.mapping.update(pose, laser)
 
-        self.map_msg.header.stamp =rclpy.clock.Clock().now().to_msg()
-        self.map_msg.data=list_map_data[0]
-        self.map_pub.publish(self.map_msg)
+            np_map_data=self.mapping.map.reshape(1,self.map_size) 
+            list_map_data=np_map_data.tolist()
+            for i in range(self.map_size):
+                list_map_data[0][i]=100-int(list_map_data[0][i]*100)
+                if list_map_data[0][i] >100 :
+                    list_map_data[0][i]=100
+    
+                if list_map_data[0][i] <0 :
+                    list_map_data[0][i]=0
+    
+
+            self.map_msg.header.stamp =rclpy.clock.Clock().now().to_msg()
+            self.map_msg.data=list_map_data[0]
+            self.map_pub.publish(self.map_msg)
 
 def save_map(node,file_path):
+
     pkg_path =os.getcwd()
     back_folder='..'
     folder_name='map'
@@ -282,6 +299,9 @@ def save_map(node,file_path):
         data+='{0} '.format(pixel)
     f.write(data) 
     f.close()
+
+    # 맵을 저장한 이후 원래 변수 값을 초기화 시켜준다.
+    
 
         
 def main(args=None):    
