@@ -10,14 +10,21 @@ const StartPage = () => {
   const handleLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
   };
+  const setToken = () => {
+    localStorage.setItem("turtle_number", 1);
+  };
   return (
     <div className="StartPage">
       <div className="start-content">
         <h1>가꿈</h1>
 
-       
-          <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} style={{marginTop:"60vh"}}/>
-        
+        <img
+          src={loginImg}
+          alt="카카오 로그인"
+          onClick={handleLogin}
+          style={{ marginTop: "60vh" }}
+        />
+        <button onClick={setToken}>test</button>
       </div>
     </div>
   );
