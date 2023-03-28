@@ -1,5 +1,10 @@
 import { atom } from "recoil";
 
+export let needWaterState = atom({
+  key: "needWaterState",
+  default: null
+})
+
 export let weatherState = atom({
   key: "weatherState",
   default: null
