@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus, Handcontrol
+from ssafy_msgs.msg import TurtlebotStatus
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
@@ -164,7 +164,7 @@ class followTheCarrot(Node):
                 print("no found forward point")
                 self.cmd_msg.linear.x=0.0
                 self.cmd_msg.angular.z=0.0
-                self.hand_control_pub.publish(2)
+                # self.hand_control_pub.publish(2)
 
             self.cmd_pub.publish(self.cmd_msg)
 

@@ -27,7 +27,7 @@ from std_msgs.msg import String
 class a_star(Node):
 
     def __init__(self):
-        super().__init__('a_Star')
+        super().__init__('a_star')
         # 로직 1. publisher, subscriber 만들기
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
@@ -50,8 +50,8 @@ class a_star(Node):
         self.map_size_x=350
         self.map_size_y=350
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        self.map_offset_x=-7-8.75
+        self.map_offset_y=10-8.75
     
         self.GRIDSIZE=350 
  
@@ -150,7 +150,7 @@ class a_star(Node):
                 # 0은 장애물이 없는 영역을 의미한다.
                 if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
                     # 시작점을 넣어주었다.
-                    self.a_star(start_grid_cell)
+                    self.aStar(start_grid_cell)
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
