@@ -19,6 +19,7 @@
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "react-switch": "^7.0.0",
+    "react-xml-parser": "^1.1.8",
     "recoil": "^0.7.7",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",

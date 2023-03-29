@@ -1,33 +1,40 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import flowerImg from "../../assets/main/flower-gif.gif"
+import XMLParser from "react-xml-parser"
+
 
 const API_KEY = "XXL2KwjyRGopX8KOKa1BT7gj3em5fLBeqRHJ3xmUpHboTi9da0bZL9fXntQWh63TkQBodm6xHmgeas8K7yBerg%3D%3D"
 
-const TodayFlower = () => {
+let now = new Date()
+let todayMonth = now.getMonth() + 1;
+let todayDay = now.getDate();
 
-  let now = new Date()
-  let todayMonth = now.getMonth() + 1;
-  let todayDay = now.getDate();
+const TodayFlower = () => {
   
   console.log(todayMonth, todayDay)
 
-  const [flowerData, setFlowerData] = useState(null)
+  const [flowerName, setFlowerName] = useState(null)
+  const [flowerMean, setFlowerMean] = useState(null)
+  const [flowerImg, setFlowerImg] = useState(null)
+
   const getFlowerData = async () => {
     try {
       axios
-        .get("https://apis.data.go.kr/1390804/NihhsTodayFlowerInfo01/selectTodayFlowerView01", {
-          params: {
-            ServiceKey: "XXL2KwjyRGopX8KOKa1BT7gj3em5fLBeqRHJ3xmUpHboTi9da0bZL9fXntQWh63TkQBodm6xHmgeas8K7yBerg%3D%3D",
-            fMonth: todayMonth,
-            fDay: todayDay
-          },
+        .get(`http://apis.data.go.kr/1390804/NihhsTodayFlowerInfo01/selectTodayFlower01?serviceKey=${API_KEY}&fMonth=${3}&fDay=${30}`, {
           headers: {
             "Content-Type": "application/json"
           }
         })
         .then((res) => {
-          console.log(res)
+          const dataSet = new XMLParser().parseFromString(res.data)
+          console.log(dataSet)
+          setFlowerName(dataSet?.children[0].children[3].children[3].value)
+          setFlowerMean(dataSet?.children[0].children[3].children[6].value)
+          setFlowerImg([
+            dataSet?.children[0].children[3].children[14].value.split(" ")[0],
+            dataSet?.children[0].children[3].children[15].value.split(" ")[0],
+            dataSet?.children[0].children[3].children[16].value.split(" ")[0]
+          ])
         })
     } catch (error) {
       console.log(error)
@@ -42,15 +49,15 @@ const TodayFlower = () => {
     <div className="TodayFlower"> 
       <h2>오늘의 꽃</h2>
       <div className="flower-content">
-        <img 
-          className="flower-img"
-          src={flowerImg}
-          alt="꽃 이미지"
-        />
+        {flowerImg ? (
+          <img 
+            src={flowerImg[Math.floor(Math.random() * 3)]}
+            alt="꽃 이미지"
+          />
+        ) : null}
         <div className="flower-text">
-          <h3>조팝나무</h3>
-          <p>"단정한 사랑"</p>
-          <p>"헛고생"</p>
+          <h3>{flowerName}</h3>
+          <p>{flowerMean}</p>
         </div>
       </div>
     </div>
