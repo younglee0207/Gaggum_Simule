@@ -9,8 +9,8 @@ const MapScan = () => {
 
   const handleClick = () => {
     Swal.fire({
-      title: "맵 스캔",
-      text: "맵을 스캔 하시겠습니까?", 
+      title: "집 스캔",
+      text: "집을 스캔 하시겠습니까?", 
       showDenyButton: true,
       confirmButtonText: "네",
       denyButtonText: "아니오"
@@ -31,7 +31,7 @@ const MapScan = () => {
           size="40"
         />
       </span>
-      <span><h2>맵 스캔</h2></span>
+      <span><h2>집 스캔</h2></span>
     </div>
   )
 };

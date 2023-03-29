@@ -15,28 +15,33 @@ const RegisterController = ({ socket }) => {
     }
   }, [])
 
-  const handleUp = () => {
-    console.log("위")
+
+
+  const handleUpMouseDown = () => {
     // 앞쪽으로 이동
-    socket.emit("go_straight", { data: "go straight" })
+    socket.emit("go_straight", 
+    { name: "go straight", data: 2 })
   };
 
   const handleDown = () => {
-    console.log("아래")
+    console.log("뒤")
     // 뒤쪽으로 이동
-    socket.emit("go_back", { data: "go back" })
+    socket.emit("go_back", 
+    { name: "go back", data: 3 })
   };
 
   const handleLeft = () => {
     console.log("왼쪽")
     // 왼쪽으로 이동
-    socket.emit("go_left", { data: "go left" })
+    socket.emit("go_left", 
+    { name: "go left", data: 1 })
   };
 
   const handleRight = () => {
     console.log("오른쪽")
     // 오른쪽으로 이동
-    socket.emit("go_right", { data: "go right" })
+    socket.emit("go_right", 
+    { name: "go right", data: 4 })
   };
 
   return (
@@ -45,7 +50,8 @@ const RegisterController = ({ socket }) => {
         <FaArrowAltCircleUp 
           size="100" 
           color="#022a17"
-          onClick={handleUp}
+          // onClick={handleUpKeyDown}
+          onMouseOver={handleUpMouseDown}
         />
       </div>
       <div className="controller__down">
