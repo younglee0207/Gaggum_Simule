@@ -73,7 +73,7 @@ class MoveTurtleBot(Node):
         self.m_control_interval = 10
         self.m_control_iter = 0
 
-        sio.connect('http://localhost:3001')
+        sio.connect('http://j8b310.p.ssafy.io:3001')
 
 
     def odom_callback(self, msg):
@@ -83,12 +83,12 @@ class MoveTurtleBot(Node):
         _,_,self.robot_yaw=q.to_euler()
     
     def turtlebot_go(self) :
-        self.cmd_msg.linear.x=0.2
+        self.cmd_msg.linear.x=0.15
         self.cmd_msg.angular.z=0.0
 
 
     def turtlebot_back(self) :
-        self.cmd_msg.linear.x= -0.2
+        self.cmd_msg.linear.x= -0.15
         self.cmd_msg.angular.z=0.0
 
 
@@ -99,7 +99,7 @@ class MoveTurtleBot(Node):
 
     def turtlebot_cw_rot(self) :
         self.cmd_msg.linear.x=0.0
-        self.cmd_msg.angular.z=0.1
+        self.cmd_msg.angular.z=0.15
 
 
     def turtlebot_cww_rot(self) :

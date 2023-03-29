@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { socketState, socketState2 } from "../../store";
 
-const socket = io("ws://localhost:3001");
+const socket = io("http://j8b310.p.ssafy.io:3001");
 
 const Temp = () => {
   const [data, setData] = useRecoilState(socketState);

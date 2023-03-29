@@ -17,6 +17,14 @@ info = {
         "battery" : 100,
         "mode" : 0
     },
+    "environment" : {
+        "month" : 30,
+        "day" : 0,
+        "hour" : 9,
+        "minute" : 0,
+        "temperature" : 10,
+        "weather" : "Cloudy"
+    }
 }
 
 # global 변수 설정, msg로 publish 하여 다른 node에서 조건에 맞게 실행하기 위함
@@ -53,7 +61,8 @@ def run_mapping(data):
 # def get_map_create():
 #     return [map_create, map_create_turtle_bot]
     
-ip_server = 'http://localhost:3001'
+# ip_server = 'http://localhost:3001'
+ip_server = 'http://j8b310.p.ssafy.io:3001'
 
 print("connect ", ip_server)
 sio.connect(ip_server)
@@ -66,6 +75,8 @@ class SocketClass(Node):
 
         # 맵 만들 때 필요한 변수를 저장하는 주소 publish
         self.create_map_publisher = self.create_publisher(Int8MultiArray, '/create_map', 10)
+        self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.env_callback, 100)
+    
 
         self.timer_period = 1
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
@@ -76,13 +87,29 @@ class SocketClass(Node):
 
     # Front 신호 받아 온 값을 터틀 봇 내 msg로 저장
 
+    # 시뮬레이터 환경 변수 전달.
+    def env_callback(self, msg):
+        print("env", msg)
+    #         "environment" : {
+    #     "month" : 30,
+    #     "day" : 0,
+    #     "hour" : 9,
+    #     "minute" : 0,
+    #     "temperature" : 10,
+    #     "weather" : "Cloudy"
+    # }
+        info["environment"]["weather"] = msg.weather
+        info["environment"]["temperature"] = msg.temperature
 
-    # 내가 보내는 데이터
+
+    # run_mapping을 하기위해 만든 함수. msg를 publish해서 run_mapping, wall_tracking을 할 수 있게 한다.
     def timer_callback(self):
         msg = Int8MultiArray()
         msg.data = [map_create, map_create_turtle_bot]
         print("MapOperationList", msg)
         self.create_map_publisher.publish(msg)
+        
+        
 
         sio.emit("ros_test", 'ROS에서 보내는 데이터')
 
