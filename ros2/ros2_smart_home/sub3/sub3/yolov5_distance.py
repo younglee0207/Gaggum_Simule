@@ -5,6 +5,7 @@ import os
 import math
 import rclpy
 import time
+import base64
 
 from sub2.ex_calib import *
 from rclpy.node import Node
@@ -14,8 +15,18 @@ from geometry_msgs.msg import Twist
 from ssafy_msgs.msg import TurtlebotStatus
 # from std_msgs.msg import Int16,Int8
 
-# from modules import *
 from squaternion import Quaternion
+
+import socketio
+sio = socketio.Client()
+
+@sio.event
+def connect():
+    print('connection established')
+
+@sio.event
+def disconnect():
+    print('disconnected from server')
 
 params_lidar = {
     "Range" : 90, #min & max range of lidar azimuths
@@ -57,6 +68,7 @@ params_bot = {
 
 class detection_net_class():
     def __init__(self):
+        sio.connect('http://j8b310.p.ssafy.io:3001/')
         # yolo v5
         full_path = os.path.abspath(__file__)
         full_path = full_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 
@@ -342,6 +354,21 @@ def main(args=None):
                     object_global_pose = transform_bot2map(transform_lidar2bot(relative))
                     print(f"객체 위치 좌표 : {object_global_pose}")
                     print(f"로봇 위치 좌표 : {loc_x, loc_y}")
+                    if relative_x < 0.2:
+                        b64data = base64.b64encode(origin_img)
+                        # print(f"base64_decode : {b64data.decode('utf-8')}")
+                    data = {
+                        "plant_detected_name" : "plant2",
+                        "plant_img": b64data.decode('utf-8'),
+                        "plant_position_x": loc_x,
+                        "plant_position_y": loc_y
+                    }
+                    try:
+                        print("데이터 보냄")
+                        # print("decode: ", b64data.decode('utf-8'))
+                        # sio.emit("streaming", data)
+                    except:
+                        print("오류")
 
                     ## 대표값이 존재하면 
                     if not np.isnan(ostate[0]):
