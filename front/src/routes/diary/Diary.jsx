@@ -242,7 +242,7 @@ const Diary = () => {
                   <p className="flex memo memo-wrap">{item.diary_memo}</p>
                   <p className="flex">{item.diary_date.substr(0, 10)}</p>
                 </div>
-                <div>
+                <div className="button-div">
                   <button
                     onClick={() => setSelectedDiary(item)}
                     className="modify-button"
