@@ -22,9 +22,9 @@ const App = () => {
           {/* 시작화면 */}
           <Route path="/" element={<StartPage />} />
           {/* 메인화면 */}
-          {/* <Route path="/home" element={<MainPage />} /> */}
+          <Route path="/home" element={<MainPage />} />
           
-          <Route
+          {/* <Route
             path="/home"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -33,7 +33,7 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
           {/* 로딩화면 */}
           {/* <Route path="/loading" element={<LoadingPage />} /> */}
           
