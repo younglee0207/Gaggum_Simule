@@ -54,13 +54,22 @@
 
         display: flex;
         justify-content: space-evenly;
+        align-items: center;
+        padding: 16px;
 
-        .flower-img {
+        img {
           width: 100px;
           height: 100px;
+          border-radius: 16px;
         }
 
         .flower-text {
+          padding-left: 16px;
+
+          h3 {
+            margin-top: 0;
+          }
+
           p {
             margin: 0;
           }
