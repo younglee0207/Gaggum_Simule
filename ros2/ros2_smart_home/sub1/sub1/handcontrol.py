@@ -40,26 +40,30 @@ class Handcontrol(Node):
         self.is_turtlebot_status = False
 
     def timer_callback(self):
-        # while True:
-        # 로직 2. 사용자 메뉴 구성
         print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
-        # menu = int(input(">>"))
-        if self.menu == 0:
-            thread_status = threading.Thread(target=self.hand_control_status)
-            thread_status.start()
-            # self.hand_control_status()
-        if self.menu == 1:
-            thread_preview = threading.Thread(target=self.hand_control_preview)
-            thread_preview.start()
-            # self.hand_control_preview()
-        if self.menu == 2:
-            thread_pick = threading.Thread(target=self.hand_control_pick_up)
-            thread_pick.start()
-            # self.hand_control_pick_up()
-        if self.menu == 3:
-            thread_put = threading.Thread(target=self.hand_control_put_down)
-            thread_put.start()
-            # self.hand_control_put_down()
+        try:
+            # 로직 2. 사용자 메뉴 구성
+            menu=int(input(">>"))
+        except:
+            print('입력이 잘못되었습니다.')
+        else:
+            if menu == 0:               
+                thread_status = threading.Thread(target=self.hand_control_status)
+                thread_status.start()  
+                # self.hand_control_status()
+            if menu == 1:
+                thread_preview = threading.Thread(target=self.hand_control_preview)               
+                thread_preview.start()  
+                # self.hand_control_preview()               
+            if menu == 2:
+                thread_pick = threading.Thread(target=self.hand_control_pick_up)               
+                thread_pick.start()  
+                # self.hand_control_pick_up()   
+            if menu == 3:
+                thread_put = threading.Thread(target=self.hand_control_put_down)               
+                thread_put.start() 
+                # self.hand_control_put_down()
+            
 
     def hand_control_status(self):
         '''
@@ -86,6 +90,9 @@ class Handcontrol(Node):
         => can_put 이 false 이면 publish 요청을 보내서 빨간색으로 바뀜
         '''
         self.hand_control_msg.control_mode = 1
+        self.hand_control_msg.put_distance = 0.4
+        self.hand_control_msg.put_height = 0.4
+
         while (not self.turtlebot_status_msg.can_put):
             self.hand_control.publish(self.hand_control_msg)
 
