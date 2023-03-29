@@ -10,12 +10,18 @@ const s3 = new AWS.S3({
   secretAccessKey: config.awsKey.secretAccessKey,
 });
 
-const uploadFile = () => {
+const uploadFile = (name, base64) => {
+  //const base64Data = new Buffer.from(imgfile.re)
+  const base64Data = new Buffer.from(
+    base64.replace(/^data:image\/\w+;base64,/, ""),
+    "base64"
+  );
+  const type = base64.split(";")[0].split("/")[1];
   const params = {
     Bucket: "ssafybucket",
-    Key: "image/" + "imageTest",
-    Body: fs.readFileSync("pot.jpg"),
-    ContentType: "image/png",
+    Key: "image/" + name,
+    Body: base64Data,
+    ContentType: `image/${type}`,
   };
 
   s3.upload(params, function (err, data) {
