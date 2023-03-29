@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import "./Register.style.scss";
 import {
   FaArrowAltCircleUp,
   FaArrowAltCircleDown,
   FaArrowAltCircleLeft,
   FaArrowAltCircleRight,
 } from 'react-icons/fa';
-
+import { io } from "socket.io-client";
 const RegisterController = ({ socket }) => {
   const [UpKeyDown, setUpKeyDown] = useState(false);
   const [DownKeyDown, setDownKeyDown] = useState(false);

@@ -5,10 +5,9 @@ from rclpy.node import Node
 from ssafy_msgs.msg import TurtlebotStatus
 from geometry_msgs.msg import Twist,Point
 from std_msgs.msg import Float32, String, Int8MultiArray
-# from create_map_msgs.msg import MapOperationList
 from math import pi,cos,sin,sqrt,atan2
 
-# MapOperationList = [map_create, map_create_turtle_bot, map_save] 
+# Int8MultiArray = [map_create, map_create_turtle_bot, map_save] 
 # lidar로 맵 스캔, 터틀봇 자동으로 움직이기, 만들어진 map 저장
 
 info = {
