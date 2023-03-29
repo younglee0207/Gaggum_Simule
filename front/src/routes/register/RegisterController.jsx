@@ -1,26 +1,42 @@
 import "./Register.style.scss"
 import { FaArrowAltCircleUp, FaArrowAltCircleDown, FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa"
+import { io } from "socket.io-client";
+import { useEffect } from "react";
 
-const RegisterController = () => {
+const RegisterController = ({ socket }) => {
+
+  useEffect(() => {
+    // 카메라 받기
+    socket.on()
+
+    return () => {
+      // 카메라 종료
+      socket.off()
+    }
+  }, [])
 
   const handleUp = () => {
     console.log("위")
-    // 위쪽으로 이동
+    // 앞쪽으로 이동
+    socket.emit("go_straight", { data: "go straight" })
   };
 
   const handleDown = () => {
     console.log("아래")
-    // 아래쪽으로 이동
+    // 뒤쪽으로 이동
+    socket.emit("go_back", { data: "go back" })
   };
 
   const handleLeft = () => {
     console.log("왼쪽")
     // 왼쪽으로 이동
+    socket.emit("go_left", { data: "go left" })
   };
 
   const handleRight = () => {
     console.log("오른쪽")
     // 오른쪽으로 이동
+    socket.emit("go_right", { data: "go right" })
   };
 
   return (

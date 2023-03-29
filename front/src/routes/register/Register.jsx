@@ -9,6 +9,11 @@ import "./Register.style.scss"
 import RegisterCamera from "./RegisterCamera";
 import RegisterController from "./RegisterController";
 
+import { io } from "socket.io-client";
+
+// 나중에 배포 주소로 바꿔주기
+const socket = io("ws://localhost:3001")
+
 const Register = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -78,8 +83,8 @@ const Register = () => {
       {/* hr 위로 */}
       <hr />
       {/* hr밑으로 */}
-      <RegisterCamera />
-      <RegisterController />
+      <RegisterCamera socket={socket} />
+      <RegisterController socket={socket} />
       {isModalOpen && <RegisterModal onClose={closeModal} />}
     </div>
   );

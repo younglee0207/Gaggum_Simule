@@ -22,9 +22,9 @@ const App = () => {
           {/* 시작화면 */}
           <Route path="/" element={<StartPage />} />
           {/* 메인화면 */}
-          <Route path="/home" element={<MainPage />} />
+          {/* <Route path="/home" element={<MainPage />} /> */}
           
-          {/* <Route
+          <Route
             path="/home"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -33,11 +33,11 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
           {/* 로딩화면 */}
-          <Route path="/loading" element={<LoadingPage />} />
+          {/* <Route path="/loading" element={<LoadingPage />} /> */}
           
-          {/* <Route
+          <Route
             path="/loading"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -46,9 +46,10 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
 
           {/* 내 식물 */}
+          {/* <Route path="/plant" element={<PlantListPage />} /> */}
           <Route
             path="/plant"
             element={
@@ -83,8 +84,9 @@ const App = () => {
             }
           />
           {/* 식물 등록 */}
+          <Route path="/register" element={<Register />} />
           
-          <Route
+          {/* <Route
             path="/register"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -93,7 +95,7 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
           {/* 카카오 RedirectURI 페이지 */}
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
           {/* Socket 체크 */}
