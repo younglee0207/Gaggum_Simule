@@ -1,7 +1,6 @@
 var express = require("express");
 var axios = require("axios");
 const router = express.Router();
-const aws = require("../aws/s3");
 const KAKAO_OAUTH_TOKEN_API_URL = "https://kauth.kakao.com/oauth/token";
 const KAKAO_GRANT_TYPE = "authorization_code";
 const KAKAO_CLIENT_id = "58acce2e1c5607a9310ef74870273737";
@@ -39,17 +38,17 @@ router.get("/kakao/code", async function (req, res, next) {
                 },
               }
             )
-            .then(async(result2) => {
+            .then(async (result2) => {
               console.log("데이터성공 :");
               console.log(result2.data);
               const existUser = await users.getUserByEmail(result2.data);
-              console.log("유저확인",existUser.data);
-              if (existUser.data[0].vaild==0) {
+              console.log("유저확인", existUser.data);
+              if (existUser.data[0].vaild == 0) {
                 console.log("회원가입 : ");
                 users.signUpUser(result2.data);
               }
               const userData = await users.getUserByEmail2(result2.data);
-              console.log("userData:",userData);
+              console.log("userData:", userData);
               res.json(userData);
             });
         }
