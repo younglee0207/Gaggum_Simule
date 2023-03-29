@@ -38,17 +38,17 @@ router.get("/kakao/code", async function (req, res, next) {
                 },
               }
             )
-            .then(async(result2) => {
+            .then(async (result2) => {
               console.log("데이터성공 :");
               console.log(result2.data);
               const existUser = await users.getUserByEmail(result2.data);
-              console.log("유저확인",existUser.data);
-              if (existUser.data[0].vaild==0) {
+              console.log("유저확인", existUser.data);
+              if (existUser.data[0].vaild == 0) {
                 console.log("회원가입 : ");
                 users.signUpUser(result2.data);
               }
               const userData = await users.getUserByEmail2(result2.data);
-              console.log("userData:",userData);
+              console.log("userData:", userData);
               res.json(userData);
             });
         }

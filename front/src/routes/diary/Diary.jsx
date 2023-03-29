@@ -16,81 +16,18 @@ import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
 import axios from "axios";
 
-const dummyData = [
-  {
-    diary_number: 1,
-    diary_img: plantImg,
-    diary_title: "주벗",
-    plant_species: "버섯",
-    plant_diary_writedate: "12월",
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 2,
-    diary_img: plantImg,
-    diary_title: "주황버섯",
-    plant_species: "버섯",
-    plant_diary_writedate: "1월",
 
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 3,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 4,
-    diary_img: plantImg,
-    diary_title: "주?벗방",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 5,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content:
-      "오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 7,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-  {
-    diary_number: 6,
-    diary_img: plantImg,
-    diary_title: "주?버벗",
-    plant_species: "몰?루",
-    plant_diary_writedate: "3월",
-
-    plant_diary_content: "오늘도 잘 자라줘서 고맙다.",
-  },
-];
 
 const Diary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isPlantModalOpen, setIsPlantModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isModalMonthOpen, setIsModalMonthOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-
   const [modalButtonName, setModalButtonName] = useState("");
   const [modalMonthButtonName, setModalMonthButtonName] = useState("");
   const [modalPlantButtonName, setModalPlantButtonName] = useState("식물이름");
+
+  const [selectedDiary, setSelectedDiary] = useState(null);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -112,12 +49,7 @@ const Diary = () => {
     setIsModalMonthOpen(false);
   };
 
-  const openWriteModal = () => {
-    setIsWriteModalOpen(true);
-  };
-  const closeWriteModal = () => {
-    setIsWriteModalOpen(false);
-  };
+
 
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
@@ -187,7 +119,7 @@ const Diary = () => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/diary/name?plantName=${plant_name}`)
       .then((response) => {
-        console.log('이거이름로드',response)
+        console.log("이거이름로드", response);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
@@ -197,23 +129,21 @@ const Diary = () => {
   };
 
   const deleteDiary = (number) => {
-    console.log('넘버',number)
+    console.log("넘버", number);
     const deleteInfo = {
       diary_number: number,
     };
     axios
-      .post(`https://j8b310.p.ssafy.io/api/diary/delete`,deleteInfo)
+      .post(`https://j8b310.p.ssafy.io/api/diary/delete`, deleteInfo)
       .then((response) => {
-        alert("삭제 성공")
+        alert("삭제 성공");
         GetYearDiaries(2023);
-
       })
       .catch((error) => {
         console.log(error);
         alert("삭제에 실패하였습니다.");
       });
   };
-
   const check = () => {
     console.log(modalButtonName);
   };
@@ -223,8 +153,7 @@ const Diary = () => {
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
         </div>
-        <div>
-        </div>
+        <div></div>
       </div>
 
       <hr style={{ margin: 0 }} />
@@ -279,7 +208,6 @@ const Diary = () => {
               onItemClick={handlePlantItemClick}
               GetNameDiaries={GetNameDiaries}
               GetAllDiaries={GetAllDiaries}
-
             />
           )}
         </div>
@@ -311,27 +239,37 @@ const Diary = () => {
 
                 <div className="content-div">
                   <p className="flex">{item.diary_title}</p>
-                  <p className="flex memo">{item.diary_memo}</p>
+                  <p className="flex memo memo-wrap">{item.diary_memo}</p>
                   <p className="flex">{item.diary_date.substr(0, 10)}</p>
                 </div>
                 <div>
-                  <button onClick={openWriteModal} className="modify-button">
+                  <button
+                    onClick={() => setSelectedDiary(item)}
+                    className="modify-button"
+                  >
                     수정
                   </button>
-                  {isWriteModalOpen && (
-                    <WriteModal
-                      onClose={closeWriteModal}
-                      item={item}
-                      GetAllDiaries={GetAllDiaries}
-                      GetNameDiaries={GetNameDiaries}
-                      GetYearDiaries={GetYearDiaries}
-                    />
-                  )}
-                  <button className ={"modify-button"} onClick={() => {deleteDiary(item.diary_number);  }}>삭제</button>
+                  <button
+                    className={"modify-button"}
+                    onClick={() => {
+                      deleteDiary(item.diary_number);
+                    }}
+                  >
+                    삭제
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+        {selectedDiary && (
+          <WriteModal
+            onClose={() => setSelectedDiary(null)}
+            item={selectedDiary}
+            // GetAllDiaries={GetAllDiaries}
+            GetNameDiaries={GetNameDiaries}
+            GetYearDiaries={GetYearDiaries}
+          />
+        )}
       </div>
     </div>
   );

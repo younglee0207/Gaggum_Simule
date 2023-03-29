@@ -16,6 +16,7 @@ import axios from "axios";
 import { useRef } from "react";
 
 const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
+  console.log('이건 다이어리 넘버',item.diary_number)
   const handleItemClick = () => {
     if (item.plant_name) {
       GetNameDiaries(item.plant_name);
@@ -67,7 +68,7 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
 
           <AiOutlineCheck onClick={submitHandler} size="24" color="#022a17" />
         </div>
-        <div className={classes.pageTitle}>식물 일지 등록</div>
+        <div className={classes.pageTitle}>식물 일지 수정</div>
 
         <img className="img-plant" src={item.diary_img} alt="식물 사진" />
 

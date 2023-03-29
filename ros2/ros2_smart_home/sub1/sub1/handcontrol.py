@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 import os, time
 from ssafy_msgs.msg import TurtlebotStatus, HandControl
+from std_msgs.msg import String
 import threading
 
 
@@ -25,14 +26,14 @@ class Handcontrol(Node):
     def __init__(self):
         super().__init__('hand_control')
 
-        ## 로직 1. publisher, subscriber 만들기
+        # 로직 1. publisher, subscriber 만들기
         self.hand_control = self.create_publisher(HandControl, '/hand_control', 10)
-        self.turtlebot_status = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.turtlebot_status_cb,
-                                                         10)
+        self.turtlebot_status = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.turtlebot_status_cb, 10)
+        self.hand_control_sub = self.create_subscription(String, '/hand_control_cmd', self.hand_control_cmd, 10)
 
         self.timer = self.create_timer(1, self.timer_callback)
 
-        ## 제어 메시지 변수 생성
+        # 제어 메시지 변수 생성
         self.hand_control_msg = HandControl()
 
         self.turtlebot_status_msg = TurtlebotStatus()
@@ -42,20 +43,20 @@ class Handcontrol(Node):
         # while True:
         # 로직 2. 사용자 메뉴 구성
         print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
-        menu = int(input(">>"))
-        if menu == 0:
+        # menu = int(input(">>"))
+        if self.menu == 0:
             thread_status = threading.Thread(target=self.hand_control_status)
             thread_status.start()
             # self.hand_control_status()
-        if menu == 1:
+        if self.menu == 1:
             thread_preview = threading.Thread(target=self.hand_control_preview)
             thread_preview.start()
             # self.hand_control_preview()
-        if menu == 2:
+        if self.menu == 2:
             thread_pick = threading.Thread(target=self.hand_control_pick_up)
             thread_pick.start()
             # self.hand_control_pick_up()
-        if menu == 3:
+        if self.menu == 3:
             thread_put = threading.Thread(target=self.hand_control_put_down)
             thread_put.start()
             # self.hand_control_put_down()
@@ -107,6 +108,10 @@ class Handcontrol(Node):
     def turtlebot_status_cb(self, msg):
         self.is_turtlebot_status = True
         self.turtlebot_status_msg = msg
+
+    def hand_control_cmd(self, msg):
+        print(msg)
+        self.menu = msg
 
 
 def main(args=None):

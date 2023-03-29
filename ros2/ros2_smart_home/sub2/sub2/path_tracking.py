@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, Handcontrol
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
@@ -25,7 +25,7 @@ import random
 
 class followTheCarrot(Node):
     def __init__(self):
-        super().__init__('path_tracking')
+        super().__init__('path_tracking') 
 
         # 로봇을 움직이게 하는 부분
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -44,6 +44,9 @@ class followTheCarrot(Node):
         time_period=0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
 
+        # handcontrol node에 제어 메시지를 보냄
+        self.hand_control_pub = self.create_publisher(String, '/hand_control_cmd', 10)
+
         self.is_odom = False
         self.is_path = False
         self.is_status = False
@@ -54,6 +57,8 @@ class followTheCarrot(Node):
         self.turtle_yaw = 0.0
         self.path_msg=Path()
         self.cmd_msg=Twist()
+
+        self.handcontrol_cmd = 0
 
         # 로직 2. 파라미터 설정(전방주시거리)
         self.lfd=0.1
@@ -72,13 +77,7 @@ class followTheCarrot(Node):
 
         self.state = 1
 
-        # goal 전용
-        self.map_size_x=350
-        self.map_size_y=350
-        self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
-
+       
     def timer_callback(self):
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
         if self.is_status and self.is_odom and self.is_path:
@@ -119,7 +118,7 @@ class followTheCarrot(Node):
                         self.is_look_forward_point = True
                         target_num = num
 
-                if self.is_look_forward_point:
+                if self.is_look_forward_point: 
                     # 전방 주시 포인트
                     global_forward_point=[self.forward_point.x, self.forward_point.y, 1]
 
@@ -140,7 +139,7 @@ class followTheCarrot(Node):
                     ])
                     # 역행렬 만들기
                     det_trans_matrix = np.linalg.inv(trans_matrix)
-                    # 글로벌 경로를 역행렬 연산 => 로컬 경로를 알아냄
+                    # 글로벌 경로를 역행렬 연산 => 로컬 경로를 알아냄   
                     local_forward_point = det_trans_matrix.dot(global_forward_point)
                     # 로봇과 전방주시 포인트간의 차이값 계산
                     theta = -atan2(local_forward_point[1], local_forward_point[0])
@@ -165,6 +164,7 @@ class followTheCarrot(Node):
                 print("no found forward point")
                 self.cmd_msg.linear.x=0.0
                 self.cmd_msg.angular.z=0.0
+                self.hand_control_pub.publish(2)
 
             self.cmd_pub.publish(self.cmd_msg)
 
