@@ -2,7 +2,7 @@ import rclpy
 import socketio
 
 from rclpy.node import Node
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus,EnviromentStatus
 from geometry_msgs.msg import Twist,Point
 from std_msgs.msg import Float32, String, Int8MultiArray
 from math import pi,cos,sin,sqrt,atan2
