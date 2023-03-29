@@ -97,9 +97,7 @@ async function deletePlant(body) {
 async function createPlant(body) {
   try {
     const rows = await db.query(
-      `UPDATE plants
-        SET plant_isdelete = 1
-        WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
+      `식물등록쿼리문`
     );
     const data = helper.emptyOrRows(rows);
 
