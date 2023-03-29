@@ -49,17 +49,33 @@ function socketStart() {
       socket.to(roomName).emit("ros_test", message);
     });
 
-    setInterval(() => {
-      const data = {
-        timestamp: Date.now(),
-      };
-      console.log(data);
-      socket.to(roomName).emit("testServer2Client", data);
-    }, 3000);
+    // setInterval(() => {
+    //   const data = {
+    //     timestamp: Date.now(),
+    //   };
+    //   console.log(data);
+    //   socket.to(roomName).emit("testServer2Client", data);
+    // }, 5000);
 
-    // socket.on("turnleftToServer", (data) => {
-    //   socket.to(roomName).emit("turnleft", data);
-    // });
+    socket.on("go_straight", (data) => {
+      socket.to(roomName).emit("go_straight", data);
+      console.log("앞");
+    });
+
+    socket.on("go_back", (data) => {
+      socket.to(roomName).emit("go_back", data);
+      console.log("뒤");
+    });
+
+    socket.on("go_left", (data) => {
+      socket.to(roomName).emit("go_left", data);
+      console.log("왼쪽");
+    });
+
+    socket.on("go_right", (data) => {
+      socket.to(roomName).emit("go_right", data);
+      console.log("오른쪽");
+    });
 
     // socket.on("gostraightToServer", (data) => {
     //   socket.to(roomName).emit("gostraight", data);

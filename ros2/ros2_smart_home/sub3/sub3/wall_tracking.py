@@ -51,6 +51,7 @@ class wallTracking(Node):
     def start_callback(self, msg):
         # msg.data[1] = map_create_turtle_bot
         self.is_start = msg.data[1]
+        print('터틀봇 움직이는 명령어', self.is_start)
 
     def timer_callback(self):
 
@@ -62,12 +63,15 @@ class wallTracking(Node):
             elif self.state == 2:
                 self.follow_the_wall()
             else:
-                print('오류 발생!!')
+                print('오류 발생!!')            
             
-            self.cmd_pub.publish(self.cmd_msg)
         else:
-            print('터틀봇 대기중')
+            # 제자리에 멈추고 행동 취하기 충돌 방지
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.0
+            print('터틀봇 대기중')            
 
+        self.cmd_pub.publish(self.cmd_msg)
 
     def change_state(self,state):
 
@@ -75,11 +79,8 @@ class wallTracking(Node):
             self.state = state
 
 
-    def take_action(self):
-        
-        # 제자리에 멈추고 행동 취하기 충돌 방지
-        self.cmd_msg.linear.x = 0.0
-        self.cmd_msg.angular.z = 0.0
+    def take_action(self):       
+ 
         d = 0.6
 
         if self.regions['front'] > d:                # 전방 널널
