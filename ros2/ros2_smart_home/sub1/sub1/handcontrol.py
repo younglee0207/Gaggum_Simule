@@ -43,7 +43,7 @@ class Handcontrol(Node):
         print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
         try:
             # 로직 2. 사용자 메뉴 구성
-            menu=int(input(">>"))
+            menu=self.menu
         except:
             print('입력이 잘못되었습니다.')
         else:
