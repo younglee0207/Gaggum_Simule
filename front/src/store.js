@@ -36,6 +36,6 @@ export let socketState = atom({
 });
 
 export let socketState2 = atom({
-  key: "socketState",
+  key: "socketState2",
   default: null,
 });

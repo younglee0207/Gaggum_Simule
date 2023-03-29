@@ -6,6 +6,7 @@ from ssafy_msgs.msg import TurtlebotStatus
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from sensor_msgs.msg import LaserScan, PointCloud
+from std_msgs.msg import Int8MultiArray
 
 
 class wallTracking(Node):
@@ -17,6 +18,8 @@ class wallTracking(Node):
         self.lidar_sub = self.create_subscription(LaserScan,'/scan',self.lidar_callback,10)
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
+        self.move_start_sub = self.create_subscription(Int8MultiArray, '/create_map', self.start_callback, 10)
+
 
         self.cmd_msg = Twist()
         time_period = 0.05
@@ -43,7 +46,11 @@ class wallTracking(Node):
         self.collision = False
 
         # wall_following 시작 조건
-        self.is_start = True
+        self.is_start = False
+
+    def start_callback(self, msg):
+        # msg.data[1] = map_create_turtle_bot
+        self.is_start = msg.data[1]
 
     def timer_callback(self):
 
