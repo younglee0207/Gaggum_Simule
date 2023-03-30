@@ -17,7 +17,21 @@ const app = express();
 
 // 로직 1. WebSocket 서버, WebClient 통신 규약 정의
 const server = require("http").createServer(app);
-const io = require("socket.io")(server);
+
+const io = require("socket.io")(server, {
+  cors: {
+    origin: [
+      "http://j8b310.p.ssafy.io:3001",
+      "http://j8b310.p.ssafy.io",
+      "http://localhost:8080",
+      "http://localhost:3001",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST"],
+    transports: ["websocket", "polling"],
+    credentials: true,
+  },
+});
 
 // var fs = require('fs'); // required for file serving
 
@@ -38,36 +52,38 @@ function socketStart() {
     console.log("connected from server");
 
     // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
-    socket.on("safety_status", (message) => {
-      socket.to(roomName).emit("safety_status", message);
+    socket.on("run_mapping", (message) => {
+      socket.to(roomName).emit("run_mapping", message);
       // socket.emit("safety_status", message);
-      console.log("safety_status", message);
+      console.log("run_mapping", message);
     });
 
-    socket.on("ros_test", (message) => {
-      console.log("ros_test", message);
-      socket.to(roomName).emit("ros_test", message);
+    // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달
+    socket.on("simulator_info", (data) => {
+      console.log("simulator_info", data);
+      socket.to(roomName).emit("simulator_info", data);
     });
 
-    setInterval(() => {
-      const data = {
-        timestamp: Date.now(),
-      };
-      console.log(data);
-      socket.to(roomName).emit("testServer2Client", data);
-    }, 3000);
+    // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
+    socket.on("go_straight", (data) => {
+      socket.to(roomName).emit("go_straight", data);
+      console.log("앞");
+    });
 
-    // socket.on("turnleftToServer", (data) => {
-    //   socket.to(roomName).emit("turnleft", data);
-    // });
+    socket.on("go_back", (data) => {
+      socket.to(roomName).emit("go_back", data);
+      console.log("뒤");
+    });
 
-    // socket.on("gostraightToServer", (data) => {
-    //   socket.to(roomName).emit("gostraight", data);
-    // });
+    socket.on("go_left", (data) => {
+      socket.to(roomName).emit("go_left", data);
+      console.log("왼쪽");
+    });
 
-    // socket.on("turnrightToServer", (data) => {
-    //   socket.to(roomName).emit("turnright", data);
-    // });
+    socket.on("go_right", (data) => {
+      socket.to(roomName).emit("go_right", data);
+      console.log("오른쪽");
+    });
 
     socket.on("disconnect", () => {
       console.log("disconnected from server");

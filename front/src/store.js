@@ -35,7 +35,7 @@ export let socketState = atom({
   default: null,
 });
 
-export let socketState2 = atom({
-  key: "socketState2",
-  default: null,
+export let simulatorInfo = atom({
+  key: "simulatorInfo",
+  default: {},
 });

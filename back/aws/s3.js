@@ -11,10 +11,10 @@ const s3 = new AWS.S3({
 });
 
 const uploadFile = (name, base64) => {
-    //const base64Data = new Buffer.from(imgfile.re)
-    const base64Data = new Buffer.from(base64.replace("", ""), 'base64');
-    const type = base64.split(';')[0].split('/')[1];
-    const params = {
+  //const base64Data = new Buffer.from(imgfile.re)
+  const base64Data = new Buffer.from(base64.replace("", ""), "base64");
+  const type = base64.split(";")[0].split("/")[1];
+  const params = {
     Bucket: "ssafybucket",
     Key: "image/" + name,
     Body: base64Data,
