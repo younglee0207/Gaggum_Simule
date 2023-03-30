@@ -9,7 +9,7 @@ import {
 } from "react-icons/ai";
 import plantImg from "../../assets/plant/mush.gif";
 
-const RegisterModal = ({ onClose }) => {
+const RegisterModal = ({ onClose, onRegister }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleCheckboxChange = (event) => {
@@ -20,7 +20,7 @@ const RegisterModal = ({ onClose }) => {
       <div className={classes.modalContent}>
         <div className="justify">
           <AiOutlineClose onClick={onClose} size="24" color="red" />
-          <AiOutlineCheck onClick={onClose} size="24" color="#022a17" />
+          <AiOutlineCheck onClick={onRegister} size="24" color="#022a17" />
         </div>
         <div className={classes.pageTitle}>나의 식물 등록</div>
         <div 
