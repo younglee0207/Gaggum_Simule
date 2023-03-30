@@ -7,7 +7,7 @@ from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
 import numpy as np
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import String
+from std_msgs.msg import Int32
 import time
 import random
 # path_tracking 노드는 로봇의 위치(/odom), 로봇의 속도(/turtlebot_status), 주행 경로(/local_path)를 받아서, 주어진 경로를 따라가게 하는 제어 입력값(/cmd_vel)을 계산합니다.
@@ -45,7 +45,10 @@ class followTheCarrot(Node):
         self.timer = self.create_timer(time_period, self.timer_callback)
 
         # handcontrol node에 제어 메시지를 보냄
-        self.hand_control_pub = self.create_publisher(String, '/hand_control_cmd', 10)
+        self.hand_control_pub = self.create_publisher(Int32, '/hand_control_cmd', 10)
+
+        # 목표 좌표를 가지고 옴
+        self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
 
         self.is_odom = False
         self.is_path = False
@@ -58,7 +61,7 @@ class followTheCarrot(Node):
         self.path_msg=Path()
         self.cmd_msg=Twist()
 
-        self.handcontrol_cmd = 0
+        self.handcontrol_cmd_msg = Int32()
 
         # 로직 2. 파라미터 설정(전방주시거리)
         self.lfd=0.1
@@ -76,22 +79,33 @@ class followTheCarrot(Node):
         self.back_cnt = 0
 
         self.state = 1
+        
+        # 터틀봇의 현재 위치
+        self.robot_pose_x = 0
+        self.robot_pose_y = 0
 
+        # 터틀봇의 목표 위치
+        self.goal_x = 0
+        self.goal_y = 0
        
     def timer_callback(self):
+
+        # 로봇의 현재 위치를 나타내는 변수
+        self.robot_pose_x = self.odom_msg.pose.pose.position.x
+        self.robot_pose_y = self.odom_msg.pose.pose.position.y
+
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
         if self.is_status and self.is_odom and self.is_path:
             # 남은 경로가 1 이상이면
             if len(self.path_msg.poses)> 1:
                 self.is_look_forward_point = False
 
-                # 로봇의 현재 위치를 나타내는 변수
-                robot_pose_x = self.odom_msg.pose.pose.position.x
-                robot_pose_y = self.odom_msg.pose.pose.position.y
+                self.handcontrol_cmd_msg.data = 0
+
 
                 # 로봇과 가장 가까운 경로점과의 직선거리
-                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-robot_pose_y,2))
-                # print(robot_pose_x,robot_pose_y,lateral_error)
+                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-self.robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-self.robot_pose_y,2))
+                # print(self.robot_pose_x,self.robot_pose_y,lateral_error)
 
                 # 로직 4. 로봇이 주어진 경로점과 떨어진 거리(lateral_error)와 로봇의 선속도를 이용해 전방주시거리 설정
 
@@ -124,7 +138,7 @@ class followTheCarrot(Node):
 
                     '''
                     로직 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
-                    (테스트) 맵에서 로봇의 위치(robot_pose_x,robot_pose_y)가 (5,5)이고, 헤딩(self.robot_yaw) 1.57 rad 일 때, 선택한 전방포인트(global_forward_point)가 (3,7)일 때
+                    (테스트) 맵에서 로봇의 위치(self.robot_pose_x,self.robot_pose_y)가 (5,5)이고, 헤딩(self.robot_yaw) 1.57 rad 일 때, 선택한 전방포인트(global_forward_point)가 (3,7)일 때
                     변환행렬을 구해서 전방포인트를 로봇 기준좌표계로 변환을 하면 local_forward_point가 구해지고, atan2를 이용해 선택한 점과의 각도를 구하면
                     theta는 0.7853 rad 이 나옵니다.
                     trans_matrix는 로봇좌표계에서 기준좌표계(Map)로 좌표변환을 하기위한 변환 행렬입니다.
@@ -133,8 +147,8 @@ class followTheCarrot(Node):
                     theta는 로봇과 전방 주시 포인트와의 각도입니다. 
                     '''
                     trans_matrix = np.array([       
-                                            [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
-                                            [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
+                                            [cos(self.robot_yaw), -sin(self.robot_yaw), self.robot_pose_x],
+                                            [sin(self.robot_yaw), cos(self.robot_yaw), self.robot_pose_y],
                                             [0, 0, 1],
                     ])
                     # 역행렬 만들기
@@ -154,19 +168,26 @@ class followTheCarrot(Node):
                     elif self.is_approach:  # 목적이 영역 밖에서 사물과 근접 했다면
                         out_vel = -0.1
                         out_rad_vel = theta*2
-
+                    # goal post에 도착했다면
+              
                     self.cmd_msg.linear.x = out_vel
                     self.cmd_msg.angular.z = out_rad_vel
 
-
-            # 경로가 없을 때
+            # 남은 경로가 1 미만
             else:
-                print("no found forward point")
+                # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
+                if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
+                    print('목표 지점에 도착')
+                    # 물건을 들고 있으면 내려놓고
+                    # 물건을 들고 있지 않으면 물건을 들기
+                else:
+                    print("no found forward point")
+          
                 self.cmd_msg.linear.x=0.0
                 self.cmd_msg.angular.z=0.0
-                # self.hand_control_pub.publish(2)
 
             self.cmd_pub.publish(self.cmd_msg)
+            self.hand_control_pub.publish(self.handcontrol_cmd_msg)
 
 
     def odom_callback(self, msg):
@@ -174,7 +195,8 @@ class followTheCarrot(Node):
         self.odom_msg=msg
 
         # 로직 3. Quaternion 을 euler angle 로 변환
-        q = Quaternion(msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
+        q = Quaternion(msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, 
+                       msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
         _, _, self.robot_yaw = q.to_euler()
 
 
@@ -253,7 +275,15 @@ class followTheCarrot(Node):
             #     self.is_approach = False
             #     print('후방 근접')
 
-
+    def goal_callback(self,msg):
+        if msg.header.frame_id=='map':
+            # print(msg)
+            '''
+            로직 6. goal_pose 메시지 수신하여 목표 위치 설정
+            ''' 
+            self.goal_x=msg.pose.position.x
+            self.goal_y=msg.pose.position.y
+            
 def main(args=None):
     rclpy.init(args=args)
 
