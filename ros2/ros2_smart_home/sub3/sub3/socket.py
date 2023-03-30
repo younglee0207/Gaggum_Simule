@@ -62,7 +62,7 @@ def run_mapping(data):
 #     return [map_create, map_create_turtle_bot]
     
 # ip_server = 'http://localhost:3001'
-ip_server = 'https://j8b310.p.ssafy.io:3001'
+ip_server = 'http://j8b310.p.ssafy.io:3001'
 
 
 print("connect ", ip_server)
