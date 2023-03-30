@@ -12,6 +12,10 @@ const Temp = () => {
   const [data, setData] = useRecoilState(socketState);
   const [data2, setData2] = useRecoilState(simulatorInfo);
 
+  socket.on("connect", () => {
+    console.log(socket.connected); // true
+  });
+
   // useEffect(() => {
   //   socket.on("safety_status", (data) => {
   //     console.log("received update :", data);
