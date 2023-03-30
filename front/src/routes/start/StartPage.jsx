@@ -22,7 +22,7 @@ const StartPage = () => {
           src={logoImg}
         />
         <img
-        className="button-content"
+          className="button-content"
           src={loginImg}
           alt="카카오 로그인"
           onClick={handleLogin}

@@ -30,9 +30,9 @@ const TodayFlower = () => {
           console.log(dataSet)
           setFlowerName(dataSet?.children[0].children[3].children[3].value)
           setFlowerMean(dataSet?.children[0].children[3].children[6].value)
-          setFlowerImg([
+          setFlowerImg(
             dataSet?.children[0].children[3].children[14].value.split(" ")[0]
-          ])
+          )
         })
     } catch (error) {
       console.log(error)
