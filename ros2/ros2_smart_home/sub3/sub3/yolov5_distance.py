@@ -68,7 +68,6 @@ params_bot = {
 
 class detection_net_class():
     def __init__(self):
-        sio.connect('http://j8b310.p.ssafy.io:3001/')
         # yolo v5
         full_path = os.path.abspath(__file__)
         full_path = full_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 
@@ -131,7 +130,8 @@ def imu_callback(msg):
     global is_imu
     is_imu =True
     '''
-    로직 3. IMU 에서 받은 quaternion을 euler angle로 변환해서 사용
+    로직 3. IMU 에서 받은 quaternion을 euler angle로 변환해서 사용(라디안 단위)
+    각도(도) = 라디안 * 180/π
     '''
     global robot_yaw
     imu_q= Quaternion(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z)
