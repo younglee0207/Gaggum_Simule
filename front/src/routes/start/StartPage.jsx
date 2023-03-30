@@ -1,5 +1,6 @@
 import "./Start.style.scss";
 import loginImg from "../../assets/start/kakao_login_medium_wide.png";
+import logoImg from "../../assets/logo/maskable_icon_x192_logo.png"
 
 const StartPage = () => {
   const REST_API_KEY = "58acce2e1c5607a9310ef74870273737";
@@ -16,9 +17,12 @@ const StartPage = () => {
   return (
     <div className="StartPage">
       <div className="start-content">
-        <h1>가꿈</h1>
-
+        <img 
+          className="start__logo"
+          src={logoImg}
+        />
         <img
+          className="start__login"
           src={loginImg}
           alt="카카오 로그인"
           onClick={handleLogin}
