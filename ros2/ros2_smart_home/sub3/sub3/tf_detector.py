@@ -8,9 +8,13 @@ import time
 from sensor_msgs.msg import CompressedImage, LaserScan
 from ssafy_msgs.msg import BBox
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from sub2.ex_calib import *
+
+from std_msgs.msg import Int16,Int8
+from geometry_msgs.msg import PoseStamped
+from squaternion import Quaternion
 
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
@@ -51,25 +55,24 @@ params_lidar = {
     "Block_SIZE": int(1206),
     "X": 0, # meter
     "Y": 0,
-    "Z": 0.6,
+    "Z": 0.4+0.19,
     "YAW": 0, # deg
     "PITCH": 0,
     "ROLL": 0
 }
 
-
 params_cam = {
-    "WIDTH": 320, # image width
-    "HEIGHT": 240, # image height
+    "WIDTH": 640, # image width
+    "HEIGHT": 480, # image height
     "FOV": 60, # Field of view
     "localIP": "127.0.0.1",
     "localPort": 1232,
     "Block_SIZE": int(65000),
     "X": 0, # meter
     "Y": 0,
-    "Z": 1,
+    "Z":  0.8,
     "YAW": 0, # deg
-    "PITCH": 5,
+    "PITCH": 0.0,
     "ROLL": 0
 }
 
@@ -109,10 +112,13 @@ class detection_net_class():
         image_process = np.copy(image_np)
 
         idx_detect = np.arange(scores.shape[1]).reshape(scores.shape)[np.where(scores>0.5)]
+        print(f"image_process : {idx_detect}")
 
         boxes_detect = boxes[0, idx_detect, :]
+        print(f"boxes_detect : {boxes_detect}")
 
         classes_pick = classes[:, idx_detect]
+        print(f"classes_pick : {classes_pick}")
 
         vis_util.visualize_boxes_and_labels_on_image_array(image_process,
                 np.squeeze(boxes),
@@ -134,12 +140,12 @@ def visualize_images(image_out, t_cost):
     
     cv2.putText(image_out,'SSD',(30,50), font, 1,(0,255,0), 2, 0)
 
-    cv2.putText(image_out,'{:.4f}s'.format(t_cost),(30,150), font, 1,(0,255,0), 2, 0)
+    cv2.putText(image_out,'{:.4f}fps'.format(1/t_cost),(30,150), font, 1,(0,255,0), 2, 0)
     
     winname = 'Vehicle Detection'
-    cv2.imshow(winname, cv2.resize(image_out, (2*image_out.shape[1], 2*image_out.shape[0])))
+    # cv2.imshow(winname, cv2.resize(image_out, (2*image_out.shape[1], 2*image_out.shape[0])))
+    cv2.imshow(winname, cv2.resize(image_out, (image_out.shape[1], image_out.shape[0])))
     cv2.waitKey(1)
-
 
      
 def img_callback(msg):
@@ -177,11 +183,12 @@ def main(args=None):
     ## 'ssd_mobilenet_v1_coco_11_06_2017'와 data 폴더 내 mscoco_label_map.pbtxt를
     ## 넣어둬야 합니다    
     
-    pkg_path =os.getcwd()
+    # pkg_path =os.getcwd()
     # back_folder='catkin_ws\\src\\ros2_smart_home\\sub3'
-    back_folder='Desktop\\test_ws\\src\\ssafy_smarthome\\sub3'
+    # back_folder='Desktop\\test_ws\\src\\ssafy_smarthome\\sub3'
+    CWD_PATH = 'C:\\Users\\SSAFY\\Desktop\\S08P22B310\\ros2\\ros2_smart_home\\sub3\\sub3'
 
-    CWD_PATH = os.path.join(pkg_path, back_folder,'sub3')
+    # CWD_PATH = os.path.join(pkg_path, back_folder,'sub3')
     
     MODEL_NAME = 'ssd_mobilenet_v1_coco_2018_01_28'
 
@@ -277,15 +284,13 @@ def main(args=None):
         # sub2 에서 ex_calib 에 했던 대로 라이다 포인트들을
         # 이미지 프레임 안에 정사영시킵니다.
 
-        xyz_p = xyz[np.where(xyz[:, 0]>=0)]
+        # xyz_p = xyz[np.where(xyz[:, 0]>=0)]
 
-        xyz_c = l2c_trans.transform_lidar2cam(xyz_p)
+        # xyz_c = l2c_trans.transform_lidar2cam(xyz_p)
 
-        xy_i = l2c_trans.project_pts2img(xyz_c, False)
+        # xy_i = l2c_trans.project_pts2img(xyz_c, False)
 
-        xyii = np.concatenate([xy_i, xyz_p], axis=1)
-
-        """
+        # xyii = np.concatenate([xy_i, xyz_p], axis=1)
 
         # 로직 12. bounding box 결과 좌표 뽑기
         ## boxes_detect 안에 들어가 있는 bounding box 결과들을
@@ -298,12 +303,12 @@ def main(args=None):
             ih = img_bgr.shape[0]
             iw = img_bgr.shape[1]
 
-            boxes_np = 
+            boxes_np = np.array(boxes_detect[0])
 
-            x = 
-            y = 
-            w = 
-            h = 
+            x = boxes_np.T[1] * iw
+            y = boxes_np.T[0] * ih
+            w = (boxes_np.T[3] - boxes_np.T[1]) * iw
+            h = (boxes_np.T[2] - boxes_np.T[0]) * ih
 
             bbox = np.vstack([
                 x.astype(np.int32).tolist(),
@@ -312,10 +317,7 @@ def main(args=None):
                 h.astype(np.int32).tolist()
             ]).T
 
-        """
-
             
-        """
 
             # 로직 13. 인식된 물체의 위치 추정
             ## bbox가 구해졌으면, bbox 안에 들어가는 라이다 포인트 들을 구하고
@@ -329,30 +331,30 @@ def main(args=None):
                 w = int(bbox[i, 2])
                 h = int(bbox[i, 3])
 
-                cx = 
-                cy = 
+                cx = int((x + w) / 2)
+                cy = int((y + h) / 2)
                 
-                xyv = 
+                # xyv = xyii[np.logical_and(xyii[:, 0]>=x, xyii[:, 0]<=x+w), :]
+                # xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
 
                 ## bbox 안에 들어가는 라이다 포인트들의 대표값(예:평균)을 뽑는다
-                ostate = 
+                # ostate = np.median(xyv, axis=0)
 
                 ## 대표값이 존재하면 
-                if not np.isnan(ostate[0]):
-                    ostate_list.append(ostate)
+                # if not np.isnan(ostate[0]):
+                    # ostate_list.append(ostate)
 
-            image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32),
-                                            xy_i[:, 1].astype(np.int32))
+            # image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32),
+                                            # xy_i[:, 1].astype(np.int32))
 
-            print(ostate_list)
-        """
+            # print(ostate_list)
+
         visualize_images(image_process, infer_time)
 
     g_node.destroy_node()
     rclpy.shutdown()
 
+
 if __name__ == '__main__':
 
     main()
-
-    
