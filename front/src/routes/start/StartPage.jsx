@@ -1,5 +1,5 @@
 import "./Start.style.scss";
-import loginImg from "../../assets/start/kakao_login_medium_wide.png";
+import loginImg from "../../assets/start/kakao_login_large_wide.png";
 import logoImg from "../../assets/logo/maskable_icon_x192_logo.png"
 
 const StartPage = () => {
@@ -22,7 +22,7 @@ const StartPage = () => {
           src={logoImg}
         />
         <img
-          className="start__login"
+        className="button-content"
           src={loginImg}
           alt="카카오 로그인"
           onClick={handleLogin}

@@ -13,14 +13,29 @@ import { io } from "socket.io-client";
 
 // 나중에 배포 주소로 바꿔주기
 // const socket = io("ws://localhost:3001");
-const socket = io("http://j8b310.p.ssafy.io:3001");
+const socket = io("https://j8b310.p.ssafy.io/socket");
 
 const Register = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
+  const [isRegist, setIsRegist] = useState(false)
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    Swal.fire({
+      title: "등록 취소",
+      text: "등록을 취소하시겠습니까?",
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니오",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        setIsModalOpen(false)
+      }
+    });
+  };
+
+  const handleRegisterModal = () => {
+
   };
 
   // const handleItemClick = (itemName) => {
@@ -81,7 +96,7 @@ const Register = () => {
       {/* hr밑으로 */}
       <RegisterCamera socket={socket} />
       <RegisterController socket={socket} />
-      {isModalOpen && <RegisterModal onClose={closeModal} />}
+      {isModalOpen && <RegisterModal onClose={closeModal} onRegister={handleRegisterModal} />}
     </div>
   );
 };
