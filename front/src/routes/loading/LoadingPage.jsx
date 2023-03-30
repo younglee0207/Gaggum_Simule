@@ -7,7 +7,7 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import Swal from "sweetalert2";
 
 // 나중에 배포주소로 바꿔주기
-const socket = io("https://j8b310.p.ssafy.io/socket");
+const socket = io("https://j8b310.p.ssafy.io");
 
 const LoadingPage = () => {
   const navigate = useNavigate();

@@ -13,7 +13,7 @@ import { io } from "socket.io-client";
 
 // 나중에 배포 주소로 바꿔주기
 // const socket = io("ws://localhost:3001");
-const socket = io("https://j8b310.p.ssafy.io/socket");
+const socket = io("https://j8b310.p.ssafy.io");
 
 const Register = () => {
   const navigate = useNavigate();
