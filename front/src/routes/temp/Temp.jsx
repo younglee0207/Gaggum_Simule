@@ -4,17 +4,13 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { socketState, simulatorInfo } from "../../store";
 
-const socket = io("https://j8b310.p.ssafy.io/socket");
+const socket = io("https://j8b310.p.ssafy.io");
 // const socket = io("http://localhost:3001");
 // const socket = io("http://j8b310.p.ssafy.io:3001");
 
 const Temp = () => {
   const [data, setData] = useRecoilState(socketState);
   const [data2, setData2] = useRecoilState(simulatorInfo);
-
-  socket.on("connect", () => {
-    console.log(socket.connected); // true
-  });
 
   // useEffect(() => {
   //   socket.on("safety_status", (data) => {
@@ -33,6 +29,12 @@ const Temp = () => {
   // });
 
   useEffect(() => {
+    console.log("asda", socket); // true
+
+    socket.on("connect", () => {
+      console.log(socket); // true
+    });
+
     socket.on("simulator_info", (data) => {
       console.log("simulator_info :", data.environment);
       setData2(data);
@@ -51,7 +53,7 @@ const Temp = () => {
   const handleRequestSocket = () => {
     console.log("button clicked");
     socket.emit("run_mapping", {
-      data: "mapping start",
+      data: "mapping start1",
     });
   };
 
