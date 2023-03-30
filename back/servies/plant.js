@@ -97,7 +97,8 @@ async function deletePlant(body) {
 async function createPlant(body) {
   try {
     const rows = await db.query(
-      `식물등록쿼리문`
+      `insert into plants(user_number,plant_name,plant_species,plant_memo,plant_position_x,plant_position_y,plant_img,plant_watering_cycle,plant_watering_amount,plant_last_watering_date,plant_sunlight,plant_create_date,plant_original_name,sunspot_number)
+      values (1,"${body.plant_name}","${body.plant_species}","${body.plant_memo}",${body.plant_position_x},${body.plant_position_y},"https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/${body.plant_name}",${body.plant_watering_cycle},${body.plant_watering_amount},curdate(),${body.plant_sunlight},curdate(),"${body.plant_original_name}",0);`
     );
     const data = helper.emptyOrRows(rows);
 
