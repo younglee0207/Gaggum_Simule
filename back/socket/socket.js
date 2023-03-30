@@ -1,19 +1,5 @@
 const express = require("express");
 const app = express();
-// Websocket 서버 구동을 위한 서버 코드입니다.
-
-// 노드 로직 순서
-
-// const path = require('path');
-// const express = require('express');
-
-// client 경로의 폴더를 지정해줍니다.
-// const publicPath = path.join(__dirname, "/../client");
-// var app = express();
-
-// const picPath = path.join(__dirname, "/../client");
-
-// app.use(express.static(publicPath));
 
 // 로직 1. WebSocket 서버, WebClient 통신 규약 정의
 const server = require("http").createServer(app);
@@ -32,8 +18,6 @@ const io = require("socket.io")(server, {
     credentials: true,
   },
 });
-
-// var fs = require('fs'); // required for file serving
 
 // 로직 2. 포트번호 지정
 function socketStart() {
@@ -58,10 +42,14 @@ function socketStart() {
       console.log("run_mapping", message);
     });
 
-    // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달
+    // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
     socket.on("simulator_info", (data) => {
       console.log("simulator_info", data);
+      // 프론트 페이지로 simulator 전달
       socket.to(roomName).emit("simulator_info", data);
+
+      // ROS로 다시 데이터 전달
+      socket.emit("auto_move", data.environment.month);
     });
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
