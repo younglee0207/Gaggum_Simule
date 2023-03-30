@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 const RedirectURI = () => {
   const [token, setToken] = useState(true);
   const [name, setName] = useState("");
@@ -30,7 +32,11 @@ const RedirectURI = () => {
       .then((res) => {
         console.log('밸리드확인',res)
         if (res.data.data[0].valid === 0) {
-          alert("잘못된 인증키입니다.");
+          Swal.fire({
+            title: "인증키 오류",
+            text: "잘못된 인증키입니다.",
+            icon: "error"
+          })
         } else {
           axios
             .post("https://j8b310.p.ssafy.io/api/user/turtle", info)
