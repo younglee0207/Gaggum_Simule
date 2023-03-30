@@ -34,10 +34,6 @@ const Register = () => {
     });
   };
 
-  const handleRegisterModal = () => {
-
-  };
-
   // const handleItemClick = (itemName) => {
   //   setModalButtonName(itemName);
   //   closeModal();
@@ -96,7 +92,7 @@ const Register = () => {
       {/* hr밑으로 */}
       <RegisterCamera socket={socket} />
       <RegisterController socket={socket} />
-      {isModalOpen && <RegisterModal onClose={closeModal} onRegister={handleRegisterModal} />}
+      {isModalOpen && <RegisterModal onClose={closeModal} setIsModalOpen={setIsModalOpen} />}
     </div>
   );
 };
