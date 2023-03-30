@@ -23,6 +23,7 @@ const MainPlantList = () => {
     axios
       .get('https://j8b310.p.ssafy.io/api/plant/needwater')
       .then((res) => {
+        console.log(res.data.data)
         setNeedWaterPlant(res.data.data)
       })
   }

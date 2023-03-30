@@ -17,7 +17,8 @@ const PlantDetailPage = () => {
     axios
       .get(`https://j8b310.p.ssafy.io/api/plant/number?plantNumber=${id}`)
       .then((res) => {
-        setPlantDetail(res.data.data[0])
+        console.log(res.data.data[id - 1])
+        setPlantDetail(res.data.data[id - 1])
       })
   }
 
