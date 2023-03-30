@@ -17,8 +17,6 @@ from ssafy_msgs.msg import TurtlebotStatus
 
 from squaternion import Quaternion
 
-import socketio
-
 params_lidar = {
     "Range" : 90, #min & max range of lidar azimuths
     "CHANNEL" : int(1), #verticla channel of a lidar
