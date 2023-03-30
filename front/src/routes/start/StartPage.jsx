@@ -1,5 +1,6 @@
 import "./Start.style.scss";
-import loginImg from "../../assets/start/kakao_login_medium_wide.png";
+import loginImg from "../../assets/start/kakao_login_large_wide.png";
+import logoImg from "../../assets/logo/maskable_icon_x192_logo.png"
 
 const StartPage = () => {
   const REST_API_KEY = "58acce2e1c5607a9310ef74870273737";
@@ -10,14 +11,22 @@ const StartPage = () => {
   const handleLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
   };
+  const setToken = () => {
+    localStorage.setItem("turtle_number", 1);
+  };
   return (
     <div className="StartPage">
       <div className="start-content">
-        <h1>가꿈</h1>
-
-       
-          <img src={loginImg} alt="카카오 로그인" onClick={handleLogin} style={{marginTop:"60vh"}}/>
-        
+        <img 
+          className="start__logo"
+          src={logoImg}
+        />
+        <img
+          className="button-content"
+          src={loginImg}
+          alt="카카오 로그인"
+          onClick={handleLogin}
+        />
       </div>
     </div>
   );
