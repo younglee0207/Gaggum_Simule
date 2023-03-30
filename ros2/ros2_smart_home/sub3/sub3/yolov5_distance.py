@@ -358,7 +358,7 @@ def main(args=None):
                         b64data = base64.b64encode(origin_img)
                         # print(f"base64_decode : {b64data.decode('utf-8')}")
                     data = {
-                        "plant_detected_name" : "plant2",
+                        "plant_original_name" : "plant2",
                         "plant_img": b64data.decode('utf-8'),
                         "plant_position_x": loc_x,
                         "plant_position_y": loc_y
