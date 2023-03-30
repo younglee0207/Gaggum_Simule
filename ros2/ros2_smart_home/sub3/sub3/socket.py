@@ -78,6 +78,7 @@ class SocketClass(Node):
         # 맵 만들 때 필요한 변수를 저장하는 주소 publish
         self.create_map_publisher = self.create_publisher(Int8MultiArray, '/create_map', 10)
         self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.env_callback, 1000)
+        self.turtl
     
 
         self.timer_period = 1
