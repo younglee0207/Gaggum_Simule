@@ -3,7 +3,7 @@ import { useState } from "react";
 import plantImg from "../../assets/plant/mush.gif";
 import { BsCameraFill } from "react-icons/bs";
 
-const RegisterCamera = () => {
+const RegisterCamera = ({ socket }) => {
   const handleLift = () => {
     console.log("들기");
     // Socket 통신으로 들기 명령 보내기
@@ -28,7 +28,7 @@ const RegisterCamera = () => {
         <button className="camera-button" onClick={handleLift}>
           들기
         </button>
-        <button className="camera-button" style={{width:"78.53px"}}>
+        <button className="camera-button">
           <BsCameraFill
             size="32"
             // color="#022a17"
