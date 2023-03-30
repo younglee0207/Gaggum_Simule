@@ -74,6 +74,7 @@ class MoveTurtleBot(Node):
         self.m_control_iter = 0
 
         sio.connect('http://j8b310.p.ssafy.io:3001')
+        # sio.connect('http://localhost:3001')
 
 
     def odom_callback(self, msg):

@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "./Register.style.scss";
 import {
   FaArrowAltCircleUp,
   FaArrowAltCircleDown,
   FaArrowAltCircleLeft,
   FaArrowAltCircleRight,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 import { io } from "socket.io-client";
+
 const RegisterController = ({ socket }) => {
   const [UpKeyDown, setUpKeyDown] = useState(false);
   const [DownKeyDown, setDownKeyDown] = useState(false);
@@ -16,7 +17,6 @@ const RegisterController = ({ socket }) => {
   const logKeyDown = (direction, number) => {
     console.log(`${direction} Key is down`, number);
     socket.emit(`go_${direction}`, { name: `go ${direction}`, data: number });
-    
   };
 
   const createInterval = (callback) => {
@@ -36,7 +36,7 @@ const RegisterController = ({ socket }) => {
   useEffect(() => {
     setUpIntervalId((prevIntervalId) =>
       UpKeyDown && prevIntervalId === null
-        ? createInterval(() => logKeyDown('straight',2))
+        ? createInterval(() => logKeyDown("straight", 2))
         : !UpKeyDown && prevIntervalId !== null
         ? clearAndNullifyInterval(prevIntervalId)
         : prevIntervalId
@@ -46,7 +46,7 @@ const RegisterController = ({ socket }) => {
   useEffect(() => {
     setDownIntervalId((prevIntervalId) =>
       DownKeyDown && prevIntervalId === null
-        ? createInterval(() => logKeyDown('back',3))
+        ? createInterval(() => logKeyDown("back", 3))
         : !DownKeyDown && prevIntervalId !== null
         ? clearAndNullifyInterval(prevIntervalId)
         : prevIntervalId
@@ -56,7 +56,7 @@ const RegisterController = ({ socket }) => {
   useEffect(() => {
     setLeftIntervalId((prevIntervalId) =>
       LeftKeyDown && prevIntervalId === null
-        ? createInterval(() => logKeyDown('left',1))
+        ? createInterval(() => logKeyDown("left", 1))
         : !LeftKeyDown && prevIntervalId !== null
         ? clearAndNullifyInterval(prevIntervalId)
         : prevIntervalId
@@ -66,7 +66,7 @@ const RegisterController = ({ socket }) => {
   useEffect(() => {
     setRightIntervalId((prevIntervalId) =>
       RightKeyDown && prevIntervalId === null
-        ? createInterval(() => logKeyDown('right',4))
+        ? createInterval(() => logKeyDown("right", 4))
         : !RightKeyDown && prevIntervalId !== null
         ? clearAndNullifyInterval(prevIntervalId)
         : prevIntervalId
@@ -104,8 +104,8 @@ const RegisterController = ({ socket }) => {
           onTouchStart={() => setDownKeyDown(true)}
           onTouchEnd={() => setDownKeyDown(false)}
           tabIndex="0"
-          />
-          <FaArrowAltCircleRight
+        />
+        <FaArrowAltCircleRight
           size="100"
           color="#022a17"
           onKeyDown={() => setRightKeyDown(true)}
@@ -113,10 +113,10 @@ const RegisterController = ({ socket }) => {
           onTouchStart={() => setRightKeyDown(true)}
           onTouchEnd={() => setRightKeyDown(false)}
           tabIndex="0"
-          />
-          </div>
-          </div>
-          );
-          };
-          
-          export default RegisterController;
+        />
+      </div>
+    </div>
+  );
+};
+
+export default RegisterController;
