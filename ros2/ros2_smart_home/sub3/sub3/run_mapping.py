@@ -269,11 +269,15 @@ class Mapper(Node):
         self.map_pub.publish(self.map_msg)
 
 def save_map(node,file_path):
-    pkg_path =os.getcwd()
-    back_folder='..'
-    folder_name='map'
-    file_name=file_path
-    full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
+    # pkg_path =os.getcwd()
+    # back_folder='..'
+    # folder_name='map'
+    # file_name=file_path
+    # full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
+
+    full_path = os.path.abspath(__file__)
+    full_path = full_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\run_mapping.py',
+                                  'ros2_smart_home\\sub3\\map\\map.txt')
     print('full_path', full_path)
     f=open(full_path,'w')
     data=''
