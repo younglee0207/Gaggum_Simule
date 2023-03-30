@@ -3,6 +3,7 @@ import sunlight from "../../assets/plant/sun_image.png"
 import { useEffect, useState } from "react";
 import { GiWaterDrop } from "react-icons/gi"
 import { useNavigate } from "react-router";
+import { FaSun } from "react-icons/fa"
 
 const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plantWateringAmount, plantSunlight }) => {
 
@@ -12,7 +13,7 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
     navigate(`/plant/${plantId}`, { state: item });
   };
   const needSunlight = plantSunlight ? 
-  <img className="img-sunlight" src={sunlight} alt="햇빛 사진" /> : null
+  <FaSun className="sunlight__img" size="32px" color="#FF6B00" /> : <FaSun className="sunlight__img" size="32px" />
 
   const grayColor = "gray";
   const blueColor = "#25D8FF";
@@ -70,17 +71,17 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
       className="MyPlantListItem"
       onClick={navigateToDetail}
     >
-      <div className="img-div">
+      <div className="img__container">
         <img
           className="img-plant"
           src={plantImg}
           alt="식물 사진"
         />
-        {needSunlight}
+        {/* {needSunlight} */}
       </div>
-      <div className="content-div">
-        <p className="plant-name">{plantName}</p>
-        <p>{plantSpecies}</p>
+      <div className="content__container">
+        <h3 className="content__name">{plantName}</h3>
+        <p className="content__species">{plantSpecies}</p>
         <div className="watering-amount-div">
           <GiWaterDrop color={wateringAmount1}/>
           <GiWaterDrop color={wateringAmount2}/>

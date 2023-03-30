@@ -48,8 +48,8 @@ const App = () => {
           />
 
           {/* 내 식물 */}
-          {/* <Route path="/plant" element={<PlantListPage />} /> */}
-          <Route
+          <Route path="/plant" element={<PlantListPage />} />
+          {/* <Route
             path="/plant"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -58,9 +58,11 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
 
-          <Route
+          {/* 식물 디테일 */}
+          <Route path="/plant/:id" element={<PlantDetailPage />} />
+          {/* <Route
             path="/plant/:id"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -69,7 +71,7 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
           {/* 식물 일지 */}
           <Route
             path="/diary"
@@ -82,9 +84,9 @@ const App = () => {
             }
           />
           {/* 식물 등록 */}
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/register" element={<Register />} /> */}
 
-          {/* <Route
+          <Route
             path="/register"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -93,7 +95,7 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
           {/* 카카오 RedirectURI 페이지 */}
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
           {/* Socket 체크 */}
