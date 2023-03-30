@@ -22,7 +22,6 @@ const StartPage = () => {
           src={loginImg}
           alt="카카오 로그인"
           onClick={handleLogin}
-          style={{ marginTop: "60vh" }}
         />
       </div>
     </div>

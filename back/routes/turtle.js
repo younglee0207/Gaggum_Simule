@@ -6,7 +6,6 @@ const turtles = require("../servies/turtle");
 /* GET turtle. */
 router.get("/", async function (req, res, next) {
   try {
-    s3.uploadFile();
     res.json(await turtles.getTurtle(req.query.page));
   } catch (err) {
     console.error(`Error while getting turtle `, err.message);
