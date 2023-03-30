@@ -1,5 +1,6 @@
 import "./Start.style.scss";
 import loginImg from "../../assets/start/kakao_login_large_wide.png";
+import logoImg from "../../assets/logo/maskable_icon_x192_logo.png"
 
 const StartPage = () => {
   const REST_API_KEY = "58acce2e1c5607a9310ef74870273737";
