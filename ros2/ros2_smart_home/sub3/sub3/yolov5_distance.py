@@ -18,15 +18,6 @@ from ssafy_msgs.msg import TurtlebotStatus
 from squaternion import Quaternion
 
 import socketio
-sio = socketio.Client()
-
-@sio.event
-def connect():
-    print('connection established')
-
-@sio.event
-def disconnect():
-    print('disconnected from server')
 
 params_lidar = {
     "Range" : 90, #min & max range of lidar azimuths
