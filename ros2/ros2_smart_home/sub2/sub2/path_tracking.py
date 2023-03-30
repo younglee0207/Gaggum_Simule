@@ -7,7 +7,7 @@ from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
 import numpy as np
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import Int32
+from std_msgs.msg import Int16
 import time
 import random
 # path_tracking 노드는 로봇의 위치(/odom), 로봇의 속도(/turtlebot_status), 주행 경로(/local_path)를 받아서, 주어진 경로를 따라가게 하는 제어 입력값(/cmd_vel)을 계산합니다.
@@ -45,7 +45,7 @@ class followTheCarrot(Node):
         self.timer = self.create_timer(time_period, self.timer_callback)
 
         # handcontrol node에 제어 메시지를 보냄
-        self.hand_control_pub = self.create_publisher(Int32, '/hand_control_cmd', 10)
+        self.hand_control_pub = self.create_publisher(Int16, '/hand_control_cmd', 10)
 
         # 목표 좌표를 가지고 옴
         self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
@@ -61,7 +61,7 @@ class followTheCarrot(Node):
         self.path_msg=Path()
         self.cmd_msg=Twist()
 
-        self.handcontrol_cmd_msg = Int32()
+        self.handcontrol_cmd_msg = Int16()
 
         # 로직 2. 파라미터 설정(전방주시거리)
         self.lfd=0.1
@@ -78,6 +78,8 @@ class followTheCarrot(Node):
         self.go_cnt = 0
         self.back_cnt = 0
 
+        # 터틀봇의 상태 
+        # 100 물 주러 감 101 102
         self.state = 1
         
         # 터틀봇의 현재 위치
@@ -178,8 +180,15 @@ class followTheCarrot(Node):
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
                 if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
                     print('목표 지점에 도착')
-                    # 물건을 들고 있으면 내려놓고
-                    # 물건을 들고 있지 않으면 물건을 들기
+                    print(self.status_msg.can_lift)
+                    if self.status_msg.can_lift:
+                    # 물건을 들 수 있는 상태이면
+                        self.handcontrol_cmd_msg.data = 2
+                    # 물건을 들 고 있고 물건을 내려놓을 수 있으면
+                    elif not self.status_msg.can_lift and self.status_msg.can_use_hand:
+                        self.handcontrol_cmd_msg.data = 3
+
+                    self.hand_control_pub.publish(self.handcontrol_cmd_msg)
                 else:
                     print("no found forward point")
           
@@ -187,8 +196,7 @@ class followTheCarrot(Node):
                 self.cmd_msg.angular.z=0.0
 
             self.cmd_pub.publish(self.cmd_msg)
-            self.hand_control_pub.publish(self.handcontrol_cmd_msg)
-
+            
 
     def odom_callback(self, msg):
         self.is_odom=True
