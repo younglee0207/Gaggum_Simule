@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const plants = require("../servies/plant");
+const s3 = require("../aws/s3");
 
 /* GET plant. */
 router.get("/", async function (req, res, next) {
@@ -52,6 +53,16 @@ router.post("/edit", async function (req, res, next) {
 router.post("/delete", async function (req, res, next) {
   try {
     res.json(await plants.deletePlant(req.body));
+  } catch (err) {
+    console.error(`Error while watering plant`, err.message);
+    next(err);
+  }
+});
+
+router.post("/create", async function (req, res, next) {
+  try {
+    s3.uploadFile(req.body.plant_name,req.body.plant_img);
+    res.json(await plants.createPlant(req.body));
   } catch (err) {
     console.error(`Error while watering plant`, err.message);
     next(err);
