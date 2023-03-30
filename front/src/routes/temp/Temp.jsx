@@ -12,38 +12,11 @@ const Temp = () => {
   const [data, setData] = useRecoilState(socketState);
   const [data2, setData2] = useRecoilState(simulatorInfo);
 
-  // useEffect(() => {
-  //   socket.on("safety_status", (data) => {
-  //     console.log("received update :", data);
-  //     setData(data.data);
-  //   });
-
-  //   return () => {
-  //     socket.off("safety_status");
-  //   };
-  // }, []);
-
-  // socket.on("safety_status", (data) => {
-  //   console.log("safety_status :", data);
-  //   // setData(data);
-  // });
-
   useEffect(() => {
-    console.log("asda", socket); // true
-
-    socket.on("connect", () => {
-      console.log(socket); // true
-    });
-
     socket.on("simulator_info", (data) => {
       console.log("simulator_info :", data.environment);
       setData2(data);
     });
-
-    // socket.on("testServer2Client", (data) => {
-    //   console.log("Wlrgla", data);
-    //   setData(data.timestamp);
-    // });
 
     return () => {
       socket.off("simulator_info");
