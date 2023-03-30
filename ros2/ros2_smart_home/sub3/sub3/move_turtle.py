@@ -73,7 +73,7 @@ class MoveTurtleBot(Node):
         self.m_control_interval = 10
         self.m_control_iter = 0
 
-        sio.connect('https://j8b310.p.ssafy.io:3001')
+        sio.connect('https://j8b310.p.ssafy.io/socket')
         # sio.connect('http://localhost:3001')
 
 

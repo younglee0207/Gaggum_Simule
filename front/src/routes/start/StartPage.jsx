@@ -16,8 +16,10 @@ const StartPage = () => {
   return (
     <div className="StartPage">
       <div className="start-content">
-        <h1>가꿈</h1>
-
+        <img 
+          className="start__logo"
+          src={logoImg}
+        />
         <img
         className="button-content"
           src={loginImg}

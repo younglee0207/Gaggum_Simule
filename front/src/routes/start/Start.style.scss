@@ -1,9 +1,10 @@
 .StartPage {
   text-align: center;
   height: 100vh;
-  background-image: url("../../assets/start/mokoko_background.png");
+  background-image: url("../../assets/start/start_background_tulip.png");
   background-repeat: no-repeat;
   background-size: cover;
+
 
   .start-content {
     height: 100%;
@@ -13,8 +14,8 @@
       padding-top: 15vh;
     }
 
-    img {
-      margin-top: 50vh;
+    .start__login {
+      margin-top: 40vh;
       cursor: pointer;
     }
   }
