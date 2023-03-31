@@ -12,7 +12,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import CompressedImage, LaserScan, Imu
 from geometry_msgs.msg import Twist
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, Detection
 # from std_msgs.msg import Int16,Int8
 
 from squaternion import Quaternion
@@ -234,6 +234,8 @@ def main(args=None):
     subscription_scan = g_node.create_subscription(LaserScan, '/scan', scan_callback, 3)
 
     subscription_imu = g_node.create_subscription(Imu,'/imu',imu_callback,10)
+
+    publisher_detect = g_node.create_publisher(Detection, "/yolo_detected", 10)
     
     oflag = [False] * 5
     olist = ['plant1', 'plant2', 'plant3', 'plant4', 'plant5']
@@ -322,16 +324,10 @@ def main(args=None):
                     cx = int(x + (w / 2))
                     cy = int(y + (h / 2))
                     
-                    # xyv = xyii[np.logical_and(xyii[:, 0]>=cx-0.4*w, xyii[:, 0]<cx+0.4*w), :]
-                    # xyv = xyv[np.logical_and(xyv[:, 1]>=cy-0.4*h, xyv[:, 1]<cy+0.4*h), :]
-
-                    # xyv = xyii[np.logical_and(xyii[:, 0]>=x, xyii[:, 0]<=x+w), :]
-                    # xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
-
                     xyv = xyii[np.logical_and(xyii[:, 0]>=cx-(w/2 * 0.7), xyii[:, 0]<=cx+(w/2 * 0.7)), :]
                     xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
-                    
                     # print(f"xyv : {xyv}")
+                    
                     ## bbox 안에 들어가는 라이다 포인트들의 대표값(예:평균)을 뽑는다
                     # ostate = np.median(xyv[:, 2:], axis=0)
                     ostate = np.median(xyv, axis=0)
@@ -345,6 +341,7 @@ def main(args=None):
                     object_global_pose = transform_bot2map(transform_lidar2bot(relative))
                     print(f"객체 위치 좌표 : {object_global_pose}")
                     print(f"로봇 위치 좌표 : {loc_x, loc_y}")
+                    
                     # if relative_x < 0.2:
                     #     b64data = base64.b64encode(origin_img)
                     #     # print(f"base64_decode : {b64data.decode('utf-8')}")
@@ -354,8 +351,17 @@ def main(args=None):
                     #     "plant_position_x": loc_x,
                     #     "plant_position_y": loc_y
                     # }
+
+                    # 토픽 전송 테스트
+                    local_detect = Detection()
+                    local_detect.x = relative_x
+                    local_detect.y = relative_y
+                    local_detect.confidence = 80.
+                    local_detect.name = "plant1"
+
                     try:
                         print("데이터 보냄")
+                        publisher_detect.publish(local_detect)
                         # print("decode: ", b64data.decode('utf-8'))
                         # sio.emit("streaming", data)
                     except:
