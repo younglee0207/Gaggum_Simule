@@ -18,7 +18,7 @@ const socket = io("https://j8b310.p.ssafy.io");
 const Register = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-  const [isRegist, setIsRegist] = useState(false)
+  const [isRegist, setIsRegist] = useState(false);
 
   const closeModal = () => {
     Swal.fire({
@@ -29,7 +29,7 @@ const Register = () => {
       denyButtonText: "아니오",
     }).then((res) => {
       if (res.isConfirmed) {
-        setIsModalOpen(false)
+        setIsModalOpen(false);
       }
     });
   };

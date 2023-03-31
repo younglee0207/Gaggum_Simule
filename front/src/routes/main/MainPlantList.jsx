@@ -14,8 +14,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
+import { useNavigate } from "react-router";
 
 const MainPlantList = () => {
+
+  const navigate = useNavigate()
 
   const [needWaterPlant, setNeedWaterPlant] = useRecoilState(needWaterState);
 
@@ -23,9 +26,14 @@ const MainPlantList = () => {
     axios
       .get('https://j8b310.p.ssafy.io/api/plant/needwater')
       .then((res) => {
+        console.log(res.data.data)
         setNeedWaterPlant(res.data.data)
       })
   }
+
+  const handleNavigate = (id) => {
+    navigate(`/plant/${id}`)
+  };
 
   useEffect(() => {
     getNeedWaterPlant();
@@ -42,7 +50,7 @@ const MainPlantList = () => {
       >
         {needWaterPlant?.map((item) => {
           return (
-            <SwiperSlide key={item.div}>
+            <SwiperSlide key={item.div} onClick={() => handleNavigate(item.plant_number)} >
               <img
                 style={{ width: 100, height: 100 }}
                 src={item.plant_img}
