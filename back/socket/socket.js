@@ -52,7 +52,7 @@ function socketStart() {
       if (data.environment.hour == 13) {
         (async () => {
           // db에서 물줘야하는 식물 리스트 가져오기
-          let waterNeedPlants = await plants.getWaterNeedPlant();
+          let waterNeedPlants = await plants.getWaterNeedPlant2();
           console.log("물줘야하는 식물들", waterNeedPlants);
           waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
@@ -61,7 +61,7 @@ function socketStart() {
       }else if(data.environment.hour == 15 ){
         (async () => {
           // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
-          let sunNeedPlants = await plants.getWaterNeedPlant();
+          let sunNeedPlants = await plants.sunNeedPlants();
           let sunSpots = await plants.getSunSpot();
           console.log("햇빛 필요 식물들", sunNeedPlants);
           sunNeedPlants.mode = 200;
@@ -71,6 +71,9 @@ function socketStart() {
         })();
       }
     });
+    auto_move.data[1].plant_number
+    auto_move.mode
+    auto_move.sunspot.data[1].sunspot_x_position
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
     socket.on("go_straight", (data) => {
