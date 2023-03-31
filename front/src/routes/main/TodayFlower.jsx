@@ -30,11 +30,9 @@ const TodayFlower = () => {
           console.log(dataSet)
           setFlowerName(dataSet?.children[0].children[3].children[3].value)
           setFlowerMean(dataSet?.children[0].children[3].children[6].value)
-          setFlowerImg([
-            dataSet?.children[0].children[3].children[14].value.split(" ")[0],
-            dataSet?.children[0].children[3].children[15].value.split(" ")[0],
-            dataSet?.children[0].children[3].children[16].value.split(" ")[0]
-          ])
+          setFlowerImg(
+            dataSet?.children[0].children[3].children[14].value.split(" ")[0]
+          )
         })
     } catch (error) {
       console.log(error)
@@ -51,7 +49,7 @@ const TodayFlower = () => {
       <div className="flower-content">
         {flowerImg ? (
           <img 
-            src={flowerImg[Math.floor(Math.random() * 3)]}
+            src={flowerImg}
             alt="꽃 이미지"
           />
         ) : null}
