@@ -76,9 +76,6 @@ function socketStart() {
         })();
       }
     });
-    auto_move.data[1].plant_number
-    auto_move.mode
-    auto_move.sunspot.data[1].sunspot_x_position
 
     // // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
     // socket.on("simulator_info", (data) => {
