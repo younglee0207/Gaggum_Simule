@@ -54,9 +54,20 @@ function socketStart() {
           // db에서 물줘야하는 식물 리스트 가져오기
           let waterNeedPlants = await plants.getWaterNeedPlant();
           console.log("물줘야하는 식물들", waterNeedPlants);
-
+          waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
           socket.emit("auto_move", waterNeedPlants);
+        })();
+      }else if(data.environment.hour == 15 ){
+        (async () => {
+          // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
+          let sunNeedPlants = await plants.getWaterNeedPlant();
+          let sunSpots = await plants.getSunSpot();
+          console.log("햇빛 필요 식물들", sunNeedPlants);
+          sunNeedPlants.mode = 200;
+          sunNeedPlants.sunSpots = sunSpots;
+          // ROS로 급수 필요 식물 리스트 전달
+          socket.emit("auto_move", sunNeedPlants);
         })();
       }
     });
