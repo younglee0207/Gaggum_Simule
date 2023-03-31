@@ -60,11 +60,13 @@ def run_mapping(data):
 @sio.on("auto_move")
 def auto_move(data):
     # 여기에 어떤 정보를 가공해서 보내야 할까?
-    print("auto_move", data)
+    # [모드, x, y], [모드, x, y], [모드, x, y]
+    # { 물 주는 모드 : [[x, y], [x,y], [x,y]] }
+    print("auto_move", data)    
 
     
-# ip_server = 'http://localhost:3001'
-ip_server = "https://j8b310.p.ssafy.io/socket"
+ip_server = 'http://localhost:3001'
+# ip_server = "https://j8b310.p.ssafy.io/socket"
 # ip_server = 'http://j8b310.p.ssafy.io:3001'
 
 
@@ -122,7 +124,7 @@ class SocketClass(Node):
         self.create_map_publisher.publish(msg)
 
         #
-        self.auto_mode_publisher.publish()
+        # self.auto_mode_publisher.publish()
             
         # envir_status 정보를 socket 통신을 통해 프론트에 전달.
         sio.emit("simulator_info", info)
