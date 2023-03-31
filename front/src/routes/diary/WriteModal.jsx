@@ -1,19 +1,16 @@
 //수정모달입니다. 이름만 Write임
 
 
-import Reac, { useState } from "react";
+import { useState } from "react";
 import ReactDOM from "react-dom";
 import classes from "./WriteModal.module.scss";
 import {
-  AiOutlineArrowLeft,
-  AiFillPlusCircle,
   AiOutlineClose,
   AiOutlineCheck,
 } from "react-icons/ai";
-import plantImg from "../../assets/plant/mush.gif";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useRef } from "react";
+import client from "../../api/client";
 
 const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries }) => {
   // console.log('이건 다이어리 넘버',item.diary_number)
@@ -48,8 +45,8 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
     };
     // props.onAddInfo(userInfo);
 
-    axios
-      .post("https://j8b310.p.ssafy.io/api/diary/edit", diaryInfo)
+    client
+      .post("diary/edit", diaryInfo)
       .then((response) => {
         handleItemClick();
         onSubmit();

@@ -1,13 +1,12 @@
 import "./Main.style.scss"
 import { useRecoilState } from "recoil";
-import axios from "axios";
 import { useEffect } from "react";
 import { needWaterState } from "../../store";
+import client from "../../api/client"
 
 // import swiper
 import { Navigation, Pagination, Scrollbar, A11y, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-
 
 // swiper styles
 import 'swiper/css';
@@ -23,10 +22,10 @@ const MainPlantList = () => {
   const [needWaterPlant, setNeedWaterPlant] = useRecoilState(needWaterState);
 
   const getNeedWaterPlant = () => {
-    axios
-      .get('https://j8b310.p.ssafy.io/api/plant/needwater')
+    client
+      .get('plant/needwater')
       .then((res) => {
-        console.log(res.data.data)
+        console.log("물이 필요한 식물들 불러오기 성공")
         setNeedWaterPlant(res.data.data)
       })
   }
@@ -41,7 +40,7 @@ const MainPlantList = () => {
 
   return (
     <div className="MainPlantList">
-      <h2>물 줘</h2>
+      <h2>오늘 물을 줘야하는 식물</h2>
       <Swiper
         modules={[Navigation, EffectFade, Pagination]}
         spaceBetween={30}

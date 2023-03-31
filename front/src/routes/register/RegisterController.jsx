@@ -6,7 +6,6 @@ import {
   FaArrowAltCircleLeft,
   FaArrowAltCircleRight,
 } from "react-icons/fa";
-import { io } from "socket.io-client";
 
 const RegisterController = ({ socket }) => {
   const [UpKeyDown, setUpKeyDown] = useState(false);

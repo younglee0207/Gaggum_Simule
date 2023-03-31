@@ -1,5 +1,4 @@
 import "./Register.style.scss";
-import { useState } from "react";
 import plantImg from "../../assets/plant/mush.gif";
 import { BsCameraFill } from "react-icons/bs";
 
