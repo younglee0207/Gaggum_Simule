@@ -46,7 +46,7 @@ class wallTracking(Node):
         self.collision = False
 
         # wall_following 시작 조건
-        self.is_start = True
+        self.is_start = False
 
     def timer_callback(self):
         
