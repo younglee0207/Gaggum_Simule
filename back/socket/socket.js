@@ -66,7 +66,7 @@ function socketStart() {
       } else if (data.environment.hour == 15) {
         (async () => {
           // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
-          let sunNeedPlants = await plants.sunNeedPlants();
+          let sunNeedPlants = await plants.SunNeedPlant();
           let sunSpots = await plants.getSunSpot();
           console.log("햇빛 필요 식물들", sunNeedPlants);
           sunNeedPlants.mode = 200;
