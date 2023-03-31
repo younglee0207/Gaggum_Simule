@@ -8,15 +8,13 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import plantImg from "../../assets/plant/mush.gif";
 import NavBar from "../../components/navbar/NavBar";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import ModalMonth from "./ModalMonth";
 
 import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
 import axios from "axios";
-
-
 
 const Diary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -49,8 +47,6 @@ const Diary = () => {
     setIsModalMonthOpen(false);
   };
 
-
-
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
     closeModal();
@@ -80,7 +76,9 @@ const Diary = () => {
         alert("로딩에 실패하였습니다.");
       });
   };
-
+  useEffect(() => {
+    GetAllDiaries();
+  }, []);
   const GetYearDiaries = (year) => {
     console.log(year);
     axios
