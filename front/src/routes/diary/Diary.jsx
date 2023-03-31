@@ -103,7 +103,9 @@ const Diary = () => {
         alert("로딩에 실패하였습니다.");
       });
   };
-
+  useEffect(() => {
+    GetAllDiaries();
+  }, []);
   const GetYearDiaries = (year) => {
     console.log(year);
     client
