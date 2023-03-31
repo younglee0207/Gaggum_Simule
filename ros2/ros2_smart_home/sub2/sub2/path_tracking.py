@@ -166,6 +166,9 @@ class followTheCarrot(Node):
                     # 10이내의 거리에서 선속도를 줄이고 각속도를 높여서 목표 지점을 지나치지 않도록 함
                     if len(self.path_msg.poses) < 10:
                         out_vel = 0.3
+                        # 5 이내의 거리에서는 정밀한 제어를 위해 완전히 속도를 줄임
+                        if len(self.path_msg.poses) < 5:
+                            out_vel = 0.1
                         out_rad_vel = theta*2
                     elif self.is_approach:  # 목적이 영역 밖에서 사물과 근접 했다면
                         out_vel = -0.1
@@ -180,20 +183,25 @@ class followTheCarrot(Node):
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
                 if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
                     print('목표 지점에 도착')
+                    # 도착 후 멈추기
+                    self.cmd_msg.linear.x=0.0
+                    self.cmd_msg.angular.z=0.0
+
+                    # 핸드 컨트롤 publish 부분
                     print(self.status_msg.can_lift)
                     if self.status_msg.can_lift:
                     # 물건을 들 수 있는 상태이면
                         self.handcontrol_cmd_msg.data = 2
-                    # 물건을 들 고 있고 물건을 내려놓을 수 있으면
+                    # 물건을 들고 있고 물건을 내려놓을 수 있으면
                     elif not self.status_msg.can_lift and self.status_msg.can_use_hand:
                         self.handcontrol_cmd_msg.data = 3
 
                     self.hand_control_pub.publish(self.handcontrol_cmd_msg)
                 else:
+                    # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
                     print("no found forward point")
-          
-                self.cmd_msg.linear.x=0.0
-                self.cmd_msg.angular.z=0.0
+                    self.cmd_msg.linear.x=-0.1
+                    self.cmd_msg.angular.z=0.1
 
             self.cmd_pub.publish(self.cmd_msg)
             

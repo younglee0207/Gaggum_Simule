@@ -145,9 +145,6 @@ class a_star(Node):
                 # 350 * 350 으로 채워진 350 X 350 행렬 만들기
                 self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
 
-                # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
-                # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-                # 0은 장애물이 없는 영역을 의미한다.
                 if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
                     # 시작점을 넣어주었다.
                     self.aStar(start_grid_cell)
@@ -174,7 +171,6 @@ class a_star(Node):
 
     def heuristics(self, node):
         # 스마트 홈은 경로상에서 특정한 가중치(교통 혼잡 등)을 생각할 필요가 없어서 맨하탄을 사용
-        # return sqrt((node[0] - self.goal[0])**2+(node[1] - self.goal[1])**2) # 피타고라스
         return (abs(node[0] - self.goal[0]) + abs(node[1] - self.goal[1])) # 맨하탄
             
             
@@ -182,7 +178,6 @@ class a_star(Node):
         heap = []
         heapq.heappush(heap,(0,start))
         self.cost[start[0]][start[1]] = 1
-        found = False
         '''
         로직 7. grid 기반 최단경로 탐색
         '''
@@ -191,13 +186,12 @@ class a_star(Node):
         while heap:
             cost,current = heapq.heappop(heap) 
             if self.goal[0] == current[0] and self.goal[1] == current[1]:
-                found = True
                 break
 
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if next[0] >= 0 and next[1] >= 0 and next[0] < self.GRIDSIZE and next[1] < self.GRIDSIZE:
-                        if self.grid[next[0]][next[1]] < 50: # 50보다 작거나 127인 경우 이동 가능한 것으로 본다.
+                        if self.grid[next[0]][next[1]] <= 50:    # 장애물 확률이 50% 이하면
                             deltaCost = self.dCost[i] + self.heuristics(next)
                             if  self.cost[next[0]][next[1]] > self.cost[current[0]][current[1]] + deltaCost:
                                 self.cost[next[0]][next[1]] = self.cost[current[0]][current[1]] + deltaCost
