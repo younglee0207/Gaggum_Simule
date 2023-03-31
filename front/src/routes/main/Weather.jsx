@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import axios from "axios"
 import { useRecoilState } from "recoil";
 import { guLocationState, doLocationState, weatherState } from "../../store";
-
 const API_KEY = "be002738467412a6651e4278dd3f8c76"
 const KAKAO_REST_API_KEY = process.env.REACT_APP_KAKAO_MAP_REST_API_KEY;
 
@@ -51,6 +50,7 @@ const Weather = () => {
           },
         )
         .then((res) => {
+          console.log("날씨 최신화")
           const location = res.data.documents[0].address
           setDoLocation(location.region_1depth_name)
           setGuLocation(location.region_2depth_name)

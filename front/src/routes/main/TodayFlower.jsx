@@ -27,8 +27,8 @@ const TodayFlower = () => {
           }
         })
         .then((res) => {
+          console.log("오늘의 꽃 불러오기 성공")
           const dataSet = new XMLParser().parseFromString(res.data)
-          console.log(dataSet)
           setFlowerName(dataSet?.children[0].children[3].children[3].value)
           setFlowerMean(dataSet?.children[0].children[3].children[6].value)
           setFlowerImg(

@@ -2,22 +2,16 @@ import "./Diary.scss";
 import { useNavigate } from "react-router-dom";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
-import { AiOutlineArrowLeft, AiFillPlusCircle } from "react-icons/ai";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import plantImg from "../../assets/plant/mush.gif";
-import NavBar from "../../components/navbar/NavBar";
 
+import { MdKeyboardArrowDown } from "react-icons/md";
 import React, { useState } from "react";
 import Modal from "./Modal";
 import ModalMonth from "./ModalMonth";
 
 import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
-import axios from "axios";
 import Swal from "sweetalert2";
-
-
+import client from "../../api/client";
 
 const Diary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -98,8 +92,8 @@ const Diary = () => {
   const [loadedPlants, setLoadedPlants] = useState([]);
 
   const GetAllDiaries = () => {
-    axios
-      .get("https://j8b310.p.ssafy.io/api/diary")
+    client
+      .get("diary")
       .then((response) => {
         // console.log("이거", response.data.data);
         setLoadedDiaries(response.data.data);
@@ -112,8 +106,8 @@ const Diary = () => {
 
   const GetYearDiaries = (year) => {
     console.log(year);
-    axios
-      .get(`https://j8b310.p.ssafy.io/api/diary/date?diaryDate=${year}`)
+    client
+      .get(`diary/date?diaryDate=${year}`)
       .then((response) => {
         // console.log("이거년도", response.data.data);
         setLoadedDiaries(response.data.data);
@@ -124,8 +118,8 @@ const Diary = () => {
       });
   };
   const GetPlants = () => {
-    axios
-      .get(`https://j8b310.p.ssafy.io/api/plant`)
+    client
+      .get(`plant`)
       .then((response) => {
         const plants = [];
         // console.log("이거전체식물", response);
@@ -145,8 +139,8 @@ const Diary = () => {
   };
 
   const GetNameDiaries = (plant_name) => {
-    axios
-      .get(`https://j8b310.p.ssafy.io/api/diary/name?plantName=${plant_name}`)
+    client
+      .get(`diary/name?plantName=${plant_name}`)
       .then((response) => {
         console.log("이거이름로드", response);
         setLoadedDiaries(response.data.data);
@@ -162,8 +156,8 @@ const Diary = () => {
     const deleteInfo = {
       diary_number: number,
     };
-    axios
-      .post(`https://j8b310.p.ssafy.io/api/diary/delete`, deleteInfo)
+    client
+      .post(`diary/delete`, deleteInfo)
       .then((response) => {
         alert("삭제 성공");
         GetYearDiaries(2023);
