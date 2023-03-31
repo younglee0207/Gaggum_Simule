@@ -31,6 +31,13 @@ const LoadingPage = () => {
     socket.emit("run_mapping", {
       data: "mapping start",
     });
+
+    socket.on("run_mapping", (data) => {
+      if (data === -1) {
+        console.log("종료조건", data);
+        navigate("/home");
+      }
+    });
   }, []);
 
   useEffect(() => {

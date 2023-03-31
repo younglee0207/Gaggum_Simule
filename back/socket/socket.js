@@ -40,26 +40,29 @@ function socketStart() {
       socket.to(roomName).emit("run_mapping", message);
       // socket.emit("safety_status", message);
       console.log("run_mapping", message);
-    });
 
-    // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
-    socket.on("simulator_info", (data) => {
-      console.log("simulator_info", data);
-      // 프론트 페이지로 simulator 전달
-      // socket.to(roomName).emit("simulator_info", data);
-
-      //현재 시간이 물주는 시간인지 체크
-      if (data.environment.hour == 13) {
-        (async () => {
-          // db에서 물줘야하는 식물 리스트 가져오기
-          let waterNeedPlants = await plants.getWaterNeedPlant();
-          console.log("물줘야하는 식물들", waterNeedPlants);
-
-          // ROS로 급수 필요 식물 리스트 전달
-          socket.emit("auto_move", waterNeedPlants);
-        })();
+      if (message == -1) {
+        console.log("맵 종료 됨");
+        socket.emit("run_mapping", message);
       }
     });
+
+    // // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
+    // socket.on("simulator_info", (data) => {
+    //   console.log("simulator_info", data);
+
+    //   //현재 시간이 물주는 시간인지 체크
+    //   if (data.environment.hour == 13) {
+    //     (async () => {
+    //       // db에서 물줘야하는 식물 리스트 가져오기
+    //       let waterNeedPlants = await plants.getWaterNeedPlant();
+    //       console.log("물줘야하는 식물들", waterNeedPlants);
+
+    //       // ROS로 급수 필요 식물 리스트 전달
+    //       socket.emit("auto_move", waterNeedPlants);
+    //     })();
+    //   }
+    // });
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
     socket.on("go_straight", (data) => {
