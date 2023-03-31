@@ -15,8 +15,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useRef } from "react";
 
-const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
-  console.log('이건 다이어리 넘버',item.diary_number)
+const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries }) => {
+  // console.log('이건 다이어리 넘버',item.diary_number)
   const handleItemClick = () => {
     if (item.plant_name) {
       GetNameDiaries(item.plant_name);
@@ -52,7 +52,7 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
       .post("https://j8b310.p.ssafy.io/api/diary/edit", diaryInfo)
       .then((response) => {
         handleItemClick();
-        onClose();
+        onSubmit();
       })
       .catch((error) => {
         console.log(error);
