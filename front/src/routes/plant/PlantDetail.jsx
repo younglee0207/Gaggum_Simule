@@ -7,7 +7,12 @@ import axios from "axios";
 const PlantDetail = ({ item, handleWatering }) => {
 
   const [checked, setChecked] = useState(false);
+  const registDate = new Date(item.plant_create_date?.slice(0, 10))
+  const nowDate = new Date()
+  const diff = (nowDate - registDate) / (1000 * 60 * 60 * 24) // 일(day) 단위로 계산
+  const daysDiff = Math.floor(diff) // 소수점 이하 절사
   
+
   const handleChange = () => {
     setChecked(!checked)
   };
@@ -23,14 +28,17 @@ const PlantDetail = ({ item, handleWatering }) => {
       <div className="detail-top">
         {item?.plant_sunlight ? <FaSun className="top__img" size="40px" color="#FF6B00"/> : <FaSun className="top__img" size="40px" color="#000000" />}
         <p className="top__title">{item?.plant_species}</p>
-        <button
+        <div
           className="top__button"
-          onClick={handleWatering}
-        >물</button>
+        >
+          <button
+            onClick={handleWatering}
+          >급수 최신화</button>
+        </div>
       </div>
       <h2 className="detail-name">{item?.plant_name}</h2>
       <div className="detail-content">
-        <h3>20일이 지났어요</h3>
+        <h3>{daysDiff}일이 지났어요</h3>
         <hr />
         <p>{item?.plant_memo}</p>
       </div>
