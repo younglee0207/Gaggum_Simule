@@ -3,7 +3,7 @@ import loginImg from "../../assets/start/kakao_login_large_wide.png";
 import logoImg from "../../assets/logo/maskable_icon_x192_logo.png"
 
 const StartPage = () => {
-  const REST_API_KEY = "58acce2e1c5607a9310ef74870273737";
+  const REST_API_KEY = process.env.REACT_APP_KAKAO_LOGIN_REST_API_KEY;
   // const REDIRECT_URI = "http://localhost:3000/auth/kakao/callback";
   const REDIRECT_URI = "https://j8b310.p.ssafy.io/auth/kakao/callback";
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
