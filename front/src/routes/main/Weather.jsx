@@ -13,7 +13,7 @@ const Weather = () => {
   const [nowLon, setNowLon] = useState(null)
   const [doLocation, setDoLocation] = useRecoilState(doLocationState)
   const [guLocation, setGuLocation] = useRecoilState(guLocationState)
-  const [iconState, setIconState] = useState(null)
+  const [iconState, setIconState] = useState()
 
   // 현재 위치 함수
   const getCurrentLocation = () => {
@@ -51,6 +51,7 @@ const Weather = () => {
         )
         .then((res) => {
           console.log("날씨 최신화")
+
           const location = res.data.documents[0].address
           setDoLocation(location.region_1depth_name)
           setGuLocation(location.region_2depth_name)
@@ -62,13 +63,12 @@ const Weather = () => {
   }
 
   useEffect(() => {
-    if (!nowWeather) {
-      getCurrentLocation();
-    }
+    getCurrentLocation();
+    
     if (!doLocation || !guLocation) {
       mapApi();
     }
-  }, [nowLat, nowLon])
+  }, [nowLat, nowLon, iconState])
 
   return (
     <div 
