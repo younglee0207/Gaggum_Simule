@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-
+const plants = require("../servies/plant");
 // 로직 1. WebSocket 서버, WebClient 통신 규약 정의
 const server = require("http").createServer(app);
 
@@ -46,10 +46,16 @@ function socketStart() {
     socket.on("simulator_info", (data) => {
       console.log("simulator_info", data);
       // 프론트 페이지로 simulator 전달
-      socket.to(roomName).emit("simulator_info", data);
+      // socket.to(roomName).emit("simulator_info", data);
 
-      // ROS로 다시 데이터 전달
-      socket.emit("auto_move", data.environment.month);
+      //현재 시간이 물주는 시간인지 체크
+      if(data.environment.hour==12){
+        //db에서 물줘야하는 식물 리스트 가져오기
+        let waterNeedPlants = plants.getWaterNeedPlant();
+        console.log("물줘야하는 식물들", waterNeedPlants);
+        //ROS로 급수 필요 식물 리스트 전달\
+        socket.emit("auto_move", waterNeedPlants);
+      }
     });
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
