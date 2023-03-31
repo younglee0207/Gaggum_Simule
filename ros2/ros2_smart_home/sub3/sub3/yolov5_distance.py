@@ -17,17 +17,6 @@ from ssafy_msgs.msg import TurtlebotStatus
 
 from squaternion import Quaternion
 
-import socketio
-sio = socketio.Client()
-
-@sio.event
-def connect():
-    print('connection established')
-
-@sio.event
-def disconnect():
-    print('disconnected from server')
-
 params_lidar = {
     "Range" : 90, #min & max range of lidar azimuths
     "CHANNEL" : int(1), #verticla channel of a lidar
@@ -69,11 +58,14 @@ params_bot = {
 class detection_net_class():
     def __init__(self):
         # yolo v5
-        full_path = os.path.abspath(__file__)
-        full_path = full_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 
+        os_file_path = os.path.abspath(__file__)
+        print(os_file_path)
+        full_path = os_file_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 
                                         'ros2_smart_home\\sub3\\sub3\\model_weights\\gaggum_weight.pt')
-        remote_yolov5_path = "ultralytics/yolov5"
-        self.model = torch.hub.load(remote_yolov5_path, 'custom', path=full_path)
+        # remote_yolov5_path = "ultralytics/yolov5"
+        local_yolov5_path = os_file_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 'yolov5')
+
+        self.model = torch.hub.load(local_yolov5_path, 'custom', path=full_path)
 
     def inference(self, image_np):
         results = self.model(image_np)
@@ -354,15 +346,15 @@ def main(args=None):
                     object_global_pose = transform_bot2map(transform_lidar2bot(relative))
                     print(f"객체 위치 좌표 : {object_global_pose}")
                     print(f"로봇 위치 좌표 : {loc_x, loc_y}")
-                    if relative_x < 0.2:
-                        b64data = base64.b64encode(origin_img)
-                        # print(f"base64_decode : {b64data.decode('utf-8')}")
-                    data = {
-                        "plant_detected_name" : "plant2",
-                        "plant_img": b64data.decode('utf-8'),
-                        "plant_position_x": loc_x,
-                        "plant_position_y": loc_y
-                    }
+                    # if relative_x < 0.2:
+                    #     b64data = base64.b64encode(origin_img)
+                    #     # print(f"base64_decode : {b64data.decode('utf-8')}")
+                    # data = {
+                    #     "plant_original_name" : "plant2",
+                    #     "plant_img": b64data.decode('utf-8'),
+                    #     "plant_position_x": loc_x,
+                    #     "plant_position_y": loc_y
+                    # }
                     try:
                         print("데이터 보냄")
                         # print("decode: ", b64data.decode('utf-8'))
