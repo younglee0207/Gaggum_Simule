@@ -13,7 +13,6 @@ import RedirectURI from "./routes/start/RedirectURI";
 import Temp from "../src/routes/temp/Temp";
 import { useState, useEffect } from "react";
 const App = () => {
-  
   return (
     <div className="App">
       <BrowserRouter>
@@ -22,8 +21,9 @@ const App = () => {
           {/* 시작화면 */}
           <Route path="/" element={<StartPage />} />
           {/* 메인화면 */}
-          
-          <Route
+          <Route path="/home" element={<MainPage />} />
+
+          {/* <Route
             path="/home"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -32,9 +32,10 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
           {/* 로딩화면 */}
-          
+          {/* <Route path="/loading" element={<LoadingPage />} /> */}
+
           <Route
             path="/loading"
             element={
@@ -47,6 +48,7 @@ const App = () => {
           />
 
           {/* 내 식물 */}
+          {/* <Route path="/plant" element={<PlantListPage />} /> */}
           <Route
             path="/plant"
             element={
@@ -57,8 +59,7 @@ const App = () => {
               )
             }
           />
-         
-            
+
           <Route
             path="/plant/:id"
             element={
@@ -69,7 +70,7 @@ const App = () => {
               )
             }
           />
-        {/* 식물 일지 */}
+          {/* 식물 일지 */}
           <Route
             path="/diary"
             element={
@@ -81,8 +82,9 @@ const App = () => {
             }
           />
           {/* 식물 등록 */}
-          
-          <Route
+          <Route path="/register" element={<Register />} />
+
+          {/* <Route
             path="/register"
             element={
               parseInt(localStorage.getItem("turtle_number")) === 1 ? (
@@ -91,11 +93,11 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          />
+          /> */}
           {/* 카카오 RedirectURI 페이지 */}
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
           {/* Socket 체크 */}
-          <Route path="/socket" element={<Temp />} />
+          <Route path="/temp" element={<Temp />} />
         </Routes>
         {/* 로그인 되어있어야 navbar 보이는 로직 추가하기 */}
       </BrowserRouter>

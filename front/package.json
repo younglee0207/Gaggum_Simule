@@ -19,12 +19,25 @@
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "react-switch": "^7.0.0",
+    "react-xml-parser": "^1.1.8",
     "recoil": "^0.7.7",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
     "sweetalert2": "^11.7.3",
     "swiper": "^9.1.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "workbox-background-sync": "^5.1.4",
+    "workbox-broadcast-update": "^5.1.4",
+    "workbox-cacheable-response": "^5.1.4",
+    "workbox-core": "^5.1.4",
+    "workbox-expiration": "^5.1.4",
+    "workbox-google-analytics": "^5.1.4",
+    "workbox-navigation-preload": "^5.1.4",
+    "workbox-precaching": "^5.1.4",
+    "workbox-range-requests": "^5.1.4",
+    "workbox-routing": "^5.1.4",
+    "workbox-strategies": "^5.1.4",
+    "workbox-streams": "^5.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -50,4 +63,5 @@
       "last 1 safari version"
     ]
   }
+  
 }
