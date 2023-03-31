@@ -65,15 +65,12 @@ function socketStart() {
           let sunSpots = await plants.getSunSpot();
           console.log("햇빛 필요 식물들", sunNeedPlants);
           sunNeedPlants.mode = 200;
-          sunNeedPlants.sunSpots = sunSpots;
+          sunNeedPlants.sunSpots = sunSpots.data;
           // ROS로 급수 필요 식물 리스트 전달
           socket.emit("auto_move", sunNeedPlants);
         })();
       }
     });
-    auto_move.data[1].plant_number
-    auto_move.mode
-    auto_move.sunspot.data[1].sunspot_x_position
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
     socket.on("go_straight", (data) => {
