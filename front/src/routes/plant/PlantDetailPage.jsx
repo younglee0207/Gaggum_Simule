@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Swal from "sweetalert2";
@@ -6,6 +5,7 @@ import NavBar from "../../components/navbar/NavBar";
 import { getPlantDetailState } from "../../store";
 import "./Plant.style.scss"
 import PlantDetail from "./PlantDetail";
+import client from "../../api/client";
 
 const PlantDetailPage = () => {
 
@@ -13,8 +13,8 @@ const PlantDetailPage = () => {
   const [plantDetail, setPlantDetail] = useState(getPlantDetailState);
 
   const getPlantDetail = () => {
-    axios
-      .get(`https://j8b310.p.ssafy.io/api/plant/number?plantNumber=${id}`)
+    client
+      .get(`plant/number?plantNumber=${id}`)
       .then((res) => {
         setPlantDetail(res.data.data[id - 1])
       })
@@ -33,8 +33,8 @@ const PlantDetailPage = () => {
       confirmButtonText: "네",
       denyButtonText: "아니오"
     }).then(() => {
-      axios
-        .post('https://j8b310.p.ssafy.io/api/plant/water', data)
+      client
+        .post('plant/water', data)
         .then(() => {
           getPlantDetail()
         })

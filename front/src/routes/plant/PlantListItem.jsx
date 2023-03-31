@@ -1,5 +1,4 @@
 import "./Plant.style.scss"
-import sunlight from "../../assets/plant/sun_image.png"
 import { useEffect, useState } from "react";
 import { GiWaterDrop } from "react-icons/gi"
 import { useNavigate } from "react-router";

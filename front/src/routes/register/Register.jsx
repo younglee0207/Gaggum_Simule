@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowLeft, AiFillCheckCircle } from "react-icons/ai";
-import classes from "../diary/WriteModal.module.scss";
 import Swal from "sweetalert2";
 
 import { useState } from "react";

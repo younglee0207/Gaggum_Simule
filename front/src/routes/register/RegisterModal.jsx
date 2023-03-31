@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import classes from "../diary/WriteModal.module.scss";
 import {
-  AiOutlineArrowLeft,
-  AiFillPlusCircle,
   AiOutlineClose,
   AiOutlineCheck,
 } from "react-icons/ai";
