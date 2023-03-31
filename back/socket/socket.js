@@ -49,13 +49,14 @@ function socketStart() {
       // socket.to(roomName).emit("simulator_info", data);
 
       //현재 시간이 물주는 시간인지 체크
-      if (data.environment.hour == 13) {
-        //db에서 물줘야하는 식물 리스트 가져오기
-        let waterNeedPlants = plants.getWaterNeedPlant();
-        console.log("물줘야하는 식물들", waterNeedPlants);
-        //ROS로 급수 필요 식물 리스트 전달\
-        socket.emit("auto_move", waterNeedPlants);
-      }
+      if (data.environment.hour == 13)
+        async () => {
+          //db에서 물줘야하는 식물 리스트 가져오기
+          let waterNeedPlants = await plants.getWaterNeedPlant();
+          console.log("물줘야하는 식물들", waterNeedPlants);
+          //ROS로 급수 필요 식물 리스트 전달\
+          socket.emit("auto_move", waterNeedPlants);
+        };
     });
 
     // 터틀봇 수동조작 파트 앞, 뒤, 오른쪽, 왼쪽
