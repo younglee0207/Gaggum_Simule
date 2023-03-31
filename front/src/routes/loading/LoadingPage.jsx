@@ -7,7 +7,8 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import Swal from "sweetalert2";
 
 // 나중에 배포주소로 바꿔주기
-const socket = io("https://j8b310.p.ssafy.io");
+// const socket = io("https://j8b310.p.ssafy.io");
+const socket = io("http://localhost:3001");
 
 const LoadingPage = () => {
   const navigate = useNavigate();
@@ -29,6 +30,13 @@ const LoadingPage = () => {
   useEffect(() => {
     socket.emit("run_mapping", {
       data: "mapping start",
+    });
+
+    socket.on("run_mapping", (data) => {
+      if (data === -1) {
+        console.log("종료조건", data);
+        navigate("/home");
+      }
     });
   }, []);
 

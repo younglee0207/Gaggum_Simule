@@ -6,7 +6,7 @@ from ssafy_msgs.msg import TurtlebotStatus
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from sensor_msgs.msg import LaserScan, PointCloud
-
+from std_msgs.msg import Int8MultiArray
 
 class wallTracking(Node):
 
@@ -17,6 +17,11 @@ class wallTracking(Node):
         self.lidar_sub = self.create_subscription(LaserScan,'/scan',self.lidar_callback,10)
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
+
+        # 맵 만들 때 필요한 변수를 저장하는 주소 publish
+        self.create_map_publisher = self.create_publisher(Int8MultiArray, '/create_map', 10)
+        # socket에서 받아온 맵 만들기 실행 여부 정보 받기
+        self.create_map_sub = self.create_subscription(Int8MultiArray, '/create_map', self.create_map_callback, 100)
 
         self.cmd_msg = Twist()
         time_period = 0.05
@@ -46,7 +51,13 @@ class wallTracking(Node):
         self.collision = False
 
         # wall_following 시작 조건
-        self.is_start = True
+        self.is_start = False
+
+    
+    # 맵 생성
+    def create_map_callback(self, msg):
+        self.is_start = msg.data[1]
+        print("wall_tracking 데이터 값", msg)
 
     def timer_callback(self):
         
@@ -72,12 +83,21 @@ class wallTracking(Node):
                 self.follow_the_wall()
             else:
                 print('오류 발생!!')
+
+        # 맵 종료 되면 -1 data 전달.
+        elif self.is_mapping_end:
+            msg = Int8MultiArray()
+            msg.data = [-1, -1]
+            self.create_map_publisher.publish(msg)
             
         else:
             # 제자리에 멈추기
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.0
             print('터틀봇 대기중')
+
+        
+            
 
         self.cmd_pub.publish(self.cmd_msg)
 

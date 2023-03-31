@@ -40,6 +40,11 @@ function socketStart() {
       socket.to(roomName).emit("run_mapping", message);
       // socket.emit("safety_status", message);
       console.log("run_mapping", message);
+
+      if (message == -1) {
+        console.log("맵 종료 됨");
+        socket.emit("run_mapping", message);
+      }
     });
 
     // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
@@ -52,20 +57,20 @@ function socketStart() {
       if (data.environment.hour == 13) {
         (async () => {
           // db에서 물줘야하는 식물 리스트 가져오기
-          let waterNeedPlants = await plants.getWaterNeedPlant();
+          let waterNeedPlants = await plants.getWaterNeedPlant2();
           console.log("물줘야하는 식물들", waterNeedPlants);
           waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
           socket.emit("auto_move", waterNeedPlants);
         })();
-      }else if(data.environment.hour == 15 ){
+      } else if (data.environment.hour == 15) {
         (async () => {
           // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
-          let sunNeedPlants = await plants.getWaterNeedPlant();
+          let sunNeedPlants = await plants.SunNeedPlant();
           let sunSpots = await plants.getSunSpot();
           console.log("햇빛 필요 식물들", sunNeedPlants);
           sunNeedPlants.mode = 200;
-          sunNeedPlants.sunSpots = sunSpots;
+          sunNeedPlants.sunSpots = sunSpots.data;
           // ROS로 급수 필요 식물 리스트 전달
           socket.emit("auto_move", sunNeedPlants);
         })();

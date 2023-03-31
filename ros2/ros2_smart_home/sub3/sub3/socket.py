@@ -52,19 +52,23 @@ def run_mapping(data):
 
     global map_create, map_create_turtle_bot 
 
+    map_create = 1
+    map_create_turtle_bot = 1
+
     # mapping을 시작한다. 여기 부분 그냥 1로 바꾸기 !
-    map_create = not map_create
-    map_create_turtle_bot = not map_create_turtle_bot
+    # if map_create == 0 and map_create_turtle_bot == 0:
+    #     map_create = 1
+    #     map_create_turtle_bot = 1
 
 # 자동급수, 자동 물주기 정보 들어오는 곳
 @sio.on("auto_move")
 def auto_move(data):
     # 여기에 어떤 정보를 가공해서 보내야 할까?
-    print("auto_move", data)
+    print("auto_move", data)    
 
     
-# ip_server = 'http://localhost:3001'
-ip_server = "https://j8b310.p.ssafy.io/socket"
+ip_server = 'http://localhost:3001'
+# ip_server = "https://j8b310.p.ssafy.io/socket"
 # ip_server = 'http://j8b310.p.ssafy.io:3001'
 
 
@@ -80,7 +84,9 @@ class SocketClass(Node):
         # 맵 만들 때 필요한 변수를 저장하는 주소 publish
         self.create_map_publisher = self.create_publisher(Int8MultiArray, '/create_map', 10)
         # 터틀 봇 모드별로 작동 실행 [모드, 화분, x, y]
-        self.auto_mode_publisher = self.create_publisher(Int8MultiArray, '/auto_mode', 10)
+        # self.auto_mode_publisher = self.create_publisher(Int8MultiArray, '/auto_mode', 10)
+        # 터틀 봇 맵 작동 정보 구독
+        self.create_map_sub = self.create_subscription(Int8MultiArray, '/create_map', self.create_map_callback, 1000)
         # 환경 변수
         self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.env_callback, 1000)
         # 터틀봇 정보
@@ -111,6 +117,19 @@ class SocketClass(Node):
         info["robot"]["x"] = msg.twist.angular.x
         info["robot"]["y"] = msg.twist.angular.y
 
+    def create_map_callback(self, msg):
+        # test
+        if msg.data[1] == -1:
+            print("맵 스캔이 종료되었습니다.")
+            sio.emit("run_mapping", msg.data[1])
+
+            # 스캔 종료 후 다시 0으로 대기 상태 하기
+            msg = Int8MultiArray()
+            msg.data = [0, 0]
+            self.create_map_publisher.publish(msg)
+            
+            sio.disconnect()
+
 
     # socket 정보를 저장하거나 다른 곳에 쓸 수 있게 callback
     def timer_callback(self):
@@ -120,11 +139,19 @@ class SocketClass(Node):
         msg.data = [map_create, map_create_turtle_bot]
         print("MapOperationList", msg)
         self.create_map_publisher.publish(msg)
-
-        #
-        self.auto_mode_publisher.publish()
+        
+        # self.auto_mode_publisher.publish()  
             
-        # envir_status 정보를 socket 통신을 통해 프론트에 전달.
+        # test
+        # if msg.data[1] == -1:
+        #     print("맵 스캔이 종료되었습니다.")
+        #     sio.emit("run_mapping", msg.data[1])
+
+        #     # 스캔 종료 후 다시 0으로 대기 상태 하기
+        #     msg.data = [0, 0]
+        #     self.create_map_publisher.publish(msg)
+            
+        # envir_status 정보를 socket 통신을 통해 백에 전달.
         sio.emit("simulator_info", info)
 
 
