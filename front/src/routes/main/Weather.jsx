@@ -5,7 +5,7 @@ import { useRecoilState } from "recoil";
 import { guLocationState, doLocationState, weatherState } from "../../store";
 
 const API_KEY = "be002738467412a6651e4278dd3f8c76"
-const KAKAO_REST_API_KEY = "6d4cc0bbd54b7fee991f9f9f3bcbed4d";
+const KAKAO_REST_API_KEY = process.env.REACT_APP_KAKAO_MAP_REST_API_KEY;
 
 const Weather = () => {
 
