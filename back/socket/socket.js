@@ -47,6 +47,36 @@ function socketStart() {
       }
     });
 
+    // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
+    socket.on("simulator_info", (data) => {
+      console.log("simulator_info", data);
+      // 프론트 페이지로 simulator 전달
+      // socket.to(roomName).emit("simulator_info", data);
+
+      //현재 시간이 물주는 시간인지 체크
+      if (data.environment.hour == 13) {
+        (async () => {
+          // db에서 물줘야하는 식물 리스트 가져오기
+          let waterNeedPlants = await plants.getWaterNeedPlant();
+          console.log("물줘야하는 식물들", waterNeedPlants);
+          waterNeedPlants.mode = 100;
+          // ROS로 급수 필요 식물 리스트 전달
+          socket.emit("auto_move", waterNeedPlants);
+        })();
+      } else if (data.environment.hour == 15) {
+        (async () => {
+          // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
+          let sunNeedPlants = await plants.getWaterNeedPlant();
+          let sunSpots = await plants.getSunSpot();
+          console.log("햇빛 필요 식물들", sunNeedPlants);
+          sunNeedPlants.mode = 200;
+          sunNeedPlants.sunSpots = sunSpots;
+          // ROS로 급수 필요 식물 리스트 전달
+          socket.emit("auto_move", sunNeedPlants);
+        })();
+      }
+    });
+
     // // 시뮬레이터 환경변수(시간, 날씨), 로봇 위치 정보 전달(백 -> ROS)
     // socket.on("simulator_info", (data) => {
     //   console.log("simulator_info", data);
