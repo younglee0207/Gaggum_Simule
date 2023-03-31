@@ -6,7 +6,6 @@ from ssafy_msgs.msg import TurtlebotStatus
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import Int8MultiArray
 
 
 class wallTracking(Node):
@@ -18,8 +17,6 @@ class wallTracking(Node):
         self.lidar_sub = self.create_subscription(LaserScan,'/scan',self.lidar_callback,10)
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
-        self.move_start_sub = self.create_subscription(Int8MultiArray, '/create_map', self.start_callback, 10)
-
 
         self.cmd_msg = Twist()
         time_period = 0.05
@@ -32,6 +29,9 @@ class wallTracking(Node):
 
         # 터틀봇의 상태를 저장
         self.state = 0
+
+        self.is_comback = False
+        self.is_mapping_end = False
 
         # 영역별 장애물과의 거리
         self.regions = {
@@ -46,16 +46,24 @@ class wallTracking(Node):
         self.collision = False
 
         # wall_following 시작 조건
-        self.is_start = False
-
-    def start_callback(self, msg):
-        # msg.data[1] = map_create_turtle_bot
-        self.is_start = msg.data[1]
-        print('터틀봇 움직이는 명령어', self.is_start)
+        self.is_start = True
 
     def timer_callback(self):
+        
+        # 맵핑 종료 조건
+        if self.is_odom:
+             # 로봇의 현재 위치
+            robot_pose_x = self.odom_msg.pose.pose.position.x
+            robot_pose_y = self.odom_msg.pose.pose.position.y
+            print(robot_pose_x, robot_pose_y)
+            print(self.is_comback, self.is_mapping_end)
+            # 로봇이 시작 위치 (-5.818, 6.399)에 5 반경을 벗어나면
+            if not (-5.818 - 0.2 <= robot_pose_x <= -5.818 + 0.2 and 6.399 - 0.2 <= robot_pose_y <= 6.399 + 0.2):
+                self.is_comback = True
+            elif self.is_comback:
+                self.is_mapping_end = True
 
-        if self.is_start:
+        if self.is_start and not self.is_mapping_end:
             if self.state == 0:
                 self.find_wall()
             elif self.state == 1:
@@ -63,13 +71,13 @@ class wallTracking(Node):
             elif self.state == 2:
                 self.follow_the_wall()
             else:
-                print('오류 발생!!')            
+                print('오류 발생!!')
             
         else:
-            # 제자리에 멈추고 행동 취하기 충돌 방지
+            # 제자리에 멈추기
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.0
-            print('터틀봇 대기중')            
+            print('터틀봇 대기중')
 
         self.cmd_pub.publish(self.cmd_msg)
 
@@ -79,8 +87,8 @@ class wallTracking(Node):
             self.state = state
 
 
-    def take_action(self):       
- 
+    def take_action(self):
+        
         d = 0.6
 
         if self.regions['front'] > d:                # 전방 널널
@@ -116,6 +124,10 @@ class wallTracking(Node):
 
     
     def odom_callback(self, msg):
+
+        # 제자리에 멈추고 행동 취하기 충돌 방지
+        self.cmd_msg.linear.x = 0.0
+        self.cmd_msg.angular.z = 0.0
 
         self.is_odom=True
         self.odom_msg=msg
