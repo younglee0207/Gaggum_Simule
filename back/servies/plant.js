@@ -143,7 +143,7 @@ async function SunNeedPlant() {
 async function getSunSpot() {
   try {
     const rows = await db.query(
-      `SELECT * FROM sunspot;`
+      `select * from sunspot where sunspot_number!=0;`
     );
     const data = helper.emptyOrRows(rows);
 
