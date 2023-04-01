@@ -110,6 +110,7 @@ class a_star(Node):
         if self.is_odom:
             print(msg.data)
 
+
     def a_star_goal_callback(self, msg):
         goal_x=msg.x
         goal_y=msg.y

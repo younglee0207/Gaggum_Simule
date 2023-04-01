@@ -135,7 +135,7 @@ class followTheCarrot(Node):
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
         if self.is_status and self.is_odom and self.is_path:
             # 남은 경로가 1 이상이면
-            if len(self.path_msg.poses)> 1:
+            if len(self.path_msg.poses)> 2:
                 self.is_look_forward_point = False
 
                 self.handcontrol_cmd_msg.data = 0
@@ -216,7 +216,7 @@ class followTheCarrot(Node):
             # 남은 경로가 1 미만
             else:
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
-                if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
+                if self.goal_x - 2 <= self.robot_pose_x <= self.goal_x + 2 and self.goal_y - 2 <= self.robot_pose_y <= self.goal_y + 2:
                     print('목표 지점에 도착')
                     # 도착 후 멈추기
                     self.cmd_msg.linear.x=0.0
