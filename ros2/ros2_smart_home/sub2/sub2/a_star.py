@@ -2,7 +2,7 @@ import rclpy
 import numpy as np
 from rclpy.node import Node
 import os
-from geometry_msgs.msg import Pose,PoseStamped
+from geometry_msgs.msg import Pose, PoseStamped, Point
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from math import pi,cos,sin,sqrt
@@ -33,6 +33,7 @@ class a_star(Node):
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.obs_sub = self.create_subscription(String, 'obs_msg', self.obs_callback, 1)
         self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
+        self.a_star_goal_sub = self.create_subscription(Point,'a_star_goal',self.a_star_goal_callback,1)
         self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
         time_period=0.1 
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -125,6 +126,11 @@ class a_star(Node):
                 self.goal = [goal_cell[0], goal_cell[1]]
             else:
                 print('좌표가 350*350을 벗어났습니다.')
+
+                
+    def a_star_goal_callback(self, msg):
+        print(msg)
+
 
     def timer_callback(self):
         # 지도 받아왔고 odom 정보도 있는 상태에서 목적지가 정해졌다면

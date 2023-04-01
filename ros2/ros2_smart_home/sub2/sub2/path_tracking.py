@@ -47,12 +47,16 @@ class followTheCarrot(Node):
         self.hand_control_pub = self.create_publisher(Int16, '/hand_control_cmd', 10)
 
         # 목표 좌표를 가지고 옴
-        self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
+        # self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
+
+        # a_star에 목표 좌표를 보냄
+        self.a_star_goal_pub = self.create_publisher(Point, 'a_star_goal', 10)
 
         self.is_odom = False
         self.is_path = False
         self.is_status = False
         self.is_approach = False
+        self.is_trigger = True
 
         self.odom_msg=Odometry()            
         self.robot_yaw=0.0
@@ -77,29 +81,52 @@ class followTheCarrot(Node):
         self.go_cnt = 0
         self.back_cnt = 0
 
+         # 터틀봇의 현재 위치
+        self.robot_pose_x = 0
+        self.robot_pose_y = 0
+
         # 터틀봇의 상태 
-        # 100 물 주러 감 101 102
-        # self.state = 
-        self.dumy = {
+        self.mode = 0
+        self.triggers = {
                 'data': [
                     {
                     'plant_number': 1, 
                     'plant_original_name': 'plant1', 
                     'plant_position_x': -2.57, 
                     'plant_position_y': 3.77
+                    },
+                    {
+                    'plant_number': 1, 
+                    'plant_original_name': 'plant1', 
+                    'plant_position_x': -4.57, 
+                    'plant_position_y': 5.77
                     }
                 ], 
                 'mode': 100}
         
-        # 터틀봇의 현재 위치
-        self.robot_pose_x = 0
-        self.robot_pose_y = 0
-
         # 터틀봇의 목표 위치 
         self.goal_x = 0
         self.goal_y = 0
+
+        # 화분의 정보
+        self.plant_original_name = ''
+        self.palnt_number = '0'
        
     def timer_callback(self):
+
+        # 백에서 트리거가 실행되면
+        if self.is_trigger:
+            self.mode = self.triggers['mode']
+            self.goal_x = self.triggers['data'][0]['plant_position_x']
+            self.goal_y = self.triggers['data'][0]['plant_position_y']
+            self.plant_original_name = self.triggers['data'][0]['plant_original_name']
+            self.plant_number = self.triggers['data'][0]['plant_number']
+
+            goal = Point()
+            goal.x, goal.y = self.goal_x, self.goal_y
+            self.a_star_goal_pub.publish(goal)
+
+
 
         # 로봇의 현재 위치를 나타내는 변수
         self.robot_pose_x = self.odom_msg.pose.pose.position.x
@@ -299,32 +326,32 @@ class followTheCarrot(Node):
             #     self.is_approach = False
             #     print('후방 근접')
 
-    def goal_callback(self,msg):
-        if msg.header.frame_id=='map':
-            # print(msg)
-            # {
-            #     'data': [
-            #         {
-            #             'plant_number': 1, 
-            #             'plant_original_name': 'plant1', 
-            #             'plant_position_x': -2.57, 
-            #             'plant_position_y': 3.77
-            #         },
-            #         {
-            #             'plant_number': 2, 
-            #             'plant_original_name': 'plant2', 
-            #             'plant_position_x': -5.57, 
-            #             'plant_position_y': 5.77
-            #         },
-            #     ], 
-            #     'mode': 100
-            # }
-            '''
-            로직 6. goal_pose 메시지 수신하여 목표 위치 설정
-            ''' 
-            self.goal_poses = []
-            self.goal_x=msg.pose.position.x
-            self.goal_y=msg.pose.position.y
+    # def goal_callback(self, msg):
+    #     if msg.header.frame_id=='map':
+    #         # print(msg)
+    #         # {
+    #         #     'data': [
+    #         #         {
+    #         #             'plant_number': 1, 
+    #         #             'plant_original_name': 'plant1', 
+    #         #             'plant_position_x': -2.57, 
+    #         #             'plant_position_y': 3.77
+    #         #         },
+    #         #         {
+    #         #             'plant_number': 2, 
+    #         #             'plant_original_name': 'plant2', 
+    #         #             'plant_position_x': -5.57, 
+    #         #             'plant_position_y': 5.77
+    #         #         },
+    #         #     ], 
+    #         #     'mode': 100
+    #         # }
+    #         '''
+    #         로직 6. goal_pose 메시지 수신하여 목표 위치 설정
+    #         ''' 
+    #         self.goal_poses = []
+    #         self.goal_x=msg.pose.position.x
+    #         self.goal_y=msg.pose.position.y
             
 def main(args=None):
     rclpy.init(args=args)
