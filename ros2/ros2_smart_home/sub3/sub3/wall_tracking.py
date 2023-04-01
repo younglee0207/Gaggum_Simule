@@ -1,12 +1,12 @@
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import Twist,Point, Point32
-from ssafy_msgs.msg import TurtlebotStatus
+from geometry_msgs.msg import Twist, Point, Point32
+from ssafy_msgs.msg import TurtlebotStatus, MapScan
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import Int8MultiArray
+
 
 class wallTracking(Node):
 
@@ -19,12 +19,12 @@ class wallTracking(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
 
         # 맵 만들 때 필요한 변수를 저장하는 주소 publish
-        self.create_map_publisher = self.create_publisher(Int8MultiArray, '/create_map', 10)
+        self.create_map_publisher = self.create_publisher(MapScan, '/map_scan', 100)
         # socket에서 받아온 맵 만들기 실행 여부 정보 받기
-        self.create_map_sub = self.create_subscription(Int8MultiArray, '/create_map', self.create_map_callback, 100)
+        self.create_map_sub = self.create_subscription(MapScan, '/map_scan', self.map_scan_callback, 100)
 
         self.cmd_msg = Twist()
-        time_period = 0.05
+        time_period = 0.1
         self.timer = self.create_timer(time_period,self.timer_callback)
 
         self.is_odom=False
@@ -53,26 +53,32 @@ class wallTracking(Node):
         # wall_following 시작 조건
         self.is_start = False
 
-    
+
     # 맵 생성
-    def create_map_callback(self, msg):
-        self.is_start = msg.data[1]
+    def map_scan_callback(self, msg):
+        # 1 넣은 이유 계속 구독해서 데이터 값 안바뀌게 하기 위해서.
+        if msg.map_scan == 1:
+            self.is_start = msg.map_scan
+            print("data가 1인 경우에만 들어오고있는 곳")
+
         print("wall_tracking 데이터 값", msg)
 
     def timer_callback(self):
-        
         # 맵핑 종료 조건
+
         if self.is_odom:
-             # 로봇의 현재 위치
+            # 로봇의 현재 위치
             robot_pose_x = self.odom_msg.pose.pose.position.x
             robot_pose_y = self.odom_msg.pose.pose.position.y
             print(robot_pose_x, robot_pose_y)
             print(self.is_comback, self.is_mapping_end)
             # 로봇이 시작 위치 (-5.818, 6.399)에 5 반경을 벗어나면
-            if not (-5.818 - 0.2 <= robot_pose_x <= -5.818 + 0.2 and 6.399 - 0.2 <= robot_pose_y <= 6.399 + 0.2):
+            if not (-5.818 - 0.3 <= robot_pose_x <= -5.818 + 0.3 and 6.399 - 0.3 <= robot_pose_y <= 6.399 + 0.3):
                 self.is_comback = True
             elif self.is_comback:
                 self.is_mapping_end = True
+                self.is_comback = False
+                self.is_start = False
 
         if self.is_start and not self.is_mapping_end:
             if self.state == 0:
@@ -84,19 +90,21 @@ class wallTracking(Node):
             else:
                 print('오류 발생!!')
 
-        # 맵 종료 되면 -1 data 전달.
+        # 맵 종료 되면 -1 data 전달. why? 종료하기 위해서.
         elif self.is_mapping_end:
-            msg = Int8MultiArray()
-            msg.data = [-1, -1]
+            print("맵 스캔이 종료되었습니다!!!")
+            msg = MapScan()
+            msg.map_scan = -1
             self.create_map_publisher.publish(msg)
+            
+            self.is_mapping_end = False
+
             
         else:
             # 제자리에 멈추기
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.0
-            print('터틀봇 대기중')
-
-        
+            print('터틀봇 대기중')      
             
 
         self.cmd_pub.publish(self.cmd_msg)

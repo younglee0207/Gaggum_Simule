@@ -28,9 +28,7 @@ const LoadingPage = () => {
   };
 
   useEffect(() => {
-    socket.emit("run_mapping", {
-      data: "mapping start",
-    });
+    socket.emit("run_mapping", 1);
 
     socket.on("run_mapping", (data) => {
       if (data === -1) {
@@ -38,6 +36,10 @@ const LoadingPage = () => {
         navigate("/home");
       }
     });
+
+    return () => {
+      socket.off("run_mapping");
+    };
   }, []);
 
   useEffect(() => {
