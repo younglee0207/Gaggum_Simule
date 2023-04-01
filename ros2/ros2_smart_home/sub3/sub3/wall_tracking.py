@@ -1,12 +1,11 @@
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import Twist,Point, Point32
-from ssafy_msgs.msg import TurtlebotStatus
+from geometry_msgs.msg import Twist, Point, Point32
+from ssafy_msgs.msg import TurtlebotStatus, MapScan
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import Int8MultiArray
 
 
 class wallTracking(Node):
@@ -20,9 +19,9 @@ class wallTracking(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
 
         # 맵 만들 때 필요한 변수를 저장하는 주소 publish
-        self.create_map_publisher = self.create_publisher(Int8MultiArray, '/map_scan', 100)
+        self.create_map_publisher = self.create_publisher(MapScan, '/map_scan', 100)
         # socket에서 받아온 맵 만들기 실행 여부 정보 받기
-        self.create_map_sub = self.create_subscription(Int8MultiArray, '/map_scan', self.map_scan_callback, 100)
+        self.create_map_sub = self.create_subscription(MapScan, '/map_scan', self.map_scan_callback, 100)
 
         self.cmd_msg = Twist()
         time_period = 0.1
@@ -58,8 +57,8 @@ class wallTracking(Node):
     # 맵 생성
     def map_scan_callback(self, msg):
         # 1 넣은 이유 계속 구독해서 데이터 값 안바뀌게 하기 위해서.
-        if msg.data[1] == 1:
-            self.is_start = msg.data[1]
+        if msg.map_scan == 1:
+            self.is_start = msg.map_scan
             print("data가 1인 경우에만 들어오고있는 곳")
 
         print("wall_tracking 데이터 값", msg)
@@ -94,8 +93,8 @@ class wallTracking(Node):
         # 맵 종료 되면 -1 data 전달. why? 종료하기 위해서.
         elif self.is_mapping_end:
             print("맵 스캔이 종료되었습니다!!!")
-            msg = Int8MultiArray()
-            msg.data = [-1, -1]
+            msg = MapScan()
+            msg.map_scan = -1
             self.create_map_publisher.publish(msg)
             
             self.is_mapping_end = False
@@ -105,9 +104,7 @@ class wallTracking(Node):
             # 제자리에 멈추기
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.0
-            print('터틀봇 대기중')
-
-        
+            print('터틀봇 대기중')      
             
 
         self.cmd_pub.publish(self.cmd_msg)
