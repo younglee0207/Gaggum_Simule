@@ -239,7 +239,7 @@ class Mapper(Node):
         self.map_msg.info=self.map_meta_data
 
         # socket에서 받아온 맵 만들기 실행 여부 정보 받기
-        self.create_map_sub = self.create_subscription(Int8MultiArray, '/create_map', self.create_map_callback, 100)
+        self.create_map_sub = self.create_subscription(Int8MultiArray, '/map_scan', self.map_scan_callback, 100)
 
         # is_map_create 변수가 True면 mapping 시작, std_msg에서 받아온 값으로 확인
         self.is_map_create = False
@@ -248,7 +248,7 @@ class Mapper(Node):
         self.mapping = Mapping(params_map)
 
 
-    def create_map_callback(self, msg):
+    def map_scan_callback(self, msg):
         self.is_map_create = msg.data[0]
         print("runmapping의 데이터 값", msg)
 
@@ -315,8 +315,10 @@ def main(args=None):
 
     except :
         save_map(run_mapping,'map.txt')
-# 
+ 
 
 
 if __name__ == '__main__':
     main()
+
+  
