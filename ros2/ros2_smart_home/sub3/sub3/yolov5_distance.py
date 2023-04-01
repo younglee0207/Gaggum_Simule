@@ -76,7 +76,7 @@ class detection_net_class():
         # remote_yolov5_path = "ultralytics/yolov5"
         local_yolov5_path = os_file_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\yolov5_distance.py', 'yolov5')
 
-        self.model = torch.hub.load(local_yolov5_path, 'custom', path=full_path)
+        self.model = torch.hub.load(local_yolov5_path, 'custom', path=full_path, source='local', force_reload=True)
 
     def inference(self, image_np):
         results = self.model(image_np)

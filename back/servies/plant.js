@@ -28,6 +28,21 @@ async function getWaterNeedPlant() {
     throw error;
   }
 }
+async function getWaterNeedPlant2() {
+  try {
+    const rows = await db.query(
+      `SELECT plant_number,plant_original_name,plant_position_x,plant_position_y from plants WHERE (curdate()-plant_last_watering_date)>=plant_watering_cycle;`
+    );
+    const data = helper.emptyOrRows(rows);
+
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 async function getPlantByNumber(param) {
   try {
     const rows = await db.query(
@@ -64,7 +79,7 @@ async function editPlant(body) {
   try {
     const rows = await db.query(
       `UPDATE plants
-        SET plant_name = ${body.plant_name}, plant_memo = ${body.plant_memo}, plant_watering_cycle = ${body.plant_watering_cycle}, plant_watering_amount = ${body.plant_watering_amount} 
+        SET plant_memo = ${body.plant_memo}, plant_watering_cycle = ${body.plant_watering_cycle}, plant_watering_amount = ${body.plant_watering_amount} 
         WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
     );
     const data = helper.emptyOrRows(rows);
@@ -110,6 +125,37 @@ async function createPlant(body) {
     throw error;
   }
 }
+async function SunNeedPlant() {
+  try {
+    const rows = await db.query(
+      `select plant_number, plant_original_name, plant_position_x, plant_position_y from plants where plant_sunlight = 1;`
+    );
+    const data = helper.emptyOrRows(rows);
+
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+async function getSunSpot() {
+  try {
+    const rows = await db.query(
+      `select * from sunspot where sunspot_number!=0;`
+    );
+    const data = helper.emptyOrRows(rows);
+
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 module.exports = {
   getPlants,
   getPlantByNumber,
@@ -118,4 +164,7 @@ module.exports = {
   editPlant,
   deletePlant,
   createPlant,
+  SunNeedPlant,
+  getSunSpot,
+  getWaterNeedPlant2,
 };

@@ -1,8 +1,6 @@
-import plantImg from "../../assets/plant/mokoko_01.gif"
 import { FaSun } from "react-icons/fa"
-import ReactSwitch from "react-switch";
 import { useState } from "react";
-import axios from "axios";
+
 
 const PlantDetail = ({ item, handleWatering }) => {
 
