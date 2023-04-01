@@ -32,7 +32,6 @@ class a_star(Node):
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.obs_sub = self.create_subscription(String, 'obs_msg', self.obs_callback, 1)
-        self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
         self.a_star_goal_sub = self.create_subscription(Point,'a_star_goal',self.a_star_goal_callback,1)
         self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
         time_period=0.1 
@@ -111,25 +110,15 @@ class a_star(Node):
         if self.is_odom:
             print(msg.data)
 
-
-    def goal_callback(self,msg):
-        if msg.header.frame_id=='map':
-            # print(msg)
-            '''
-            로직 6. goal_pose 메시지 수신하여 목표 위치 설정
-            ''' 
-            goal_x=msg.pose.position.x
-            goal_y=msg.pose.position.y
-     
-            goal_cell=self.pose_to_grid_cell(goal_x, goal_y)
-            if goal_cell[0] <= self.map_size_x and goal_cell[1] <= self.map_size_y:
-                self.goal = [goal_cell[0], goal_cell[1]]
-            else:
-                print('좌표가 350*350을 벗어났습니다.')
-
-                
     def a_star_goal_callback(self, msg):
-        print(msg)
+        goal_x=msg.x
+        goal_y=msg.y
+    
+        goal_cell=self.pose_to_grid_cell(goal_x, goal_y)
+        if goal_cell[0] <= self.map_size_x and goal_cell[1] <= self.map_size_y:
+            self.goal = [goal_cell[0], goal_cell[1]]
+        else:
+            print('좌표가 350*350을 벗어났습니다.')
 
 
     def timer_callback(self):
@@ -170,9 +159,12 @@ class a_star(Node):
                     tmp_pose.pose.position.x=waypoint_x
                     tmp_pose.pose.position.y=waypoint_y
                     tmp_pose.pose.orientation.w=1.0
+
+                    print(tmp_pose)
                     
                     # 차곡차곡 담기
                     self.global_path_msg.poses.append(tmp_pose)
+                    # print('self.global_path_msg.poses', self.global_path_msg.poses)
 
                 # 경로가 존재한다면
                 if len(self.final_path)!=0 :
