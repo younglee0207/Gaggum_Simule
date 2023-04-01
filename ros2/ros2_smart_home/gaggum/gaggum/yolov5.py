@@ -74,6 +74,12 @@ class detection_net_class():
 
         info = results.pandas().xyxy[0]
         print(f"info : {info}")
+        #      xmin    ymin    xmax   ymax  confidence  class    name
+        # 0  749.50   43.50  1148.0  704.5    0.874023      0  plant1
+        # 1  433.50  433.50   517.5  714.5    0.687988      1  plant2
+        # 2  114.75  195.75  1095.0  708.0    0.624512      2  plant3
+        # 3  986.00  304.00  1028.0  420.0    0.286865      3  plant4
+        # 4  986.00  304.00  1028.0  420.0    0.286865      4  plant5
 
         idx_detect = info.index.to_numpy()
         # print(f"idx_detect : {idx_detect}")
@@ -81,10 +87,13 @@ class detection_net_class():
         boxes_detect = info[['xmin', 'ymin', 'xmax', 'ymax']].to_numpy()
         # print(f"boxes_detect : {boxes_detect}")
 
-        classes_pick = info[['class']].T.to_numpy()
+        classes_pick = info[['name']].T.to_numpy()
         # print(f"classes_pick : {classes_pick}")
 
-        return np.squeeze(results.render()), boxes_detect, classes_pick
+        info_result = info[info['confidence'] > 0.7].to_numpy()
+        print(info_result)
+
+        return np.squeeze(results.render()), boxes_detect, classes_pick, info_result
 
 def visualize_images(image_out):
 
@@ -265,7 +274,7 @@ def main(args=None):
 
         if is_img_bgr and is_scan:
             # 로직 10. object detection model inference
-            image_process, boxes_detect, classes_pick = yolov5.inference(img_bgr)
+            image_process, boxes_detect, classes_pick, info_result = yolov5.inference(img_bgr)
 
             loc_z = 0
             loc_z = 0.0
@@ -292,8 +301,6 @@ def main(args=None):
             ## numpy array로 변환
 
             if len(boxes_detect) != 0:
-                # ih = img_bgr.shape[0]
-                # iw = img_bgr.shape[1]
                 boxes_np = np.array(boxes_detect[0])
 
                 x = boxes_np.T[0]
