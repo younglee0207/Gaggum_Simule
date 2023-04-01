@@ -60,13 +60,16 @@ class detection_net_class():
         # yolo v5
         os_file_path = os.path.abspath(__file__)
         full_path = os_file_path.replace('install\\gaggum\\Lib\\site-packages\\gaggum\\yolov5.py', 
-                                        'ros2_smart_home\\gaggum\\gaggum\\model_weights\\gaggum_weight.pt')
+                                        'ros2_smart_home\\gaggum\\gaggum\\model_weights\\best.pt')
         # remote_yolov5_path = "ultralytics/yolov5"
         local_yolov5_path = os_file_path.replace('install\\gaggum\\Lib\\site-packages\\gaggum\\yolov5.py', 'yolov5')
         
         self.model = torch.hub.load(local_yolov5_path, 'custom', path=full_path, source='local', force_reload=True)
 
+        self.model.conf = 0.7
+
     def inference(self, image_np):
+        
         results = self.model(image_np)
 
         info = results.pandas().xyxy[0]
@@ -98,7 +101,7 @@ def img_callback(msg):
     origin_img = msg.data
     is_img_bgr = True
     np_arr = np.frombuffer(msg.data, np.uint8)
-    img_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    img_bgr = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
 
 def scan_callback(msg):
     global xyz
@@ -289,10 +292,8 @@ def main(args=None):
             ## numpy array로 변환
 
             if len(boxes_detect) != 0:
-
-                ih = img_bgr.shape[0]
-                iw = img_bgr.shape[1]
-
+                # ih = img_bgr.shape[0]
+                # iw = img_bgr.shape[1]
                 boxes_np = np.array(boxes_detect[0])
 
                 x = boxes_np.T[0]
