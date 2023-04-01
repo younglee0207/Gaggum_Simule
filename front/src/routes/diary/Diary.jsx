@@ -8,15 +8,14 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import plantImg from "../../assets/plant/mush.gif";
 import NavBar from "../../components/navbar/NavBar";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import ModalMonth from "./ModalMonth";
 
 import PlantModal from "./PlantModal";
 import WriteModal from "./WriteModal";
 import axios from "axios";
-
-
+import Swal from "sweetalert2";
 
 const Diary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -49,7 +48,35 @@ const Diary = () => {
     setIsModalMonthOpen(false);
   };
 
+  const handleCloseModal = () => {
+    Swal.fire({
+      title: "수정 취소",
+      text: "수정을 취소하시겠습니까?",
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니요",      
+    }).then((res) => {
+      if (res.isConfirmed) {
+        Swal.fire("수정이 취소었습니다", "", "success")
+        setSelectedDiary(null)
+      }
+    })
+  };
 
+  const handleSubmitModal = () => {
+    Swal.fire({
+      title: "수정 확인",
+      text: "수정하시겠습니까?",
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니요",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        Swal.fire("수정이 완료되었습니다", "", "success")
+        setSelectedDiary(null)
+      }
+    })
+  };
 
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
@@ -80,7 +107,9 @@ const Diary = () => {
         alert("로딩에 실패하였습니다.");
       });
   };
-
+  useEffect(() => {
+    GetAllDiaries();
+  }, []);
   const GetYearDiaries = (year) => {
     console.log(year);
     axios
@@ -232,8 +261,8 @@ const Diary = () => {
                   <img
                     className="img-plant"
                     // src={item.diary_img}
-                    src={plantImg}
-                    alt="이미지 로딩 실패"
+                    src={item.diary_img}
+                    alt="식물 이미지"
                   />
                 </div>
 
@@ -263,7 +292,8 @@ const Diary = () => {
           ))}
         {selectedDiary && (
           <WriteModal
-            onClose={() => setSelectedDiary(null)}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmitModal}
             item={selectedDiary}
             // GetAllDiaries={GetAllDiaries}
             GetNameDiaries={GetNameDiaries}

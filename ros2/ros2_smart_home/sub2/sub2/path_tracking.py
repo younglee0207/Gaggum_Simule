@@ -8,8 +8,7 @@ from math import pi,cos,sin,sqrt,atan2
 import numpy as np
 from sensor_msgs.msg import LaserScan, PointCloud
 from std_msgs.msg import Int16
-import time
-import random
+
 # path_tracking 노드는 로봇의 위치(/odom), 로봇의 속도(/turtlebot_status), 주행 경로(/local_path)를 받아서, 주어진 경로를 따라가게 하는 제어 입력값(/cmd_vel)을 계산합니다.
 # 제어입력값은 선속도와 각속도로 두가지를 구합니다. 
 
@@ -80,13 +79,23 @@ class followTheCarrot(Node):
 
         # 터틀봇의 상태 
         # 100 물 주러 감 101 102
-        self.state = 1
+        # self.state = 
+        self.dumy = {
+                'data': [
+                    {
+                    'plant_number': 1, 
+                    'plant_original_name': 'plant1', 
+                    'plant_position_x': -2.57, 
+                    'plant_position_y': 3.77
+                    }
+                ], 
+                'mode': 100}
         
         # 터틀봇의 현재 위치
         self.robot_pose_x = 0
         self.robot_pose_y = 0
 
-        # 터틀봇의 목표 위치
+        # 터틀봇의 목표 위치 
         self.goal_x = 0
         self.goal_y = 0
        
@@ -118,7 +127,6 @@ class followTheCarrot(Node):
                     self.lfd=self.min_lfd
                 if self.lfd > self.max_lfd:
                     self.lfd=self.max_lfd
-
 
                 min_dis=float('inf')
 
@@ -294,9 +302,27 @@ class followTheCarrot(Node):
     def goal_callback(self,msg):
         if msg.header.frame_id=='map':
             # print(msg)
+            # {
+            #     'data': [
+            #         {
+            #             'plant_number': 1, 
+            #             'plant_original_name': 'plant1', 
+            #             'plant_position_x': -2.57, 
+            #             'plant_position_y': 3.77
+            #         },
+            #         {
+            #             'plant_number': 2, 
+            #             'plant_original_name': 'plant2', 
+            #             'plant_position_x': -5.57, 
+            #             'plant_position_y': 5.77
+            #         },
+            #     ], 
+            #     'mode': 100
+            # }
             '''
             로직 6. goal_pose 메시지 수신하여 목표 위치 설정
             ''' 
+            self.goal_poses = []
             self.goal_x=msg.pose.position.x
             self.goal_y=msg.pose.position.y
             

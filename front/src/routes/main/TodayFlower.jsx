@@ -20,7 +20,8 @@ const TodayFlower = () => {
   const getFlowerData = async () => {
     try {
       axios
-        .get(`http://apis.data.go.kr/1390804/NihhsTodayFlowerInfo01/selectTodayFlower01?serviceKey=${API_KEY}&fMonth=${3}&fDay=${30}`, {
+        .get(`http://apis.data.go.kr/1390804/NihhsTodayFlowerInfo01/selectTodayFlower01?serviceKey=${API_KEY}&fMonth=${todayMonth}&fDay=${todayDay
+      }`, {
           headers: {
             "Content-Type": "application/json"
           }
