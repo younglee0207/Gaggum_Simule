@@ -135,11 +135,9 @@ class followTheCarrot(Node):
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
         if self.is_status and self.is_odom and self.is_path:
             # 남은 경로가 1 이상이면
-            if len(self.path_msg.poses)> 2:
+            if len(self.path_msg.poses)> 1:
                 self.is_look_forward_point = False
-
                 self.handcontrol_cmd_msg.data = 0
-
 
                 # 로봇과 가장 가까운 경로점과의 직선거리
                 lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-self.robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-self.robot_pose_y,2))
@@ -194,29 +192,29 @@ class followTheCarrot(Node):
                     local_forward_point = det_trans_matrix.dot(global_forward_point)
                     # 로봇과 전방주시 포인트간의 차이값 계산
                     theta = -atan2(local_forward_point[1], local_forward_point[0])
-
+        
                     # 로직 7. 선속도, 각속도 정하기
                     out_vel = 0.7
                     out_rad_vel = theta
                     # 10이내의 거리에서 선속도를 줄이고 각속도를 높여서 목표 지점을 지나치지 않도록 함
-                    if len(self.path_msg.poses) < 10:
+                    if len(self.path_msg.poses) < 20:
                         out_vel = 0.3
                         # 5 이내의 거리에서는 정밀한 제어를 위해 완전히 속도를 줄임
-                        if len(self.path_msg.poses) < 5:
+                        if len(self.path_msg.poses) < 10:
                             out_vel = 0.1
                         out_rad_vel = theta*2
                     elif self.is_approach:  # 목적이 영역 밖에서 사물과 근접 했다면
                         out_vel = -0.1
                         out_rad_vel = theta*2
                     # goal post에 도착했다면
-              
+            
                     self.cmd_msg.linear.x = out_vel
                     self.cmd_msg.angular.z = out_rad_vel
 
             # 남은 경로가 1 미만
             else:
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
-                if self.goal_x - 2 <= self.robot_pose_x <= self.goal_x + 2 and self.goal_y - 2 <= self.robot_pose_y <= self.goal_y + 2:
+                if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
                     print('목표 지점에 도착')
                     # 도착 후 멈추기
                     self.cmd_msg.linear.x=0.0
