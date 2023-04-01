@@ -26,8 +26,8 @@ info = {
 # global 변수 설정, msg로 publish 하여 다른 node에서 조건에 맞게 실행하기 위함
 # 기본 값은 0 으로 제어 명령을 보내지 않는 상태가 됨.
 global map_scan
-map_scan = False
-map_create_turtle_bot = False
+map_scan = 0
+map_scan_end = 0
 
 # socket 
 sio = socketio.Client()
@@ -47,12 +47,14 @@ def connect_error(data):
 @sio.on("run_mapping")
 def run_mapping(data):                
     print("run_mapping", data)
-    global map_scan
+    global map_scan, map_scan_end
     
     # FRONT -> ROS로 제어 명령 보냄
     if data == 1:
         map_scan = 1
-        
+    
+    elif data == 0:
+        map_scan_end = True
 
 
 # 자동급수, 자동 물주기 정보 들어오는 곳
@@ -62,9 +64,9 @@ def auto_move(data):
     print("auto_move", data['mode'])    
 
     
-ip_server = 'http://localhost:3001'
+# ip_server = 'http://localhost:3001'
 # ip_server = "https://j8b310.p.ssafy.io/socket"
-# ip_server = 'http://j8b310.p.ssafy.io:3001'
+ip_server = 'http://j8b310.p.ssafy.io:3001'
 
 
 print("connect ", ip_server)
@@ -119,13 +121,19 @@ class SocketClass(Node):
 
     # socket 정보를 저장하거나 다른 곳에 쓸 수 있게 callback
     def timer_callback(self):
-        global map_scan, map_create_turtle_bot
+        global map_scan, map_scan_end
 
         # run_mapping을 하기위해 만든 함수. msg를 publish해서 run_mapping, wall_tracking을 할 수 있게 한다.
         # map_scan Topic
         msg = MapScan()
-        # msg.data = [map_scan, map_create_turtle_bot]
         print("MapOperationList", msg)
+
+        if map_scan_end:
+            msg.map_scan = 0
+            self.map_scan_publisher.publish(msg)
+            map_scan_end = False
+            map_scan = 0
+
 
                     
         # wall_tracking이 종료 되었으면 map_create는 -1이 됨.
