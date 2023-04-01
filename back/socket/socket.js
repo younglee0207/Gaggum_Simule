@@ -35,7 +35,7 @@ function socketStart() {
 
     console.log("connected from server");
 
-    // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
+    // Map Auto Scan
     socket.on("run_mapping", (data) => {
       // Front -> Back -> ROS
       socket.to(roomName).emit("run_mapping", data);
