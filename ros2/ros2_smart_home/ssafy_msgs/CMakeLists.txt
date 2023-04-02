@@ -31,6 +31,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CustomObjectInfo.msg"
   "msg/Detection.msg"
   "msg/MapScan.msg"
+  "msg/Tts.msg"
   DEPENDENCIES std_msgs geometry_msgs
  )
 

@@ -13,7 +13,7 @@ class wallTracking(Node):
     def __init__(self) :
 
         super().__init__('wall_Tracking')
-        self.cmd_pub = self. create_publisher(Twist,'cmd_vel',10)
+        self.cmd_pub = self.create_publisher(Twist,'cmd_vel',10)
         self.lidar_sub = self.create_subscription(LaserScan,'/scan',self.lidar_callback,10)
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
