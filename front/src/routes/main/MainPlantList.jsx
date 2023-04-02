@@ -53,11 +53,11 @@ const MainPlantList = () => {
             return (
               <SwiperSlide key={item.div} onClick={() => handleNavigate(item.plant_number)} >
                 <img
-                  style={{ width: 100, height: 100 }}
+                  style={{ width: "100%", height: "100%" }}
                   src={item.plant_img}
                   alt="식물 사진"
                 />
-                <h3 style={{ marginTop: 0, marginBottom: 24, paddingBottom: 8 }}>{item.plant_name}</h3>
+                <h3 style={{ marginTop: 0, marginBottom: 24, paddingBottom: 8, textAlign: "center" }}>{item.plant_name}</h3>
               </SwiperSlide>
             )
           })}
