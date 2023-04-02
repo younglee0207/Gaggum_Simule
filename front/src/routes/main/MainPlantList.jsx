@@ -5,7 +5,7 @@ import { needWaterState } from "../../store";
 import client from "../../api/client"
 
 // import swiper
-import { Navigation, Pagination, Scrollbar, A11y, EffectFade } from 'swiper';
+import { Navigation, Pagination, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 // swiper styles
@@ -27,6 +27,7 @@ const MainPlantList = () => {
       .then((res) => {
         console.log("물이 필요한 식물들 불러오기 성공")
         setNeedWaterPlant(res.data.data)
+        console.log(needWaterPlant)
       })
   }
 
@@ -41,24 +42,31 @@ const MainPlantList = () => {
   return (
     <div className="MainPlantList">
       <h2>오늘 물을 줘야하는 식물</h2>
-      <Swiper
-        modules={[Navigation, EffectFade, Pagination]}
-        spaceBetween={30}
-        slidesPerView={3}
-        loop={false}
-      >
-        {needWaterPlant?.map((item) => {
-          return (
-            <SwiperSlide key={item.div} onClick={() => handleNavigate(item.plant_number)} >
-              <img
-                style={{ width: 100, height: 100 }}
-                src={item.plant_img}
-              />
-              <h3 style={{ marginTop: 0, marginBottom: 24, paddingBottom: 8 }}>{item.plant_name}</h3>
-            </SwiperSlide>
-          )
-        })}
+      {needWaterPlant === null ? (
+        <Swiper
+          modules={[Navigation, EffectFade, Pagination]}
+          spaceBetween={30}
+          slidesPerView={3}
+          loop={false}
+        >
+          {needWaterPlant?.map((item) => {
+            return (
+              <SwiperSlide key={item.div} onClick={() => handleNavigate(item.plant_number)} >
+                <img
+                  style={{ width: 100, height: 100 }}
+                  src={item.plant_img}
+                  alt="식물 사진"
+                />
+                <h3 style={{ marginTop: 0, marginBottom: 24, paddingBottom: 8 }}>{item.plant_name}</h3>
+              </SwiperSlide>
+            )
+          })}
       </Swiper>
+      ) : (
+        <div className="plant__no-plant">
+          <h3>오늘은 물이 필요한 식물이 없어요</h3>
+        </div>
+      )}
     </div>
   )
 };

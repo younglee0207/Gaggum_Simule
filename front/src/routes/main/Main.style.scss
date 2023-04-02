@@ -40,6 +40,17 @@
       }
     }
 
+    .MainPlantList {
+
+      .plant__no-plant {
+        height: 157px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+
     .TodayFlower {
       display: flex;
       flex-direction: column;
