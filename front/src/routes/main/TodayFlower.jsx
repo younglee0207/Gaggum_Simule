@@ -46,7 +46,7 @@ const TodayFlower = () => {
 
   return (
     <div className="TodayFlower"> 
-      <h2>오늘의 꽃</h2>
+      <h2>{todayMonth}월 {todayDay}일의 추천 꽃</h2>
       <div className="flower-content">
         {flowerImg ? (
           <img 
