@@ -16,7 +16,8 @@ const PlantDetailPage = () => {
     client
       .get(`plant/number?plantNumber=${id}`)
       .then((res) => {
-        setPlantDetail(res.data.data[id - 1])
+        setPlantDetail(res.data.data[id])
+        console.log(plantDetail)
       })
   }
 

@@ -42,7 +42,7 @@ const MainPlantList = () => {
   return (
     <div className="MainPlantList">
       <h2>오늘 물을 줘야하는 식물</h2>
-      {needWaterPlant === null ? (
+      {needWaterPlant !== null ? (
         <Swiper
           modules={[Navigation, EffectFade, Pagination]}
           spaceBetween={30}
