@@ -73,25 +73,17 @@ class detection_net_class():
         results = self.model(image_np)
 
         info = results.pandas().xyxy[0]
-        print(f"info : {info}")
+        # print(f"info : {info}")
         #      xmin    ymin    xmax   ymax  confidence  class    name
         # 0  749.50   43.50  1148.0  704.5    0.874023      0  plant1
         # 1  433.50  433.50   517.5  714.5    0.687988      1  plant2
         # 2  114.75  195.75  1095.0  708.0    0.624512      2  plant3
         # 3  986.00  304.00  1028.0  420.0    0.286865      3  plant4
         # 4  986.00  304.00  1028.0  420.0    0.286865      4  plant5
-
         idx_detect = info.index.to_numpy()
-        # print(f"idx_detect : {idx_detect}")
-
-        boxes_detect = info[['xmin', 'ymin', 'xmax', 'ymax']].to_numpy()
-        # print(f"boxes_detect : {boxes_detect}")
-
+        boxes_detect = info[info['confidence'] > 0.7][['xmin', 'ymin', 'xmax', 'ymax']].to_numpy()
         classes_pick = info[['name']].T.to_numpy()
-        # print(f"classes_pick : {classes_pick}")
-
         info_result = info[info['confidence'] > 0.7].to_numpy()
-        print(info_result)
 
         return np.squeeze(results.render()), boxes_detect, classes_pick, info_result
 
@@ -219,6 +211,7 @@ def main(args=None):
     global g_node
     global turtlebot_status_msg
     global origin_img
+
     global is_img_bgr
     global is_scan
     global is_imu
@@ -229,36 +222,23 @@ def main(args=None):
     is_imu = False
     is_status = False
 
-    # 터틀봇의 위치
     global loc_x
     global loc_y
     global loc_z
 
     rclpy.init(args=args)
-
     g_node = rclpy.create_node('tf_detector')
 
-    # 로봇 절대위치 좌표
     subscription_turtle = g_node.create_subscription(TurtlebotStatus, '/turtlebot_status',status_callback, 10)
-
     subscription_img = g_node.create_subscription(CompressedImage, '/image_jpeg/compressed', img_callback, 3)
-
     subscription_scan = g_node.create_subscription(LaserScan, '/scan', scan_callback, 3)
-
     subscription_imu = g_node.create_subscription(Imu,'/imu',imu_callback,10)
-
     publisher_detect = g_node.create_publisher(Detection, "/yolo_detected", 10)
     
-    oflag = [False] * 5
-    olist = ['plant1', 'plant2', 'plant3', 'plant4', 'plant5']
 
     turtlebot_status_msg = TurtlebotStatus()
     
-    # 로직 8. lidar2img 좌표 변환 클래스 정의
-    # sub2의 좌표 변환 클래스를 가져와서 정의.
     l2c_trans = LIDAR2CAMTransform(params_cam, params_lidar)
-
-    iter_step = 0
 
     global RT_Lidar2Bot
     global RT_Bot2Map
@@ -267,21 +247,17 @@ def main(args=None):
 
         time.sleep(0.05)
         
-        # 로직 9. ros 통신을 통한 이미지 수신
         for _ in range(2):
-
             rclpy.spin_once(g_node)
 
-        if is_img_bgr and is_scan:
-            # 로직 10. object detection model inference
+        detections = Detection()
+
+        if is_img_bgr and is_scan and is_status:
             image_process, boxes_detect, classes_pick, info_result = yolov5.inference(img_bgr)
 
             loc_z = 0
             loc_z = 0.0
 
-            # 로직 11. 라이다-카메라 좌표 변환 및 정사영
-            # sub2 에서 ex_calib 에 했던 대로 라이다 포인트들을
-            # 이미지 프레임 안에 정사영시킵니다.
             xyz_p = xyz[np.where(xyz[:, 0]>=0)]
 
             xyz_c = l2c_trans.transform_lidar2cam(xyz_p)
@@ -289,100 +265,89 @@ def main(args=None):
             xy_i = l2c_trans.project_pts2img(xyz_c, False)
 
             xyii = np.concatenate([xy_i, xyz_p], axis=1)
-            # print(f"xyii : {xyii}")
 
             RT_Lidar2Bot = transformMTX_lidar2bot(params_lidar, params_bot)
             RT_Bot2Map = transformMTX_bot2map()
 
-            # 로직 12. bounding box 결과 좌표 뽑기
-            ## boxes_detect 안에 들어가 있는 bounding box 결과들을
-            ## 좌상단 x,y와 너비 높이인 w,h 구하고, 
-            ## 본래 이미지 비율에 맞춰서 integer로 만들어
-            ## numpy array로 변환
+            detections.num_index = 0
+            detections.x = []
+            detections.y = []
+            detections.distance = []
+            detections.cx = []
+            detections.cy = []
+            detections.object_class = []
 
-            if len(boxes_detect) != 0:
-                boxes_np = np.array(boxes_detect[0])
+            # 로직 12. bounding box 결과 좌표 뽑기(num, x, y, distance, cx, cy, object_class)
+            detections = Detection()
+            if len(info_result) == 0:
+                detections.num_index = 0
+                detections.x = []
+                detections.y = []
+                detections.distance = []
+                detections.cx = []
+                detections.cy = []
+                detections.object_class = []
+                publisher_detect.publish(detections)
+            else :
+                detections.num_index = len(info_result)
 
-                x = boxes_np.T[0]
-                y = boxes_np.T[1]
-                w = (boxes_np.T[2] - boxes_np.T[0])
-                h = (boxes_np.T[3] - boxes_np.T[1])
+                boxes_all = []
+                for boxes in boxes_detect:
+                    boxes_np = np.array(boxes)
+                    x = boxes_np.T[0]
+                    y = boxes_np.T[1]
+                    w = (boxes_np.T[2] - boxes_np.T[0])
+                    h = (boxes_np.T[3] - boxes_np.T[1])
 
-                bbox = np.vstack([
-                    x.astype(np.int32).tolist(),
-                    y.astype(np.int32).tolist(),
-                    w.astype(np.int32).tolist(),
-                    h.astype(np.int32).tolist()
-                ]).T
+                    bbox = np.vstack([
+                        x.astype(np.int32).tolist(),
+                        y.astype(np.int32).tolist(),
+                        w.astype(np.int32).tolist(),
+                        h.astype(np.int32).tolist()
+                    ]).T
 
-                print(f"bbox : {bbox}")
+                    boxes_all.append(bbox)
+                boxes_all = np.array(boxes_all)
 
-                # 로직 13. 인식된 물체의 위치 추정
-                ## bbox가 구해졌으면, bbox 안에 들어가는 라이다 포인트 들을 구하고
-                ## 그걸로 물체의 거리를 추정할 수 있습니다.
-                
                 ostate_list = []
+                for k, bbox in enumerate(boxes_all):
+                    for i in range(bbox.shape[0]):
+                        x = int(bbox[i, 0])
+                        y = int(bbox[i, 1])
+                        w = int(bbox[i, 2])
+                        h = int(bbox[i, 3])
 
-                for i in range(bbox.shape[0]):
-                    x = int(bbox[i, 0])
-                    y = int(bbox[i, 1])
-                    w = int(bbox[i, 2])
-                    h = int(bbox[i, 3])
+                        cx = int(x + (w / 2))
+                        cy = int(y + (h / 2))
 
-                    cx = int(x + (w / 2))
-                    cy = int(y + (h / 2))
-                    
-                    xyv = xyii[np.logical_and(xyii[:, 0]>=cx-(w/2 * 0.7), xyii[:, 0]<=cx+(w/2 * 0.7)), :]
-                    xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
-                    # print(f"xyv : {xyv}")
-                    
-                    ## bbox 안에 들어가는 라이다 포인트들의 대표값(예:평균)을 뽑는다
-                    # ostate = np.median(xyv[:, 2:], axis=0)
-                    ostate = np.median(xyv, axis=0)
-                    print(f"ostate : {ostate}")
+                        xyv = xyii[np.logical_and(xyii[:, 0]>=cx-(w/2 * 0.7), xyii[:, 0]<=cx+(w/2 * 0.7)), :]
+                        xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
 
-                    relative_x = ostate[2]
-                    relative_y = ostate[3]
-                    relative_z = ostate[4]
+                        ostate = np.median(xyv, axis=0)
 
-                    relative = np.array([relative_x, relative_y, relative_z, 1])
-                    object_global_pose = transform_bot2map(transform_lidar2bot(relative))
-                    print(f"객체 위치 좌표 : {object_global_pose}")
-                    print(f"로봇 위치 좌표 : {loc_x, loc_y}")
-                    
-                    # if relative_x < 0.2:
-                    #     b64data = base64.b64encode(origin_img)
-                    #     # print(f"base64_decode : {b64data.decode('utf-8')}")
-                    # data = {
-                    #     "plant_original_name" : "plant2",
-                    #     "plant_img": b64data.decode('utf-8'),
-                    #     "plant_position_x": loc_x,
-                    #     "plant_position_y": loc_y
-                    # }
+                        relative_x = ostate[2]
+                        relative_y = ostate[3]
+                        relative_z = ostate[4]
 
-                    # 토픽 전송 테스트
-                    local_detect = Detection()
-                    local_detect.x = relative_x
-                    local_detect.y = relative_y
-                    local_detect.confidence = 80.
-                    local_detect.name = "plant1"
+                        relative = np.array([relative_x, relative_y, relative_z, 1])
+                        object_global_pose = transform_bot2map(transform_lidar2bot(relative))
+                        
+                        ostate_list.append(object_global_pose)
 
-                    try:
-                        print("데이터 보냄")
-                        publisher_detect.publish(local_detect)
-                        # print("decode: ", b64data.decode('utf-8'))
-                        # sio.emit("streaming", data)
-                    except:
-                        print("오류")
+                        detections.num_index = len(info_result)
+                        detections.x.append(object_global_pose[0])
+                        detections.y.append(object_global_pose[1])
+                        detections.distance.append(relative_x)
+                        detections.cx.append(cx)
+                        detections.cy.append(cy)
+                        detections.object_class.append(info_result[k][5])
 
-                    ## 대표값이 존재하면 
-                    if not np.isnan(ostate[0]):
-                        ostate_list.append(ostate)
+                publisher_detect.publish(detections)
 
-                image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32),
-                                            xy_i[:, 1].astype(np.int32))
+            print(detections)
 
-                print(ostate_list)
+            image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32), xy_i[:, 1].astype(np.int32))
+
             visualize_images(image_process)
 
     g_node.destroy_node()
