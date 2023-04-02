@@ -14,7 +14,10 @@ const NavBar = () => {
     <div className="NavBar">
       <div 
         className={["nav-items", "nav-item1"].join(" ")}
-        onClick={() => {navigate("/home")}}
+        onClick={() => {
+          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
+          navigate("/home");
+        }}
         // onClick={() => {navigate("/")}}
       >
         <AiFillHome className="navbar-icon" />
@@ -22,7 +25,10 @@ const NavBar = () => {
       </div>
       <div 
         className={["nav-items", "nav-item2"].join(" ")}
-        onClick={() => {navigate("/plant")}}
+        onClick={() => {
+          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
+          navigate("/plant");
+        }}
         // onClick={() => {navigate("/")}}
       >
         <RiPlantFill className="navbar-icon" />
@@ -30,7 +36,10 @@ const NavBar = () => {
       </div>
       <div 
         className={["nav-items", "nav-item3"].join(" ")}
-        onClick={() => {navigate("/diary")}}
+        onClick={() => {
+          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
+          navigate("/diary");
+        }}
         // onClick={() => {navigate("/")}}
       >
         <FaBook className="navbar-icon" />
@@ -38,7 +47,10 @@ const NavBar = () => {
       </div>
       <div 
         className={["nav-items", "nav-item4"].join(" ")}
-        onClick={() => {navigate("/register")}}
+        onClick={() => {
+          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
+          navigate("/register");
+        }}
         // onClick={() => {navigate("/")}}
       >
         <AiOutlinePlus className="navbar-icon" />

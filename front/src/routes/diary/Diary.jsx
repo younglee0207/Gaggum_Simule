@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 // import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 import { MdKeyboardArrowDown } from "react-icons/md";
+import { RxCross2 } from "react-icons/rx";
+
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import ModalMonth from "./ModalMonth";
@@ -18,8 +20,8 @@ const Diary = () => {
   const [isPlantModalOpen, setIsPlantModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isModalMonthOpen, setIsModalMonthOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-  const [modalButtonName, setModalButtonName] = useState("");
-  const [modalMonthButtonName, setModalMonthButtonName] = useState("");
+  const [modalButtonName, setModalButtonName] = useState("년");
+  const [modalMonthButtonName, setModalMonthButtonName] = useState("월");
   const [modalPlantButtonName, setModalPlantButtonName] = useState("식물이름");
 
   const [selectedDiary, setSelectedDiary] = useState(null);
@@ -50,10 +52,10 @@ const Diary = () => {
       text: "수정을 취소하시겠습니까?",
       showDenyButton: true,
       confirmButtonText: "네",
-      denyButtonText: "아니요",      
+      denyButtonText: "아니요",
     }).then((res) => {
       if (res.isConfirmed) {
-        Swal.fire("수정이 취소었습니다", "", "success")
+        Swal.fire("수정이 취소되었습니다", "", "success")
         setSelectedDiary(null)
       }
     })
@@ -187,8 +189,10 @@ const Diary = () => {
       <div className="justify">
         <div>
           <button onClick={openModal} className="diary-button">
-            {modalButtonName}년
-            <MdKeyboardArrowDown />
+            <span className="diary-button-text">{modalButtonName}</span>
+            <span className="diary-button-arrow">
+              <MdKeyboardArrowDown />
+            </span>
           </button>
           {isModalOpen && (
             <Modal
@@ -202,8 +206,10 @@ const Diary = () => {
         </div>
         <div>
           <button onClick={openModalMonth} className="diary-button">
-            {modalMonthButtonName}월
-            <MdKeyboardArrowDown />
+            <span className="diary-button-text">{modalMonthButtonName}</span>
+            <span className="diary-button-arrow">
+              <MdKeyboardArrowDown />
+            </span>
           </button>
           {isModalMonthOpen && (
             <ModalMonth
@@ -223,8 +229,10 @@ const Diary = () => {
             }}
             className="diary-button"
           >
-            {modalPlantButtonName}
-            <MdKeyboardArrowDown />
+            <span className="diary-button-text">{modalPlantButtonName}</span>
+            <span className="diary-button-arrow">
+              <MdKeyboardArrowDown />
+            </span>
           </button>
           {isPlantModalOpen && (
             <PlantModal
@@ -252,7 +260,7 @@ const Diary = () => {
           // )
           .map((item) => (
             <div key={item.diary_number}>
-              <div className="MyPlantListItem">
+              <div className="MyPlantListItem" onClick={() => setSelectedDiary(item)}>
                 <div className="img-div">
                   <img
                     className="img-plant"
@@ -261,28 +269,25 @@ const Diary = () => {
                     alt="식물 이미지"
                   />
                 </div>
-
                 <div className="content-div">
                   <p className="flex">{item.diary_title}</p>
-                  <p className="flex memo memo-wrap">{item.diary_memo}</p>
+                  <p className="flex diary-memo">{item.diary_memo}</p>
                   <p className="flex">{item.diary_date.substr(0, 10)}</p>
                 </div>
+
                 <div className="button-div">
-                  <button
-                    onClick={() => setSelectedDiary(item)}
-                    className="modify-button"
-                  >
-                    수정
-                  </button>
                   <button
                     className={"modify-button"}
                     onClick={() => {
                       deleteDiary(item.diary_number);
                     }}
                   >
-                    삭제
+                    <RxCross2/>
                   </button>
+
+
                 </div>
+
               </div>
             </div>
           ))}

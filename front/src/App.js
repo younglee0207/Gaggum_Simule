@@ -13,6 +13,15 @@ import RedirectURI from "./routes/start/RedirectURI";
 import Temp from "../src/routes/temp/Temp";
 import { useState, useEffect } from "react";
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const turtleNumber = parseInt(localStorage.getItem("turtle_number"));
+    if (turtleNumber === 1) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -23,10 +32,11 @@ const App = () => {
           {/* 메인화면 */}
           <Route path="/home" element={<MainPage />} />
 
+          
           {/* <Route
             path="/home"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <MainPage />
               ) : (
                 <Navigate to="/" replace={true} />
@@ -36,47 +46,50 @@ const App = () => {
           {/* 로딩화면 */}
           {/* <Route path="/loading" element={<LoadingPage />} /> */}
 
+          
           <Route
             path="/loading"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <LoadingPage />
               ) : (
                 <Navigate to="/" replace={true} />
               )
             }
           />
-
           {/* 내 식물 */}
           <Route path="/plant" element={<PlantListPage />} />
-          {/* <Route
+
+          <Route
             path="/plant"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <PlantListPage />
               ) : (
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
 
           {/* 식물 디테일 */}
           <Route path="/plant/:id" element={<PlantDetailPage />} />
-          {/* <Route
+
+          <Route
             path="/plant/:id"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <PlantDetailPage />
               ) : (
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
           {/* 식물 일지 */}
+
           <Route
             path="/diary"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <DiaryPage />
               ) : (
                 <Navigate to="/" replace={true} />
@@ -89,7 +102,7 @@ const App = () => {
           <Route
             path="/register"
             element={
-              parseInt(localStorage.getItem("turtle_number")) === 1 ? (
+              isLoggedIn ? (
                 <Register />
               ) : (
                 <Navigate to="/" replace={true} />
@@ -101,7 +114,7 @@ const App = () => {
           {/* Socket 체크 */}
           <Route path="/temp" element={<Temp />} />
           {/* 구글 검수 임시용 */}
-          <Route path="/googlesecret" element={<MainPage/>}/> 
+          <Route path="/googlesecret" element={<MainPage />} />
         </Routes>
         {/* 로그인 되어있어야 navbar 보이는 로직 추     가하기 */}
 
