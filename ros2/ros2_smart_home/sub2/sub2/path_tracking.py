@@ -92,7 +92,6 @@ class followTheCarrot(Node):
         self.robot_pose_y = 0
 
         # 터틀봇의 상태 
-        self.mode = 0
         self.triggers = {
                 'data': [
                     {
@@ -121,12 +120,14 @@ class followTheCarrot(Node):
        # yolo에서 받아온 정보
         self.yolo_msg = Detection()
 
+        # handcontrol에 모드를 보냄
+        self.hand_control_msg = Int16()
 
     def timer_callback(self):
 
         # 백에서 트리거가 실행되면
         if self.is_trigger:
-            self.mode = self.triggers['mode']
+            self.hand_control_msg.data = self.triggers['mode']
             self.goal_x = self.triggers['data'][0]['plant_position_x']
             self.goal_y = self.triggers['data'][0]['plant_position_y']
             self.plant_original_name = self.triggers['data'][0]['plant_original_name']
@@ -229,12 +230,11 @@ class followTheCarrot(Node):
                             # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
                             if self.yolo_msg.object_class[0] == self.plant_number - 1:
                                 print('목표 화분 맞음')                
-
                                 # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
-                                self.hand_control_pub.publish(self.mode)
+                                self.hand_control_pub.publish(self.hand_control_msg)
                             else:
                                 print('목표 화분 아님')
-                    except:
+                    except IndexError:
                         print('화분 없음')
             # 남은 경로가 1 미만
             else:
@@ -319,10 +319,10 @@ class followTheCarrot(Node):
             backward_dis = sum(backward) / len(backward)
             left_dis = sum(left) / len(left)
             right_dis = sum(right) / len(right)
-            print('전방', forward_dis)
-            print('후방', backward_dis)
-            print('좌측', left_dis)       
-            print('우측', right_dis)
+            # print('전방', forward_dis)
+            # print('후방', backward_dis)
+            # print('좌측', left_dis)       
+            # print('우측', right_dis)
 
             # 근접 감지
             if forward_dis < 0.25:

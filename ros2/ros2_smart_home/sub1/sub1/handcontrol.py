@@ -41,6 +41,8 @@ class Handcontrol(Node):
 
         self.menu = 0
 
+        self.hand_control_cmd_cnt = 0
+
     def timer_callback(self):
         print(self.menu)
         # print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
@@ -114,7 +116,13 @@ class Handcontrol(Node):
         self.turtlebot_status_msg = msg
 
     def hand_control_cmd(self, msg):
-        self.menu = msg.data
+        if self.hand_control_cmd_cnt < 1:
+            self.hand_control_cmd_cnt += 1
+            print('한번만 갔나요?')
+            self.menu = msg.data
+        else:
+            self.hand_control_sub.destroy()
+        
 
 
 def main(args=None):
