@@ -19,7 +19,6 @@ class TTS(Node):
 
         # publish도 필요함 끝났으면 끝났다는 정보를 어딘가에 전달해야하니까. Tts.msg에 end 변수도 넣을까.?
         # self.pub = self.create_publisher()
-
     
     
     def tts_callback(self,msg):
