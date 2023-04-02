@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, Detection
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
@@ -50,13 +50,19 @@ class followTheCarrot(Node):
         # self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
 
         # a_star에 목표 좌표를 보냄
-        self.a_star_goal_pub = self.create_publisher(Point, 'a_star_goal', 10)
+        self.a_star_goal_pub = self.create_publisher(Point, '/a_star_goal', 10)
+
+        # yolo에서 정보를 받아옴
+        self.yolo_sub = self.create_subscription(Detection, '/yolo_detected', self.yolo_callback, 10)
 
         self.is_odom = False
         self.is_path = False
         self.is_status = False
-        self.is_approach = False
+        self.is_forward_approach = False
+        self.is_right_approach = False
+        self.is_left_approach = False
         self.is_trigger = True
+        self.is_yolo = False
 
         self.odom_msg=Odometry()            
         self.robot_yaw=0.0
@@ -92,8 +98,8 @@ class followTheCarrot(Node):
                     {
                     'plant_number': 1, 
                     'plant_original_name': 'plant1', 
-                    'plant_position_x': -2.57, 
-                    'plant_position_y': 3.77
+                    'plant_position_x': -3.8, 
+                    'plant_position_y': 5.54
                     },
                     {
                     'plant_number': 1, 
@@ -110,8 +116,12 @@ class followTheCarrot(Node):
 
         # 화분의 정보
         self.plant_original_name = ''
-        self.palnt_number = '0'
+        self.palnt_number = 0
        
+       # yolo에서 받아온 정보
+        self.yolo_msg = Detection()
+
+
     def timer_callback(self):
 
         # 백에서 트리거가 실행되면
@@ -132,8 +142,9 @@ class followTheCarrot(Node):
         self.robot_pose_x = self.odom_msg.pose.pose.position.x
         self.robot_pose_y = self.odom_msg.pose.pose.position.y
 
-        # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
-        if self.is_status and self.is_odom and self.is_path:
+        # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때, yolo가 작동 중일때
+        print(self.is_status, self.is_odom, self.is_path)
+        if self.is_status and self.is_odom and self.is_path and self.is_yolo:
             # 남은 경로가 1 이상이면
             if len(self.path_msg.poses)> 1:
                 self.is_look_forward_point = False
@@ -192,7 +203,8 @@ class followTheCarrot(Node):
                     local_forward_point = det_trans_matrix.dot(global_forward_point)
                     # 로봇과 전방주시 포인트간의 차이값 계산
                     theta = -atan2(local_forward_point[1], local_forward_point[0])
-        
+
+                    # 목표 화분이 아니면 회피해서 목표 지점으로 가기
                     # 로직 7. 선속도, 각속도 정하기
                     out_vel = 0.7
                     out_rad_vel = theta
@@ -202,15 +214,28 @@ class followTheCarrot(Node):
                         # 5 이내의 거리에서는 정밀한 제어를 위해 완전히 속도를 줄임
                         if len(self.path_msg.poses) < 10:
                             out_vel = 0.1
-                        out_rad_vel = theta*2
-                    elif self.is_approach:  # 목적이 영역 밖에서 사물과 근접 했다면
-                        out_vel = -0.1
-                        out_rad_vel = theta*2
-                    # goal post에 도착했다면
-            
+                        out_rad_vel = theta
+        
                     self.cmd_msg.linear.x = out_vel
                     self.cmd_msg.angular.z = out_rad_vel
+                    
+                    try:
+                        # 카메라에 보이는 화분과의 거리가 0.6보다 작으면
+                        if self.yolo_msg.distance[0] <= 0.6:
+                            print('화분과 근접')
+                            # 멈추고
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = 0.0
+                            # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
+                            if self.yolo_msg.object_class[0] == self.plant_number - 1:
+                                print('목표 화분 맞음')                
 
+                                # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
+                                self.hand_control_pub.publish(self.mode)
+                            else:
+                                print('목표 화분 아님')
+                    except:
+                        print('화분 없음')
             # 남은 경로가 1 미만
             else:
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
@@ -220,16 +245,6 @@ class followTheCarrot(Node):
                     self.cmd_msg.linear.x=0.0
                     self.cmd_msg.angular.z=0.0
 
-                    # 핸드 컨트롤 publish 부분
-                    print(self.status_msg.can_lift)
-                    if self.status_msg.can_lift:
-                    # 물건을 들 수 있는 상태이면
-                        self.handcontrol_cmd_msg.data = 2
-                    # 물건을 들고 있고 물건을 내려놓을 수 있으면
-                    elif not self.status_msg.can_lift and self.status_msg.can_use_hand:
-                        self.handcontrol_cmd_msg.data = 3
-
-                    self.hand_control_pub.publish(self.handcontrol_cmd_msg)
                 else:
                     # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
                     print("no found forward point")
@@ -292,7 +307,6 @@ class followTheCarrot(Node):
                     pcd_msg.points.append(global_point)
 
             # 전/후방, 좌/우측 충돌 감지
-            self.is_approach = False
             forward_left = self.lidar_msg.ranges[0:6]
             forward_right = self.lidar_msg.ranges[355:360]
             forward = forward_left + forward_right
@@ -312,13 +326,13 @@ class followTheCarrot(Node):
 
             # 근접 감지
             if forward_dis < 0.25:
-                self.is_approach = True
+                self.is_forward_approach = True
                 print('전방 근접')
             elif left_dis < 0.25:
-                self.is_approach = True
+                self.is_right_approach = True
                 print('좌측 근접')
             elif right_dis < 0.25:
-                self.is_approach = True
+                self.is_left_approach = True
                 print('우측 근접')
             # elif backward_dis < 0.25:
             #     self.is_approach = False
@@ -350,6 +364,11 @@ class followTheCarrot(Node):
     #         self.goal_poses = []
     #         self.goal_x=msg.pose.position.x
     #         self.goal_y=msg.pose.position.y
+
+    def yolo_callback(self, msg):
+        self.is_yolo = True
+        self.yolo_msg = msg
+
             
 def main(args=None):
     rclpy.init(args=args)
