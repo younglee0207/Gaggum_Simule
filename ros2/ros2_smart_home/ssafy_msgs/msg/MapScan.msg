@@ -1,0 +1,1 @@
+int16 map_scan

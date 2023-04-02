@@ -35,15 +35,15 @@ function socketStart() {
 
     console.log("connected from server");
 
-    // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
-    socket.on("run_mapping", (message) => {
-      socket.to(roomName).emit("run_mapping", message);
-      // socket.emit("safety_status", message);
-      console.log("run_mapping", message);
+    // Map Auto Scan
+    socket.on("run_mapping", (data) => {
+      // Front -> Back -> ROS
+      socket.to(roomName).emit("run_mapping", data);
+      console.log("run_mapping", data);
 
-      if (message == -1) {
+      if (data == -1) {
         console.log("맵 종료 됨");
-        socket.emit("run_mapping", message);
+        socket.emit("run_mapping", data);
       }
     });
 

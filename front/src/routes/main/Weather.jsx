@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import axios from "axios"
 import { useRecoilState } from "recoil";
 import { guLocationState, doLocationState, weatherState } from "../../store";
+
 const KAKAO_REST_API_KEY = process.env.REACT_APP_KAKAO_MAP_REST_API_KEY;
+const OPENWEATHERMAP_API_KEY = process.env.REACT_APP_OPENWEATHERMAP_API_KEY
 
 const Weather = () => {
 
@@ -28,7 +30,7 @@ const Weather = () => {
   // 현재 날씨 함수
   const getWeatherByCurrentLocation = async (lat, lon) => {
     // &units=metric => 섭씨 사용
-    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`
     // url에 데이터를 가져올 때 까지 기다리기
     let response = await fetch(url);
     let data = await response.json();
