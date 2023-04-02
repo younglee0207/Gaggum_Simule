@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+// import { useParams } from "react-router";
 import Swal from "sweetalert2";
 import NavBar from "../../components/navbar/NavBar";
 import { getPlantDetailState } from "../../store";
 import "./Plant.style.scss"
 import PlantDetail from "./PlantDetail";
 import client from "../../api/client";
+import { useLocation } from "react-router-dom"
 
 const PlantDetailPage = () => {
 
-  const { id } = useParams()
   const [plantDetail, setPlantDetail] = useState(getPlantDetailState);
+  const location = useLocation()
+  console.log(location.state)
+  const id = location.state.plant_number
 
   const getPlantDetail = () => {
     client
       .get(`plant/number?plantNumber=${id}`)
       .then((res) => {
-        setPlantDetail(res.data.data[id - 1])
+        const data = res.data.data.filter((it) => it.plant_number === id)
+        setPlantDetail(data[0])
       })
   }
 

@@ -20,7 +20,7 @@ const PlantDetail = ({ item, handleWatering }) => {
       {/* 식물 사진 */}
       <div 
         className="detail-image-div"
-        style={{ backgroundImage: item?.plant_img, backgroundRepeat: "no-repeat", backgroundSize: "cover" }}
+        style={{ backgroundImage: item?.plant_img }}
       >
       </div>
       <div className="detail-top">

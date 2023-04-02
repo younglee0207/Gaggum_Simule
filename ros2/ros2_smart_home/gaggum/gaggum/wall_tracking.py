@@ -135,6 +135,7 @@ class wallTracking(Node):
 
 
     def find_wall(self):
+
         self.cmd_msg.linear.x = 0.3
         self.cmd_msg.angular.z = -0.3
 

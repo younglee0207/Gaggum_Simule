@@ -1,9 +1,23 @@
-import React from "react";
+import React, {useEffect} from "react";
 import ReactDOM from "react-dom";
 import classes from "./Modal.module.scss";
 
 const PlantModal = ({ onClose, children, onItemClick, GetNameDiaries, GetAllDiaries }) => {
-  const handleAllItemClick = () => {
+  useEffect(() => {
+    document.body.style.cssText = `
+      position: fixed; 
+      top: -${window.scrollY}px;
+      overflow-y: scroll;
+      width: 100%;`;
+    return () => {
+      const scrollY = document.body.style.top;
+      document.body.style.cssText = '';
+      window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+    };
+  }, []);
+
+  const handleAllItemClick = (e) => {
+    onItemClick(e.target.textContent)
     GetAllDiaries()
     onClose()
   }
@@ -28,9 +42,12 @@ const PlantModal = ({ onClose, children, onItemClick, GetNameDiaries, GetAllDiar
             return unique;
           }, [])
           .map((item) => (
-            <h1 key={item.id} onClick={handlePlantItemClick}>
-              {item.plant_name}
-            </h1>
+            <div key={item.id}>
+              <hr />
+              <h1 onClick={handlePlantItemClick}>
+                {item.plant_name}
+              </h1>
+            </div>
           ))}
       </div>
     </div>,
