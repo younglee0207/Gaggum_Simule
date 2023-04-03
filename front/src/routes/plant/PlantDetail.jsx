@@ -4,6 +4,8 @@ import { ImBook } from "react-icons/im"
 import { useNavigate } from "react-router";
 import { MdDelete } from "react-icons/md"
 import { BsFillPencilFill } from "react-icons/bs"
+import Swal from "sweetalert2";
+import client from "../../api/client";
 
 const PlantDetail = ({ item, handleWatering }) => {
 
@@ -14,6 +16,7 @@ const PlantDetail = ({ item, handleWatering }) => {
   const diff = (nowDate - registDate) / (1000 * 60 * 60 * 24) // 일(day) 단위로 계산
   const daysDiff = Math.floor(diff) // 소수점 이하 절사 
   const backgroundImage = item?.plant_img || 'https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png'
+  console.log(item)
 
   const handleChange = () => {
     setChecked(!checked)
@@ -24,12 +27,27 @@ const PlantDetail = ({ item, handleWatering }) => {
   };
 
   const handleDelete = () => {
-
+    console.log("delete")
+    Swal.fire({
+      title: "식물 삭제",
+      text: "식물을 삭제 하시겠습니까?", 
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니오"
+    }).then((res) => {
+      if (res.isConfirmed) {
+        client
+          .post(`plant/delete`, { plant_number: item.plant_number })
+          .then(() => {
+            navigate("/plant")
+          })
+      }
+    })
   };
 
-  const handleEdit = () => {
+  // const handleEdit = () => {
 
-  };
+  // };
 
   return (
     <div className="PlantDetail">
@@ -42,12 +60,12 @@ const PlantDetail = ({ item, handleWatering }) => {
           alt="식물 사진"
         />
         <div>
-          <BsFillPencilFill 
+          {/* <BsFillPencilFill 
             className="plant__edit"
             size="24px"
             color="gray"
             onClick={handleEdit}
-          />
+          /> */}
           <MdDelete 
             className="plant__delete"
             size="32px"

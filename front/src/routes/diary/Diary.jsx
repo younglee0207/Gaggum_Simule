@@ -111,6 +111,7 @@ const Diary = () => {
   useEffect(() => {
     if (location.state) {
       GetNameDiaries(location.state.plant_name)
+      setModalPlantButtonName(location.state.plant_name)
     } else {
       GetAllDiaries();
     }
