@@ -97,8 +97,8 @@ class followTheCarrot(Node):
                     {
                     'plant_number': 1, 
                     'plant_original_name': 'plant1', 
-                    'plant_position_x': -4.20, 
-                    'plant_position_y': 5.49
+                    'plant_position_x': -4.0, 
+                    'plant_position_y': 5.0
                     },
                     {
                     'plant_number': 1, 
@@ -129,7 +129,7 @@ class followTheCarrot(Node):
     def timer_callback(self):
         # 백에서 트리거가 실행되면
         if self.is_trigger:
-            self.hand_control_msg.data = self.triggers['mode']
+            self.mode = self.triggers['mode']
             self.goal_x = self.triggers['data'][0]['plant_position_x']
             self.goal_y = self.triggers['data'][0]['plant_position_y']
             self.plant_original_name = self.triggers['data'][0]['plant_original_name']
@@ -166,7 +166,7 @@ class followTheCarrot(Node):
                         # 화분 과의 거리가 0.6 미만이면 사진을 찍-5.기 위해 0.6까지 전진
                         #print('distance', distance)
                         # 중앙 맞추기
-                        if 315 <= cx <= 325:
+                        if 319 <= cx <= 321:
                             #print('중앙 맞춤')
                             # 중간에 있으면 천천히 전진
                             self.cmd_msg.angular.z=0.0
@@ -175,22 +175,28 @@ class followTheCarrot(Node):
                             if 0.58 < distance <= 0.6:
                                 self.cmd_msg.linear.x=0.0
                                 self.cmd_msg.angular.z=0.0
-                                # 사진 찍기
-                                #print(self.pickture)
-                                if number not in self.pickture:
+                                # 물 줄때만 사진 찍기
+                                if self.status_msg.twist.angular.z == 0 and self.status_msg.twist.linear == 0 and self.mode == 100 and number not in self.pickture:
                                     print('사진찍기')
                                     self.pickture.add(number)
+                                    # # 사진을 찍었으면 가까이 가기
+                                    # while self.is_forward_approach :
+                                    #     print('들러 가자!!')
+                                    #     self.cmd_msg.linear.x=0.1
+                                    #     self.cmd_msg.angular.z=0.0
+                                    #     self.cmd_pub.publish(self.cmd_msg)
+                                
                             # 너무 가까우면 후진하기
                             elif distance <= 0.58:
                                 self.cmd_msg.linear.x=-0.1
                                 self.cmd_msg.angular.z=0.0
                         # 목표가 왼쪽에 있으면
                         else:
-                            if cx < 315:
-                                self.cmd_msg.angular.z=-0.1
+                            if cx < 319:
+                                self.cmd_msg.angular.z=-0.05
                             # 목표가 오른쪽에 있으면
                             else:
-                                self.cmd_msg.angular.z=0.1
+                                self.cmd_msg.angular.z=0.05
 
                         # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
                         self.hand_control_pub.publish(self.hand_control_msg)
