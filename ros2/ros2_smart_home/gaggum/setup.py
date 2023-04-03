@@ -20,7 +20,17 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'a_star_local_path = gaggum.a_star_local_path:main',
+            'a_star = gaggum.a_star:main',
             'ex_calib = gaggum.ex_calib:main',
+            'load_map = gaggum.ex_calib:main',
+            'move_turtle = gaggum.move_turtle:main',
+            'odom = gaggum.odom:main',
+            'path_tracking = gaggum.path_tracking:main',
+            'run_mapping = gaggum.run_mapping:main',
+            'socket = gaggum.socket:main',
+            'tts = gaggum.tts:main',
+            'wall_tracking = gaggum.wall_tracking:main'
             'yolov5 = gaggum.yolov5:main',
         ],
     },
