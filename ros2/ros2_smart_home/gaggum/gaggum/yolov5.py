@@ -131,7 +131,7 @@ def imu_callback(msg):
     global robot_yaw
     imu_q= Quaternion(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z)
     _,_,robot_yaw = imu_q.to_euler()
-    print(f"robot_yaw : {robot_yaw}")
+    # print(f"robot_yaw : {robot_yaw}")
 
 def status_callback(msg):
     global turtlebot_status_msg
@@ -300,8 +300,6 @@ def main(args=None):
 
                 ostate_list = []
                 angles = []
-                x2 = []
-                y2 = []
                 for k, bbox in enumerate(boxes_all):
                     for i in range(bbox.shape[0]):
                         x = int(bbox[i, 0])
@@ -325,8 +323,8 @@ def main(args=None):
 
                         object_global_pose = transform_bot2map(transform_lidar2bot(relative))
 
-                        x2.append(loc_x + relative_x * math.cos(robot_yaw))
-                        y2.append(loc_y + relative_x * math.sin(robot_yaw))
+                        x2 = loc_x + relative_x * math.cos(robot_yaw)
+                        y2 = loc_y + relative_x * math.sin(robot_yaw)
                         angles.append(robot_yaw * 180.0 / math.pi)
 
                         ostate_list.append(object_global_pose)
@@ -342,9 +340,9 @@ def main(args=None):
                 publisher_detect.publish(detections)
 
             for i in range(detections.num_index):
-                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {}), x2y2 : ({}, {}), angles : {}"
+                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {}), angles : {}"
                       .format(i, detections.object_class[i], detections.x[i], detections.y[i], 
-                              detections.distance[i], detections.cx[i], detections.cy[i], x2[i], y2[i], angles[i]))
+                              detections.distance[i], detections.cx[i], detections.cy[i], angles[i]))
                 
             image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32), xy_i[:, 1].astype(np.int32))
 
