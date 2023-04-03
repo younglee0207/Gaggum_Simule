@@ -74,6 +74,8 @@ SSAFY 8기 특화 프로젝트
 
 ### ROS
 
+- Socket.io v5.8.0
+
 ### DB
 
 - Amazon S3
@@ -144,4 +146,33 @@ https://lemon-letter-aac.notion.site/8701deb361604d30abb754d51c7c4320
  ┣ 📜index.js
  ┣ 📜logo.svg
  ┗ 📜store.js
+```
+
+### Back
+
+```
+📦back
+ ┣ 📂aws
+ ┃ ┗ 📜s3.js
+ ┣ 📂routes
+ ┃ ┣ 📜diary.js
+ ┃ ┣ 📜plant.js
+ ┃ ┣ 📜turtle.js
+ ┃ ┗ 📜user.js
+ ┣ 📂servies
+ ┃ ┣ 📜db.js
+ ┃ ┣ 📜diary.js
+ ┃ ┣ 📜plant.js
+ ┃ ┣ 📜turtle.js
+ ┃ ┗ 📜user.js
+ ┣ 📂socket
+ ┃ ┗ 📜socket.js
+ ┣ 📜.dockerignore
+ ┣ 📜.gitignore
+ ┣ 📜app.js
+ ┣ 📜config.js
+ ┣ 📜dockerfile
+ ┣ 📜helper.js
+ ┣ 📜package-lock.json
+ ┗ 📜package.json
 ```
