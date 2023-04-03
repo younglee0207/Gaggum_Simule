@@ -13,7 +13,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage, LaserScan, Imu
 from geometry_msgs.msg import Twist
 from ssafy_msgs.msg import TurtlebotStatus, Detection
-# from std_msgs.msg import Int16,Int8
 
 from squaternion import Quaternion
 
@@ -80,6 +79,7 @@ class detection_net_class():
         # 2  114.75  195.75  1095.0  708.0    0.624512      2  plant3
         # 3  986.00  304.00  1028.0  420.0    0.286865      3  plant4
         # 4  986.00  304.00  1028.0  420.0    0.286865      4  plant5
+        
         idx_detect = info.index.to_numpy()
         boxes_detect = info[info['confidence'] > 0.7][['xmin', 'ymin', 'xmax', 'ymax']].to_numpy()
         classes_pick = info[['name']].T.to_numpy()
@@ -269,16 +269,7 @@ def main(args=None):
             RT_Lidar2Bot = transformMTX_lidar2bot(params_lidar, params_bot)
             RT_Bot2Map = transformMTX_bot2map()
 
-            detections.num_index = 0
-            detections.x = []
-            detections.y = []
-            detections.distance = []
-            detections.cx = []
-            detections.cy = []
-            detections.object_class = []
-
             # 로직 12. bounding box 결과 좌표 뽑기(num, x, y, distance, cx, cy, object_class)
-            detections = Detection()
             if len(info_result) == 0:
                 detections.num_index = 0
                 detections.x = []
@@ -289,8 +280,6 @@ def main(args=None):
                 detections.object_class = []
                 publisher_detect.publish(detections)
             else :
-                detections.num_index = len(info_result)
-
                 boxes_all = []
                 for boxes in boxes_detect:
                     boxes_np = np.array(boxes)
@@ -331,7 +320,7 @@ def main(args=None):
 
                         relative = np.array([relative_x, relative_y, relative_z, 1])
                         object_global_pose = transform_bot2map(transform_lidar2bot(relative))
-                        
+
                         ostate_list.append(object_global_pose)
 
                         detections.num_index = len(info_result)
@@ -344,8 +333,11 @@ def main(args=None):
 
                 publisher_detect.publish(detections)
 
-            print(detections)
-
+            for i in range(detections.num_index):
+                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {})"
+                      .format(i, detections.object_class[i], detections.x[i], detections.y[i], 
+                              detections.distance[i], detections.cx[i], detections.cy[i]))
+                
             image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32), xy_i[:, 1].astype(np.int32))
 
             visualize_images(image_process)
