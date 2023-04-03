@@ -131,6 +131,7 @@ def imu_callback(msg):
     global robot_yaw
     imu_q= Quaternion(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z)
     _,_,robot_yaw = imu_q.to_euler()
+    print(f"robot_yaw : {robot_yaw}")
 
 def status_callback(msg):
     global turtlebot_status_msg
@@ -251,10 +252,9 @@ def main(args=None):
             rclpy.spin_once(g_node)
 
         detections = Detection()
-
         if is_img_bgr and is_scan and is_status:
             image_process, boxes_detect, classes_pick, info_result = yolov5.inference(img_bgr)
-
+            print("--------------------new_frame--------------------")
             loc_z = 0
             loc_z = 0.0
 
@@ -299,6 +299,9 @@ def main(args=None):
                 boxes_all = np.array(boxes_all)
 
                 ostate_list = []
+                angles = []
+                x2 = []
+                y2 = []
                 for k, bbox in enumerate(boxes_all):
                     for i in range(bbox.shape[0]):
                         x = int(bbox[i, 0])
@@ -313,19 +316,24 @@ def main(args=None):
                         xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
 
                         ostate = np.median(xyv, axis=0)
-
+                        
                         relative_x = ostate[2]
                         relative_y = ostate[3]
                         relative_z = ostate[4]
 
                         relative = np.array([relative_x, relative_y, relative_z, 1])
+
                         object_global_pose = transform_bot2map(transform_lidar2bot(relative))
+
+                        x2.append(loc_x + relative_x * math.cos(robot_yaw))
+                        y2.append(loc_y + relative_x * math.sin(robot_yaw))
+                        angles.append(robot_yaw * 180.0 / math.pi)
 
                         ostate_list.append(object_global_pose)
 
                         detections.num_index = len(info_result)
-                        detections.x.append(object_global_pose[0])
-                        detections.y.append(object_global_pose[1])
+                        detections.x.append(x2)
+                        detections.y.append(y2)
                         detections.distance.append(relative_x)
                         detections.cx.append(cx)
                         detections.cy.append(cy)
@@ -334,9 +342,9 @@ def main(args=None):
                 publisher_detect.publish(detections)
 
             for i in range(detections.num_index):
-                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {})"
+                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {}), x2y2 : ({}, {}), angles : {}"
                       .format(i, detections.object_class[i], detections.x[i], detections.y[i], 
-                              detections.distance[i], detections.cx[i], detections.cy[i]))
+                              detections.distance[i], detections.cx[i], detections.cy[i], x2[i], y2[i], angles[i]))
                 
             image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32), xy_i[:, 1].astype(np.int32))
 
