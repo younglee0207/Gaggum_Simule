@@ -27,12 +27,11 @@ const MainPlantList = () => {
       .then((res) => {
         console.log("물이 필요한 식물들 불러오기 성공")
         setNeedWaterPlant(res.data.data)
-        console.log(needWaterPlant)
       })
   }
 
   const handleNavigate = (id) => {
-    navigate(`/plant/${id}`)
+    navigate(`/plant/${id}`, { state: id })
   };
 
   useEffect(() => {
@@ -51,7 +50,7 @@ const MainPlantList = () => {
         >
           {needWaterPlant?.map((item) => {
             return (
-              <SwiperSlide key={item.div} onClick={() => handleNavigate(item.plant_number)} >
+              <SwiperSlide key={item.div} onClick={() => handleNavigate(item?.plant_number)} >
                 <img
                   style={{ width: "100%", height: "100%" }}
                   src={item.plant_img}

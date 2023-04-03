@@ -12,8 +12,7 @@ const PlantDetailPage = () => {
 
   const [plantDetail, setPlantDetail] = useState(getPlantDetailState);
   const location = useLocation()
-  console.log(location.state)
-  const id = location.state.plant_number
+  const id = location.state
 
   const getPlantDetail = () => {
     client
@@ -22,6 +21,7 @@ const PlantDetailPage = () => {
         const data = res.data.data.filter((it) => it.plant_number === id)
         setPlantDetail(data[0])
       })
+
   }
 
   const handleWatering = () => {
@@ -40,13 +40,13 @@ const PlantDetailPage = () => {
       client
         .post('plant/water', data)
         .then(() => {
-          getPlantDetail()
+          getPlantDetail(id)
         })
     })
   };
 
   useEffect(() => {
-    getPlantDetail()
+    getPlantDetail(id)
   }, [])
 
   return (

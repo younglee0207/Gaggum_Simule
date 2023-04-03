@@ -13,7 +13,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage, LaserScan, Imu
 from geometry_msgs.msg import Twist
 from ssafy_msgs.msg import TurtlebotStatus, Detection
-# from std_msgs.msg import Int16,Int8
 
 from squaternion import Quaternion
 
@@ -80,6 +79,7 @@ class detection_net_class():
         # 2  114.75  195.75  1095.0  708.0    0.624512      2  plant3
         # 3  986.00  304.00  1028.0  420.0    0.286865      3  plant4
         # 4  986.00  304.00  1028.0  420.0    0.286865      4  plant5
+        
         idx_detect = info.index.to_numpy()
         boxes_detect = info[info['confidence'] > 0.7][['xmin', 'ymin', 'xmax', 'ymax']].to_numpy()
         classes_pick = info[['name']].T.to_numpy()
@@ -131,6 +131,7 @@ def imu_callback(msg):
     global robot_yaw
     imu_q= Quaternion(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z)
     _,_,robot_yaw = imu_q.to_euler()
+    print(f"robot_yaw : {robot_yaw}")
 
 def status_callback(msg):
     global turtlebot_status_msg
@@ -251,10 +252,9 @@ def main(args=None):
             rclpy.spin_once(g_node)
 
         detections = Detection()
-
         if is_img_bgr and is_scan and is_status:
             image_process, boxes_detect, classes_pick, info_result = yolov5.inference(img_bgr)
-
+            print("--------------------new_frame--------------------")
             loc_z = 0
             loc_z = 0.0
 
@@ -269,16 +269,7 @@ def main(args=None):
             RT_Lidar2Bot = transformMTX_lidar2bot(params_lidar, params_bot)
             RT_Bot2Map = transformMTX_bot2map()
 
-            detections.num_index = 0
-            detections.x = []
-            detections.y = []
-            detections.distance = []
-            detections.cx = []
-            detections.cy = []
-            detections.object_class = []
-
             # 로직 12. bounding box 결과 좌표 뽑기(num, x, y, distance, cx, cy, object_class)
-            detections = Detection()
             if len(info_result) == 0:
                 detections.num_index = 0
                 detections.x = []
@@ -289,8 +280,6 @@ def main(args=None):
                 detections.object_class = []
                 publisher_detect.publish(detections)
             else :
-                detections.num_index = len(info_result)
-
                 boxes_all = []
                 for boxes in boxes_detect:
                     boxes_np = np.array(boxes)
@@ -310,6 +299,9 @@ def main(args=None):
                 boxes_all = np.array(boxes_all)
 
                 ostate_list = []
+                angles = []
+                x2 = []
+                y2 = []
                 for k, bbox in enumerate(boxes_all):
                     for i in range(bbox.shape[0]):
                         x = int(bbox[i, 0])
@@ -324,19 +316,24 @@ def main(args=None):
                         xyv = xyv[np.logical_and(xyv[:, 1]>=y, xyv[:, 1]<=y+h), :]
 
                         ostate = np.median(xyv, axis=0)
-
+                        
                         relative_x = ostate[2]
                         relative_y = ostate[3]
                         relative_z = ostate[4]
 
                         relative = np.array([relative_x, relative_y, relative_z, 1])
+
                         object_global_pose = transform_bot2map(transform_lidar2bot(relative))
-                        
+
+                        x2.append(loc_x + relative_x * math.cos(robot_yaw))
+                        y2.append(loc_y + relative_x * math.sin(robot_yaw))
+                        angles.append(robot_yaw * 180.0 / math.pi)
+
                         ostate_list.append(object_global_pose)
 
                         detections.num_index = len(info_result)
-                        detections.x.append(object_global_pose[0])
-                        detections.y.append(object_global_pose[1])
+                        detections.x.append(x2)
+                        detections.y.append(y2)
                         detections.distance.append(relative_x)
                         detections.cx.append(cx)
                         detections.cy.append(cy)
@@ -344,8 +341,11 @@ def main(args=None):
 
                 publisher_detect.publish(detections)
 
-            print(detections)
-
+            for i in range(detections.num_index):
+                print("idx : {}, object_class : {}, xy : ({}, {}), distance : {}, cxy : ({}, {}), x2y2 : ({}, {}), angles : {}"
+                      .format(i, detections.object_class[i], detections.x[i], detections.y[i], 
+                              detections.distance[i], detections.cx[i], detections.cy[i], x2[i], y2[i], angles[i]))
+                
             image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32), xy_i[:, 1].astype(np.int32))
 
             visualize_images(image_process)

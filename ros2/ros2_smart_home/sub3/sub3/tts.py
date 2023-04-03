@@ -16,12 +16,14 @@ class TTS(Node):
         super().__init__('tts')
 
         self.tts_sub = self.create_subscription(Tts, '/tts', self.tts_callback, 100)
+        self.tts_pub = self.create_publisher(Tts, '/tts', 100)
 
         # publish도 필요함 끝났으면 끝났다는 정보를 어딘가에 전달해야하니까. Tts.msg에 end 변수도 넣을까.?
         # self.pub = self.create_publisher()
     
     
     def tts_callback(self,msg):
+        print(msg)
         # tts 사운드 상대경로 설정
         os_file_path = os.path.abspath(__file__)        
         tts_path = os_file_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\tts.py', 
@@ -41,13 +43,17 @@ class TTS(Node):
                 tts_file = 'sunny.mp3'
             
 
-            sp = gTTS( lang='ko', text=data, slow=False )
+            gaggum_tts = gTTS( lang='ko', text=data, slow=False )
 
-            sp.save(f'{tts_path}/{tts_file}')
+            gaggum_tts.save(f'{tts_path}/{tts_file}')
 
             playsound(f'{tts_path}/{tts_file}')
 
-
+            msg.water_mode = False
+            msg.sunny_mode = False
+            self.tts_pub.publish(msg)
+        
+        # 종료
 
 
 
