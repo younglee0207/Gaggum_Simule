@@ -10,7 +10,6 @@ import PlantDetailPage from "./routes/plant/PlantDetailPage";
 import DiaryPage from "./routes/diary/DiaryPage";
 import LoadingPage from "./routes/loading/LoadingPage";
 import RedirectURI from "./routes/start/RedirectURI";
-import Temp from "../src/routes/temp/Temp";
 import { useState, useEffect } from "react";
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
