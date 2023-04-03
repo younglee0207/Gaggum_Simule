@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import { GiWaterDrop } from "react-icons/gi"
 import { useNavigate } from "react-router";
 import { FaSun } from "react-icons/fa"
+import { RxCross2 } from "react-icons/rx";
+import Swal from "sweetalert2";
+import client from "../../api/client";
 
 const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plantWateringAmount, plantSunlight }) => {
 
   const navigate = useNavigate();
 
   const navigateToDetail = () => {
-    navigate(`/plant/${plantId}`, { state: item });
+    navigate(`/plant/${plantId}`, { state: plantId });
   };
   const needSunlight = plantSunlight ? 
   <FaSun className="sunlight__img" size="32px" color="#FF6B00" /> : <FaSun className="sunlight__img" size="32px" />
@@ -23,6 +26,27 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
   const [ wateringAmount4, setWateringAmount4 ] = useState(grayColor) 
   const [ wateringAmount5, setWateringAmount5 ] = useState(grayColor)
 
+  const handleDelete = () => {
+    Swal.fire({
+      title: "식물 삭제",
+      text: "식물을 삭제하시겠습니까?",
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니오",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        client
+          .post("plant/delete", { plant_number: plantId })
+          .then((res) => {
+            console.log("삭제되었습니다.")
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+    });
+  };
+  
   useEffect(() => {
     switch (plantWateringAmount) {
       case 100:
@@ -70,6 +94,12 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
       className="MyPlantListItem"
       onClick={navigateToDetail}
     >
+      {/* <RxCross2 
+        className="plant__delete"
+        size="20px"
+        color="gray"
+        onClick={handleDelete}
+      /> */}
       <div className="img__container">
         <img
           className="img-plant"

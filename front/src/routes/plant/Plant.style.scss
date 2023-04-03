@@ -18,6 +18,7 @@
 
 .MyPlantListItem {
   display: flex;
+  position: relative;
   justify-content: space-evenly;
   background-color: #DEF5E5;
   border-radius: 16px;
@@ -61,22 +62,36 @@
 }
 
 // PlantDetail
-
 .PlantDetail {
   padding-bottom: 100px;
 
   .detail-image-div {
+    position: relative;
     height: 400px;
     
     img {
       width: 100%;
       height: 100%;
     }
+
+    .plant__delete {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+    }
+    .plant__edit {
+      position: absolute;
+      bottom: 20px;
+      right: 64px;
+    }
   }
   .detail__content {
+    padding-top: 16px;
     padding-left: 16px;
     padding-right: 16px;
     padding-bottom: 16px;
+
+
 
 
     .detail-top {

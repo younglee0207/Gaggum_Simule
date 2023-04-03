@@ -2,16 +2,18 @@ import { FaSun } from "react-icons/fa"
 import { useState } from "react";
 import { ImBook } from "react-icons/im"
 import { useNavigate } from "react-router";
+import { MdDelete } from "react-icons/md"
+import { BsFillPencilFill } from "react-icons/bs"
 
 const PlantDetail = ({ item, handleWatering }) => {
 
   const navigate = useNavigate()
   const [checked, setChecked] = useState(false);
-  const registDate = new Date(item.plant_create_date?.slice(0, 10))
+  const registDate = new Date(item?.plant_create_date?.slice(0, 10))
   const nowDate = new Date()
   const diff = (nowDate - registDate) / (1000 * 60 * 60 * 24) // 일(day) 단위로 계산
   const daysDiff = Math.floor(diff) // 소수점 이하 절사 
-  const backgroundImage = item.plant_img || 'https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png'
+  const backgroundImage = item?.plant_img || 'https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png'
 
   const handleChange = () => {
     setChecked(!checked)
@@ -21,18 +23,38 @@ const PlantDetail = ({ item, handleWatering }) => {
     navigate("/diary", { state: item })
   };
 
-  console.log(item.plant_img)
+  const handleDelete = () => {
+
+  };
+
+  const handleEdit = () => {
+
+  };
+
   return (
     <div className="PlantDetail">
       {/* 식물 사진 */}
       <div 
         className="detail-image-div"
-        // style={{ backgroundImage: `url(${item?.plant_img})` }}
       >
         <img 
           src={backgroundImage}
           alt="식물 사진"
         />
+        <div>
+          <BsFillPencilFill 
+            className="plant__edit"
+            size="24px"
+            color="gray"
+            onClick={handleEdit}
+          />
+          <MdDelete 
+            className="plant__delete"
+            size="32px"
+            color="gray"
+            onClick={handleDelete}
+          />
+        </div>
       </div>
       <div className="detail__content">
         <div className="detail-top">
