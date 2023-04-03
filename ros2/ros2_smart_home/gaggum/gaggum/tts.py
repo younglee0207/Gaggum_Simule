@@ -15,7 +15,7 @@ class TTS(Node):
     def __init__(self):
         super().__init__('tts')
 
-        self.tts_sub = self.create_subscription(Tts, '/tts', self.tts_callback, 100)
+        self.tts_sub = self.create_subscription(Tts, '/tts', self.tts_callback, 10)
 
         # publish도 필요함 끝났으면 끝났다는 정보를 어딘가에 전달해야하니까. Tts.msg에 end 변수도 넣을까.?
         # self.pub = self.create_publisher()
@@ -23,13 +23,14 @@ class TTS(Node):
     
     def tts_callback(self,msg):
         # tts 사운드 상대경로 설정
+        print('tts')
         os_file_path = os.path.abspath(__file__)        
-        tts_path = os_file_path.replace('install\\sub3\\Lib\\site-packages\\sub3\\tts.py', 
-                                        'ros2_smart_home\\sub3\\sound')     
+        tts_path = os_file_path.replace('install\\gaggum\\Lib\\site-packages\\gaggum\\tts.py', 
+                                        'ros2_smart_home\\gaggum\\sound')     
         
         # TTS 만들기(물주기/ 필요한 정보 : 모드)
         # pot_name = msg.pot_name
-        pot_name = "mao1"    # 변수 명으로 바꿔야함  
+        pot_name = "경섭"    # 변수 명으로 바꿔야함      
 
         if msg.water_mode or msg.sunny_mode:
 
