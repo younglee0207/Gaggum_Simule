@@ -127,7 +127,6 @@ class followTheCarrot(Node):
         self.hand_control_msg = Int16()
 
     def timer_callback(self):
-
         # 백에서 트리거가 실행되면
         if self.is_trigger:
             self.hand_control_msg.data = self.triggers['mode']
@@ -155,7 +154,7 @@ class followTheCarrot(Node):
 
 
                 if distance <= 1:
-                    print('화분과 근접')
+                    #print('화분과 근접')
                     # 멈추고
                     self.is_stop = True
                     self.cmd_msg.linear.x=0.0
@@ -163,15 +162,28 @@ class followTheCarrot(Node):
 
                     # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
                     if  number == self.plant_number - 1:
-                        print('목표 화분 맞음')
+                        #print('목표 화분 맞음')
                         # 화분 과의 거리가 0.6 미만이면 사진을 찍-5.기 위해 0.6까지 전진
-                        print('distance', distance)
+                        #print('distance', distance)
                         # 중앙 맞추기
                         if 315 <= cx <= 325:
-                            print('중앙 맞춤')
+                            #print('중앙 맞춤')
                             # 중간에 있으면 천천히 전진
                             self.cmd_msg.angular.z=0.0
                             self.cmd_msg.linear.x=0.1
+                            
+                            if 0.58 < distance <= 0.6:
+                                self.cmd_msg.linear.x=0.0
+                                self.cmd_msg.angular.z=0.0
+                                # 사진 찍기
+                                #print(self.pickture)
+                                if number not in self.pickture:
+                                    print('사진찍기')
+                                    self.pickture.add(number)
+                            # 너무 가까우면 후진하기
+                            elif distance <= 0.58:
+                                self.cmd_msg.linear.x=-0.1
+                                self.cmd_msg.angular.z=0.0
                         # 목표가 왼쪽에 있으면
                         else:
                             if cx < 315:
@@ -179,30 +191,22 @@ class followTheCarrot(Node):
                             # 목표가 오른쪽에 있으면
                             else:
                                 self.cmd_msg.angular.z=0.1
-                
-                        if distance <= 0.6:
-                            self.cmd_msg.linear.x=0.0
-                            self.cmd_msg.angular.z=0.0
-                            # 사진 찍기
-                            if number not in self.pickture:
-                                print('사진찍기')
-                                self.pickture.add(number)
-                                
-                        
+
                         # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
                         self.hand_control_pub.publish(self.hand_control_msg)
                     else:
                         # 목표 화분이 아니면 회피해서 목표 지점으로 가기
-                        print('목표 화분 아님')
+                        #print('목표 화분 아님')
                         self.is_stop = False 
 
-                    print('x', self.cmd_msg.linear.x, 'z', self.cmd_msg.angular.z)
+                    #print('x', self.cmd_msg.linear.x, 'z', self.cmd_msg.angular.z)
                     self.cmd_pub.publish(self.cmd_msg)
             except IndexError:
-                print('화분 없음')
+                #print('화분 없음')
+                pass
 
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때, yolo가 작동 중일때, stop이 아닐때
-        print(self.is_status, self.is_odom, self.is_path, self.is_stop)
+        #print(self.is_status, self.is_odom, self.is_path, self.is_stop)
         if self.is_status and self.is_odom and self.is_path and not self.is_stop:
             # 남은 경로가 1 이상이면
             if len(self.path_msg.poses)> 1:
@@ -211,7 +215,7 @@ class followTheCarrot(Node):
 
                 # 로봇과 가장 가까운 경로점과의 직선거리
                 lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-self.robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-self.robot_pose_y,2))
-                # print(self.robot_pose_x,self.robot_pose_y,lateral_error)
+                # #print(self.robot_pose_x,self.robot_pose_y,lateral_error)
 
                 # 로직 4. 로봇이 주어진 경로점과 떨어진 거리(lateral_error)와 로봇의 선속도를 이용해 전방주시거리 설정
 
@@ -280,14 +284,14 @@ class followTheCarrot(Node):
             else:
                 # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
                 if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
-                    print('목표 지점에 도착')
+                    #print('목표 지점에 도착')
                     # 도착 후 멈추기
                     self.cmd_msg.linear.x=0.0
                     self.cmd_msg.angular.z=0.0
 
                 else:
                     # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
-                    print("no found forward point")
+                    #print("no found forward point")
                     self.cmd_msg.linear.x=-0.1
                     self.cmd_msg.angular.z=0.1
 
@@ -359,28 +363,28 @@ class followTheCarrot(Node):
             backward_dis = sum(backward) / len(backward)
             left_dis = sum(left) / len(left)
             right_dis = sum(right) / len(right)
-            # print('전방', forward_dis)
-            # print('후방', backward_dis)
-            # print('좌측', left_dis)       
-            # print('우측', right_dis)
+            # #print('전방', forward_dis)
+            # #print('후방', backward_dis)
+            # #print('좌측', left_dis)       
+            # #print('우측', right_dis)
 
             # 근접 감지
             if forward_dis < 0.25:
                 self.is_forward_approach = True
-                print('전방 근접')
+                #print('전방 근접')
             elif left_dis < 0.25:
                 self.is_right_approach = True
-                print('좌측 근접')
+                #print('좌측 근접')
             elif right_dis < 0.25:
                 self.is_left_approach = True
-                print('우측 근접')
+                #print('우측 근접')
             # elif backward_dis < 0.25:
             #     self.is_approach = False
-            #     print('후방 근접')
+            #     #print('후방 근접')
 
     # def goal_callback(self, msg):
     #     if msg.header.frame_id=='map':
-    #         # print(msg)
+    #         # #print(msg)
     #         # {
     #         #     'data': [
     #         #         {
