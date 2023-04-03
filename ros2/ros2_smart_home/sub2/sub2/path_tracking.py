@@ -180,11 +180,11 @@ class followTheCarrot(Node):
                         self.is_pointed = True
                     else:
                         self.is_pointed = False
-                    print(self.is_pointed)
+                    # print(self.is_pointed)
                     # 화분 앞에 위치하지 않으면
                     if not self.is_pointed:
                         # 거리가 2이하이면
-                        if self.yolo_distance <= 2:
+                        if self.yolo_distance <= 1:
                             self.is_stop = True
                             self.cmd_msg.linear.x=0.0
                             self.cmd_msg.angular.z=0.0
@@ -195,7 +195,7 @@ class followTheCarrot(Node):
 
                             # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
                             if  self.yolo_number == self.plant_number - 1:
-                                
+                                print('목표 화분')    
                                 # 중앙 맞추기
                                 if 315 <= self.yolo_cx <= 325:
                                     # 중간에 있으면 천천히 전진
@@ -233,13 +233,13 @@ class followTheCarrot(Node):
                                 self.is_stop = False 
                             #print('x', self.cmd_msg.linear.x, 'z', self.cmd_msg.angular.z)
                         
-                        # 2미터 밖에 있으면 경로따라 가기
+                        # 1미터 밖에 있으면 경로따라 가기
                         else:
                             self.is_stop = False
                     
                     # 화분 앞에서 정지한 상태
                     else:
-                        # print('화분 앞')
+                        print('화분 앞')
                         # 물 줄때는 사진 찍기
                         if self.mode == 100:
                             if self.yolo_number not in self.pickture:
@@ -247,6 +247,7 @@ class followTheCarrot(Node):
                             self.pickture.add(self.yolo_number)
 
                         # 전방 접근 상태
+                        print(f'접근했니? : {self.is_forward_approach}')
                         if self.is_forward_approach:
                             self.cmd_msg.linear.x=0.0
                             if self.mode == 100:
@@ -335,7 +336,7 @@ class followTheCarrot(Node):
                         theta = -atan2(local_forward_point[1], local_forward_point[0])
                         
                         # 로직 7. 선속도, 각속도 정하기
-                        out_vel = 0.7
+                        out_vel = 0.5
                         out_rad_vel = theta
                         # 10이내의 거리에서 선속도를 줄이고 각속도를 높여서 목표 지점을 지나치지 않도록 함
                         if len(self.path_msg.poses) < 20:
@@ -445,16 +446,23 @@ class followTheCarrot(Node):
             # #print('우측', right_dis)
 
             # 근접 감지
-            if forward_dis < 0.25:
+            if forward_dis < 0.2:
                 self.is_forward_approach = True
                 #print('전방 근접')
-            elif left_dis < 0.25:
+            else:
+                self.is_forward_approach = False
+
+            if left_dis < 0.2:
                 self.is_right_approach = True
                 #print('좌측 근접')
-            elif right_dis < 0.25:
+            else:
+                self.is_right_approach = False
+            if right_dis < 0.5:
                 self.is_left_approach = True
+            else:
+                self.is_left_approach = False
                 #print('우측 근접')
-            # elif backward_dis < 0.25:
+            # elif backward_dis < 0.2:
             #     self.is_approach = False
             #     #print('후방 근접')
 
