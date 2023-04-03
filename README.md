@@ -118,34 +118,43 @@ https://lemon-letter-aac.notion.site/8701deb361604d30abb754d51c7c4320
 ### Front
 
 ```
-📦src
- ┣ 📂.well-known
- ┃ ┗ 📜assetlinks.json
- ┣ 📂api
- ┃ ┗ 📜client.js
- ┣ 📂assets
- ┃ ┣ 📂fonts
- ┃ ┣ 📂loading
- ┃ ┣ 📂logo
- ┃ ┣ 📂main
- ┃ ┣ 📂plant
- ┃ ┣ 📂start
- ┃ ┗ 📂weather
- ┣ 📂components
- ┃ ┣ 📂navbar
- ┃ ┣ 📂scrolltotop
- ┃ ┗ 📂title
- ┣ 📂routes
- ┃ ┣ 📂diary
- ┃ ┣ 📂loading
- ┃ ┣ 📂main
- ┃ ┣ 📂plant
- ┃ ┣ 📂register
- ┃ ┗ 📂start
- ┣ 📜App.js
- ┣ 📜index.js
- ┣ 📜logo.svg
- ┗ 📜store.js
+📦front
+ ┣ 📂node_modules
+ ┣ 📂public
+ ┃ ┣ 📂icons
+ ┣ 📂src
+ ┃ ┣ 📂.well-known
+ ┃ ┣ 📂api
+ ┃ ┣ 📂assets
+ ┃ ┃ ┣ 📂fonts
+ ┃ ┃ ┣ 📂loading
+ ┃ ┃ ┣ 📂logo
+ ┃ ┃ ┣ 📂main
+ ┃ ┃ ┣ 📂plant
+ ┃ ┃ ┣ 📂start
+ ┃ ┃ ┗ 📂weather
+ ┃ ┣ 📂components
+ ┃ ┃ ┣ 📂navbar
+ ┃ ┃ ┣ 📂scrolltotop
+ ┃ ┃ ┗ 📂title
+ ┃ ┣ 📂routes
+ ┃ ┃ ┣ 📂diary
+ ┃ ┃ ┣ 📂loading
+ ┃ ┃ ┣ 📂main
+ ┃ ┃ ┣ 📂plant
+ ┃ ┃ ┣ 📂register
+ ┃ ┃ ┗ 📂start
+ ┃ ┣ 📜App.js
+ ┃ ┣ 📜index.js
+ ┃ ┣ 📜logo.svg
+ ┃ ┣ 📜service-worker.js
+ ┃ ┣ 📜serviceWorkerRegistration.js
+ ┃ ┗ 📜store.js
+ ┣ 📜.env
+ ┣ 📜.gitignore
+ ┣ 📜Dockerfile
+ ┣ 📜nginx.conf
+ ┗ 📜README.md
 ```
 
 ### Back
