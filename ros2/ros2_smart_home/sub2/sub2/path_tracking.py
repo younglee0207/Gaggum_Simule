@@ -63,6 +63,7 @@ class followTheCarrot(Node):
         self.is_left_approach = False
         self.is_trigger = True
         self.is_yolo = False
+        self.is_pointed = False
 
         self.odom_msg=Odometry()            
         self.robot_yaw=0.0
@@ -101,7 +102,7 @@ class followTheCarrot(Node):
                     'plant_position_y': 5.0
                     },
                     {
-                    'plant_number': 1, 
+                    'plant_number': 2, 
                     'plant_original_name': 'plant1', 
                     'plant_position_x': -4.17, 
                     'plant_position_y': 6.06
@@ -125,6 +126,9 @@ class followTheCarrot(Node):
 
         # handcontrol에 모드를 보냄
         self.hand_control_msg = Int16()
+        
+        # 멈췄는 지 확인 하는 함수
+        self.check_stop = 0
 
     def timer_callback(self):
         # 백에서 트리거가 실행되면
@@ -146,14 +150,21 @@ class followTheCarrot(Node):
         # yolo가 넘어오면
         if self.is_yolo:
             try:
-                # 카메라에 보이는 화분과의 거리가 1보다 작으면
-                distance = self.yolo_msg.distance[0]
-                number = self.yolo_msg.object_class[0]
-                cx = self.yolo_msg.cx[0]
-                cy = self.yolo_msg.cy[0]
+                idx = self.yolo_msg.object_class.index(self.plant_number - 1)
+                distance = self.yolo_msg.distance[idx]
+                number = self.yolo_msg.object_class[idx]
+                cx = self.yolo_msg.cx[idx]
+                cy = self.yolo_msg.cy[idx]
 
+                print(self.check_stop)
+                if self.check_stop >= 100:
+                    self.is_pointed = True
+                else:
+                    self.is_pointed = False
 
-                if distance <= 1:
+                # 화분 앞에 위치 하지 않으면
+                if not self.is_pointed:
+                    # 카메라에 보이는 화분과의 거리가 1보다 작으면
                     #print('화분과 근접')
                     # 멈추고
                     self.is_stop = True
@@ -166,37 +177,37 @@ class followTheCarrot(Node):
                         # 화분 과의 거리가 0.6 미만이면 사진을 찍-5.기 위해 0.6까지 전진
                         #print('distance', distance)
                         # 중앙 맞추기
-                        if 319 <= cx <= 321:
+                        if 318 <= cx <= 322:
                             #print('중앙 맞춤')
                             # 중간에 있으면 천천히 전진
                             self.cmd_msg.angular.z=0.0
-                            self.cmd_msg.linear.x=0.1
+                            self.cmd_msg.linear.x=0.3
+                            if distance <= 1:
+                                self.cmd_msg.linear.x=0.1
                             
-                            if 0.58 < distance <= 0.6:
-                                self.cmd_msg.linear.x=0.0
-                                self.cmd_msg.angular.z=0.0
-                                # 물 줄때만 사진 찍기
-                                if self.status_msg.twist.angular.z == 0 and self.status_msg.twist.linear == 0 and self.mode == 100 and number not in self.pickture:
-                                    print('사진찍기')
-                                    self.pickture.add(number)
-                                    # # 사진을 찍었으면 가까이 가기
-                                    # while self.is_forward_approach :
-                                    #     print('들러 가자!!')
-                                    #     self.cmd_msg.linear.x=0.1
-                                    #     self.cmd_msg.angular.z=0.0
-                                    #     self.cmd_pub.publish(self.cmd_msg)
-                                
-                            # 너무 가까우면 후진하기
-                            elif distance <= 0.58:
-                                self.cmd_msg.linear.x=-0.1
-                                self.cmd_msg.angular.z=0.0
+                                if 0.58 < distance <= 0.6:
+                                    self.cmd_msg.linear.x=0.0
+                                    self.cmd_msg.angular.z=0.0
+                                    self.check_stop += 1
+                                else:
+                                    # 포인트에서 벗어나면
+                                    self.check_stop = 0
+                                    # 너무 가까우면 후진하기
+                                    if distance <= 0.58:
+                                        self.cmd_msg.linear.x=-0.1
+                                        self.cmd_msg.angular.z=0.0
                         # 목표가 왼쪽에 있으면
                         else:
-                            if cx < 319:
+                            if cx < 316:
                                 self.cmd_msg.angular.z=-0.05
+                                if cx < 280:
+                                    self.cmd_msg.angular.z=-0.3
+
                             # 목표가 오른쪽에 있으면
                             else:
                                 self.cmd_msg.angular.z=0.05
+                                if cx > 360:
+                                    self.cmd_msg.angular.z = 0.3
 
                         # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
                         self.hand_control_pub.publish(self.hand_control_msg)
@@ -206,10 +217,22 @@ class followTheCarrot(Node):
                         self.is_stop = False 
 
                     #print('x', self.cmd_msg.linear.x, 'z', self.cmd_msg.angular.z)
-                    self.cmd_pub.publish(self.cmd_msg)
+                else:
+                    # 화분 앞에서 정지한 상태
+                    # 물 줄때만 사진 찍기
+                    if self.mode == 100 and number not in self.pickture:
+                        print('사진찍기')
+                        self.pickture.add(number)
+                    print('화분 앞이다!!')
+                    self.cmd_msg.linear.x=0.0
+                    self.cmd_msg.angular.z=0.0
+                    # 들기
+
+                self.cmd_pub.publish(self.cmd_msg)
             except IndexError:
-                #print('화분 없음')
-                pass
+                print('화분 없음')
+            except ValueError:
+                print('목표 화분이 yolo에 없음')
 
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때, yolo가 작동 중일때, stop이 아닐때
         #print(self.is_status, self.is_odom, self.is_path, self.is_stop)
@@ -294,7 +317,16 @@ class followTheCarrot(Node):
                     # 도착 후 멈추기
                     self.cmd_msg.linear.x=0.0
                     self.cmd_msg.angular.z=0.0
-
+                    
+                    # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
+                    try:
+                        if self.yolo_msg.object_class[0] != self.plant_number - 1:
+                            print('목표 화분이 아니야')
+                            self.cmd_msg.angular.z=0.3
+                    except:
+                        print('목표 지점에 왔는데 화분이 없어!!')
+                        self.cmd_msg.angular.z=0.3
+                        
                 else:
                     # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
                     #print("no found forward point")
