@@ -1,8 +1,23 @@
 import "./Register.style.scss";
 import plantImg from "../../assets/plant/mush.gif";
 import { BsCameraFill } from "react-icons/bs";
+import { useState, useEffect } from "react";
 
 const RegisterCamera = ({ socket }) => {
+
+  const [cameraState, setCameraState] = useState(null)
+
+  useEffect(() => {
+    socket.on("streaming_image", (data) => {
+      console.log("streaming_image");
+      setCameraState(data);
+    });
+
+    return () => {
+      socket.off("streaming_image");
+    };
+  }, []);
+
   const handleLiftUp = () => {
     console.log("들기");
     // Socket 통신으로 들기 명령 보내기
@@ -30,7 +45,11 @@ const RegisterCamera = ({ socket }) => {
     <div className="RegisterCamera">
       {/* 카메라 들어갈 부분 */}
       <div className="camera__container">
-        <img className="camera__screen" src={plantImg} />
+        <img
+          className="camera__screen"
+          src={`data:image/jpeg;base64,${cameraState}`}
+          alt="turtle-bot camera"
+        />
       </div>
       <div className="camera-buttons">
         <button className="camera-button" onClick={handleLiftUp}>
