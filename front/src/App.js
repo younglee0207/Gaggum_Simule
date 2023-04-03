@@ -111,14 +111,10 @@ const App = () => {
           />
           {/* 카카오 RedirectURI 페이지 */}
           <Route path="/auth/kakao/callback" element={<RedirectURI />} />
-          {/* Socket 체크 */}
-          <Route path="/temp" element={<Temp />} />
           {/* 구글 검수 임시용 */}
           <Route path="/googlesecret" element={<MainPage />} />
         </Routes>
-        {/* 로그인 되어있어야 navbar 보이는 로직 추     가하기 */}
-
-
+        {/* 로그인 되어있어야 navbar 보이는 로직 추가하기 */}
       </BrowserRouter>
     </div>
   );
