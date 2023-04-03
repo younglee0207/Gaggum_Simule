@@ -27,6 +27,7 @@ const Diary = () => {
   const [modalPlantButtonName, setModalPlantButtonName] = useState("식물이름");
 
   const [selectedDiary, setSelectedDiary] = useState(null);
+  const diaryImg = "https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png"
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -182,6 +183,8 @@ const Diary = () => {
   const check = () => {
     console.log(modalButtonName);
   };
+
+  console.log(loadedDiaries)
   return (
     <div className="Diary">
       <div className="center">
@@ -273,7 +276,7 @@ const Diary = () => {
                   <img
                     className="img-plant"
                     // src={item.diary_img}
-                    src={item.diary_img}
+                    src={item ? item.diary_img : diaryImg}
                     alt="식물 이미지"
                   />
                 </div>
