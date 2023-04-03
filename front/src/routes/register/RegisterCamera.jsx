@@ -1,16 +1,14 @@
 import "./Register.style.scss";
-import plantImg from "../../assets/plant/mush.gif";
 import { BsCameraFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 
 const RegisterCamera = ({ socket }) => {
-
-  const [cameraState, setCameraState] = useState(null)
+  // 들어가는 정보 : stream_image, plant_x, plant_y, plant_name
+  const [camera, setCamera] = useState(false);
 
   useEffect(() => {
     socket.on("streaming_image", (data) => {
-      console.log("streaming_image");
-      setCameraState(data);
+      setCamera(data);
     });
 
     return () => {
@@ -22,33 +20,38 @@ const RegisterCamera = ({ socket }) => {
     console.log("들기");
     // Socket 통신으로 들기 명령 보내기
     socket.emit("liftUp", {
-      name: "lift up", data: ""
-    })
+      name: "lift up",
+      data: "",
+    });
   };
 
   const handleLiftDown = () => {
     console.log("놓기");
     // Socket 통신으로 놓기 명령 보내기
     socket.emit("liftDown", {
-      name: "lift down", data: ""
-    })
+      name: "lift down",
+      data: "",
+    });
   };
 
   const handleCapture = () => {
     console.log("캡쳐");
     // Socket 통신으로 캡쳐 명령 보내기
     socket.emit("capture", {
-      name: "capture", data: ""
-    })
+      name: "capture",
+      data: "",
+    });
   };
+
+  socket.on();
+
   return (
     <div className="RegisterCamera">
       {/* 카메라 들어갈 부분 */}
       <div className="camera__container">
         <img
           className="camera__screen"
-          src={`data:image/jpeg;base64,${cameraState}`}
-          alt="turtle-bot camera"
+          src={`data:image/jpeg;base64,${camera.stream_image}`}
         />
       </div>
       <div className="camera-buttons">

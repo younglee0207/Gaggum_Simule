@@ -61,7 +61,7 @@ function socketStart() {
           console.log("물줘야하는 식물들", waterNeedPlants);
           waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
-          socket.emit("auto_move", waterNeedPlants);
+          socket.to(roomName).emit("auto_move", waterNeedPlants);
         })();
       } else if (data.environment.hour == 15) {
         (async () => {
@@ -72,8 +72,23 @@ function socketStart() {
           sunNeedPlants.mode = 200;
           sunNeedPlants.sunSpots = sunSpots.data;
           // ROS로 급수 필요 식물 리스트 전달
-          socket.emit("auto_move", sunNeedPlants);
+          socket.to(roomName).emit("auto_move", sunNeedPlants);
         })();
+      }
+    });
+
+    // 물 주는 동작 완료()
+    // socket.on("watering");
+
+    // 카메라
+    socket.on("streaming_image", (data) => {
+      console.log("streaming_image", data);
+      //ROs -> Front로 전달
+      socket.to(roomName).emit("streaming_image", data);
+
+      // front에서 들어오는 data -> ROS로 전달 (이 페이지의 목적 : ROS에서 계속 Back으로 emit 요청하는 것을 막기위해 flag 조절하려고)
+      if (data == "front") {
+        socket.to(roomName).emit("streaming_image", data);
       }
     });
 
