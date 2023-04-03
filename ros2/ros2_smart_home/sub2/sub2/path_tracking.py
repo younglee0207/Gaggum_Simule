@@ -4,11 +4,10 @@ from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
 from ssafy_msgs.msg import TurtlebotStatus, Detection
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
-from math import pi,cos,sin,sqrt,atan2
+from math import pi,cos,sin,sqrt,atan2, pow
 import numpy as np
 from sensor_msgs.msg import LaserScan, PointCloud
 from std_msgs.msg import Int16
-import math
 
 # path_tracking 노드는 로봇의 위치(/odom), 로봇의 속도(/turtlebot_status), 주행 경로(/local_path)를 받아서, 주어진 경로를 따라가게 하는 제어 입력값(/cmd_vel)을 계산합니다.
 # 제어입력값은 선속도와 각속도로 두가지를 구합니다. 
@@ -104,7 +103,7 @@ class followTheCarrot(Node):
                     },
                     {
                     'plant_number': 5, 
-                    'plant_original_name': 'plant2', 
+                    'plant_original_name': 'plant1', 
                     'plant_position_x': -3.0, 
                     'plant_position_y': 7.0
                     }
@@ -137,11 +136,7 @@ class followTheCarrot(Node):
         # 멈췄는 지 확인 하는 함수
         self.check_stop = 0
 
-        
-            
-            
     def timer_callback(self):
-
         # 백에서 트리거가 실행되면
         if self.is_trigger:
             # 가까이에 있는 좌표 찾기
@@ -151,11 +146,12 @@ class followTheCarrot(Node):
             for i in range(len(self.triggers)):
                 x2 = self.triggers['data'][i]['plant_position_x']
                 y2 = self.triggers['data'][i]['plant_position_y']
-                dis = math.sqrt(math.pow(x1-x2, 2) + math.pow(y1-y2, 2))
-                print(f'{i}번 거리: {dis}')
+                dis = sqrt(pow(x1-x2, 2) + pow(y1-y2, 2))
+                # print(f'{i}번 거리: {dis}')
                 if dis < min_dis and i not in self.visited:
+                    min_dis = dis
                     self.triggers_idx = i
-            print(self.triggers_idx)
+            # print('self.triggers_idx', self.triggers_idx)
 
             self.mode = self.triggers['mode']
             self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
@@ -449,22 +445,16 @@ class followTheCarrot(Node):
             # #print('우측', right_dis)
 
             # 근접 감지
-            if forward_dis < 0.2:
+            if forward_dis < 0.25:
                 self.is_forward_approach = True
-                # print('전방 근접')
-            else:
-                self.is_forward_approach = False
-            if left_dis < 0.2:
+                #print('전방 근접')
+            elif left_dis < 0.25:
                 self.is_right_approach = True
-                # print('좌측 근접')
-            else:
-                self.is_right_approach = False
-            if right_dis < 0.2:
+                #print('좌측 근접')
+            elif right_dis < 0.25:
                 self.is_left_approach = True
-                # print('우측 근접')
-            else:
-                self.is_left_approach = False
-            # elif backward_dis < 0.2:
+                #print('우측 근접')
+            # elif backward_dis < 0.25:
             #     self.is_approach = False
             #     #print('후방 근접')
 
