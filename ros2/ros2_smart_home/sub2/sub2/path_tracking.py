@@ -92,7 +92,7 @@ class followTheCarrot(Node):
         self.robot_pose_x = 0
         self.robot_pose_y = 0
 
-        # 터틀봇의 상태 
+        # 백에서 넘어오는 trigger
         self.triggers = {
                 'data': [
                     {
@@ -110,16 +110,19 @@ class followTheCarrot(Node):
                 ], 
                 'mode': 100}
         
-        # 터틀봇의 목표 위치 
+        # trigger 정보
         self.goal_x = 0
         self.goal_y = 0
-
-        # 화분의 정보
         self.plant_original_name = ''
         self.palnt_number = 0
+
        
        # yolo에서 받아온 정보
         self.yolo_msg = Detection()
+        self.yolo_distance = 0
+        self.yolo_number = 0
+        self.yolo_cx = 0
+        self.yolo_cy = 0
 
         # 사진은 한번만 찍기 위한 변수
         self.pickture = set()
@@ -151,41 +154,36 @@ class followTheCarrot(Node):
         if self.is_yolo:
             try:
                 idx = self.yolo_msg.object_class.index(self.plant_number - 1)
-                distance = self.yolo_msg.distance[idx]
-                number = self.yolo_msg.object_class[idx]
-                cx = self.yolo_msg.cx[idx]
-                cy = self.yolo_msg.cy[idx]
-
-                print(self.check_stop)
+                self.yolo_distance = self.yolo_msg.distance[idx]
+                self.yolo_number = self.yolo_msg.object_class[idx]
+                self.yolo_cx = self.yolo_msg.cx[idx]
+                self.yolo_cy = self.yolo_msg.cy[idx]
+                
                 if self.check_stop >= 100:
                     self.is_pointed = True
                 else:
                     self.is_pointed = False
 
-                # 화분 앞에 위치 하지 않으면
-                if not self.is_pointed:
-                    # 카메라에 보이는 화분과의 거리가 1보다 작으면
-                    #print('화분과 근접')
-                    # 멈추고
+                # 화분 앞에 위치하지 않고 거리가 2보다 작으면
+                if not self.is_pointed and self.yolo_distance <= 2:
                     self.is_stop = True
                     self.cmd_msg.linear.x=0.0
                     self.cmd_msg.angular.z=0.0
 
                     # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
-                    if  number == self.plant_number - 1:
+                    if  self.yolo_number == self.plant_number - 1:
                         #print('목표 화분 맞음')
                         # 화분 과의 거리가 0.6 미만이면 사진을 찍-5.기 위해 0.6까지 전진
                         #print('distance', distance)
                         # 중앙 맞추기
-                        if 318 <= cx <= 322:
+                        if 318 <= self.yolo_cx <= 322:
                             #print('중앙 맞춤')
                             # 중간에 있으면 천천히 전진
                             self.cmd_msg.angular.z=0.0
                             self.cmd_msg.linear.x=0.3
-                            if distance <= 1:
+                            if self.yolo_distance <= 1:
                                 self.cmd_msg.linear.x=0.1
-                            
-                                if 0.58 < distance <= 0.6:
+                                if 0.58 < self.yolo_distance <= 0.6:
                                     self.cmd_msg.linear.x=0.0
                                     self.cmd_msg.angular.z=0.0
                                     self.check_stop += 1
@@ -193,20 +191,20 @@ class followTheCarrot(Node):
                                     # 포인트에서 벗어나면
                                     self.check_stop = 0
                                     # 너무 가까우면 후진하기
-                                    if distance <= 0.58:
+                                    if self.yolo_distance <= 0.58:
                                         self.cmd_msg.linear.x=-0.1
                                         self.cmd_msg.angular.z=0.0
                         # 목표가 왼쪽에 있으면
                         else:
-                            if cx < 316:
+                            if self.yolo_cx < 316:
                                 self.cmd_msg.angular.z=-0.05
-                                if cx < 280:
+                                if self.yolo_cx < 280:
                                     self.cmd_msg.angular.z=-0.3
 
                             # 목표가 오른쪽에 있으면
                             else:
                                 self.cmd_msg.angular.z=0.05
-                                if cx > 360:
+                                if self.yolo_cx > 360:
                                     self.cmd_msg.angular.z = 0.3
 
                         # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
@@ -220,9 +218,9 @@ class followTheCarrot(Node):
                 else:
                     # 화분 앞에서 정지한 상태
                     # 물 줄때만 사진 찍기
-                    if self.mode == 100 and number not in self.pickture:
+                    if self.mode == 100 and self.yolo_number not in self.pickture:
                         print('사진찍기')
-                        self.pickture.add(number)
+                        self.pickture.add(self.yolo_number)
                     print('화분 앞이다!!')
                     self.cmd_msg.linear.x=0.0
                     self.cmd_msg.angular.z=0.0
