@@ -1,5 +1,5 @@
 import "./Diary.scss";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,6 +16,8 @@ import Swal from "sweetalert2";
 import client from "../../api/client";
 
 const Diary = () => {
+  
+  const location = useLocation()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isPlantModalOpen, setIsPlantModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -106,7 +108,13 @@ const Diary = () => {
       });
   };
   useEffect(() => {
-    GetAllDiaries();
+    console.log(location.state)
+
+    if (location.state) {
+      GetNameDiaries(location.state.plant_name)
+    } else {
+      GetAllDiaries();
+    }
   }, []);
   const GetYearDiaries = (year) => {
     console.log(year);
@@ -284,10 +292,7 @@ const Diary = () => {
                   >
                     <RxCross2/>
                   </button>
-
-
                 </div>
-
               </div>
             </div>
           ))}
