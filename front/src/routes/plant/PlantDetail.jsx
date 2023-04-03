@@ -1,9 +1,11 @@
 import { FaSun } from "react-icons/fa"
 import { useState } from "react";
-
+import { ImBook } from "react-icons/im"
+import { useNavigate } from "react-router";
 
 const PlantDetail = ({ item, handleWatering }) => {
 
+  const navigate = useNavigate()
   const [checked, setChecked] = useState(false);
   const registDate = new Date(item.plant_create_date?.slice(0, 10))
   const nowDate = new Date()
@@ -13,6 +15,10 @@ const PlantDetail = ({ item, handleWatering }) => {
 
   const handleChange = () => {
     setChecked(!checked)
+  };
+
+  const handleDiary = () => {
+    navigate("/diary", { state: item })
   };
 
   console.log(item.plant_img)
@@ -65,6 +71,15 @@ const PlantDetail = ({ item, handleWatering }) => {
               {item?.plant_last_watering_date?.slice(2, 10)}
             </div>
           </div>
+        </div>
+        <div 
+          className="content__diary--button"
+          onClick={handleDiary}
+        >
+          <span>
+            <ImBook size="40px"/>
+          </span>
+          <span><h2>일지 보기</h2></span>
         </div>
       </div>
     </div>

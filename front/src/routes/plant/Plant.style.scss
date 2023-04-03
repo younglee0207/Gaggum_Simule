@@ -139,6 +139,7 @@
     justify-content: space-around;
     padding: 16px;
     border-radius: 16px;
+    margin-bottom: 16px;
 
     .detail-bottom-item {
       display: flex;
@@ -167,4 +168,16 @@
     }
   }
 
+  .content__diary--button {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 10vh;
+    background-color: #30C7A4;
+    border-radius: 16px;
+
+    span h2 {
+      margin: 0;
+    }
+  }
 }
