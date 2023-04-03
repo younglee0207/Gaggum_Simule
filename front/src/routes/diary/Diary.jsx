@@ -109,8 +109,6 @@ const Diary = () => {
       });
   };
   useEffect(() => {
-    console.log(location.state)
-
     if (location.state) {
       GetNameDiaries(location.state.plant_name)
     } else {
