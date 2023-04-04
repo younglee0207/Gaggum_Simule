@@ -108,7 +108,7 @@ class followTheCarrot(Node):
         self.subs_img = self.create_subscription(CompressedImage, '/image_jpeg/compressed', self.img_callback, 1)
 
         # 물 주기 완료 후 TTS
-        self.tts_sub = self.create_publisher(Tts, '/tts', 10)
+        self.tts_pub = self.create_publisher(Tts, '/tts', 10)
 
         self.is_odom = False
         self.is_path = False
@@ -216,7 +216,6 @@ class followTheCarrot(Node):
     def timer_callback(self):
         # 백에서 트리거가 실행되면 소켓을 통해 준 정보를 전역변수에 저장한다.        
         global auto_mode_info, is_trigger
-
         self.triggers = auto_mode_info         
 
         if is_trigger:
@@ -347,10 +346,18 @@ class followTheCarrot(Node):
                                 self.cmd_msg.linear.x=0.0
                                 if self.mode == 100:
                                     self.water_time += 1
-                                    print(f'물 주기 {self.water_time}%')
+                                    print(f'물 주기 {self.water_time}%')                                    
+                                    # 물 주는 신호 TTS(한번만 실행)
+                                    water_msg = Tts()
+                                    if self.water_time == 1:                                        
+                                        water_msg.water_mode = True
+                                        self.tts_pub.publish(water_msg)
                                     # 물 다줬으면 다음 좌표로 이동하기
                                     if self.water_time >= 100:
                                         print('{self.plant_original_name} 물 주기 완료')
+                                        # 물 주기 완료 TTS 실행
+                                        water_msg.water_mode_end = True
+                                        self.tts_pub.publish(water_msg)
                                         # 물 주는게 완료 되었으면 백에 사진과 화분정보 제공
                                         self.diary_regist['plant_original_name'] = self.plant_original_name
                                         sio.emit('diary_regist', self.diary_regist)
