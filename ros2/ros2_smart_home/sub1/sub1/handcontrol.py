@@ -41,11 +41,10 @@ class Handcontrol(Node):
 
         self.menu = 0
 
-        self.hand_control_cmd_cnt = 0
-
     def timer_callback(self):
         print(self.menu)
         # print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
+        # self.menu = int(input)
         if self.menu == 0:               
             thread_status = threading.Thread(target=self.hand_control_status)
             thread_status.start()  
@@ -116,13 +115,7 @@ class Handcontrol(Node):
         self.turtlebot_status_msg = msg
 
     def hand_control_cmd(self, msg):
-        if self.hand_control_cmd_cnt < 1:
-            self.hand_control_cmd_cnt += 1
-            print('한번만 갔나요?')
-            self.menu = msg.data
-        else:
-            self.hand_control_sub.destroy()
-        
+        self.menu = msg.data
 
 
 def main(args=None):
