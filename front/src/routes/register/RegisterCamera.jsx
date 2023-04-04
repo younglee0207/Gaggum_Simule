@@ -3,7 +3,7 @@ import { BsCameraFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import noCameraImg from "../../assets/register/Camera-not-Working.png"
 
-const RegisterCamera = ({ socket }) => {
+const RegisterCamera = ({ setCameraData, socket }) => {
   // 들어가는 정보 : plant_img, plant_position_x, plant_position_y, plant_original_name
   const [camera, setCamera] = useState(false);
 
@@ -12,6 +12,7 @@ const RegisterCamera = ({ socket }) => {
   useEffect(() => {
     socket.on("streaming_image", (data) => {
       setCamera(data);
+      setCameraData(data)
     });
 
     return () => {

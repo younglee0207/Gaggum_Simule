@@ -1,6 +1,7 @@
 const db = require("./db");
 const helper = require("../helper");
 const config = require("../config");
+const plants = require("../servies/plant");
 
 async function getDiaries() {
   try {
@@ -86,10 +87,31 @@ async function deleteDiary(body) {
     throw error;
   }
 }
+async function createDiary(body) {
+  try {
+    var now = new Date();
+    var ndate = now.getDate();
+    let plantData = await plants.getPlantByOriginName(body.plant_original_name)
+    const rows = await db.query(
+      `INSERT INTO diaries(plant_number, diary_title, diary_img, diary_memo, diary_date)
+      values (${plantData.plant_number},"${plantData.plant_name} ${ndate}","","${plantData.plant_name} 물주기",curdate());
+      `
+    );
+    const data = helper.emptyOrRows(rows);
+    console.log(rows);
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 module.exports = {
   getDiaries,
   getDiariesByDate,
   getDiariesByName,
   editDiary,
   deleteDiary,
+  createDiary,
 };

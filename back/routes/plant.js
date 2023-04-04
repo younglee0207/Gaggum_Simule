@@ -61,9 +61,10 @@ router.post("/delete", async function (req, res, next) {
 
 router.post("/create", async function (req, res, next) {
   try {
-    s3.uploadFile(req.body.plant_name,req.body.plant_img);
+    s3.uploadFile(req.body.plant_original_name,req.body.plant_img);
     res.json(await plants.createPlant(req.body));
   } catch (err) {
+    
     console.error(`Error while watering plant`, err.message);
     next(err);
   }
