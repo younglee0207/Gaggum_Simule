@@ -120,7 +120,7 @@ class a_star(Node):
             self.goal = [goal_cell[0], goal_cell[1]]
         else:
             print('좌표가 350*350을 벗어났습니다.')
-
+        print(self.goal)
 
     def timer_callback(self):
         # 지도 받아왔고 odom 정보도 있는 상태에서 목적지가 정해졌다면
@@ -161,7 +161,7 @@ class a_star(Node):
                     tmp_pose.pose.position.y=waypoint_y
                     tmp_pose.pose.orientation.w=1.0
 
-                    print(tmp_pose)
+                    # print(tmp_pose)
                     
                     # 차곡차곡 담기
                     self.global_path_msg.poses.append(tmp_pose)
