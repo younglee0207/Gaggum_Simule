@@ -76,7 +76,7 @@ const RegisterController = ({ socket }) => {
     <div className="RegisterController">
       <div className="controller__up">
         <FaArrowAltCircleUp
-          size="100"
+          size="12vh"
           color="#022a17"
           onKeyDown={() => setUpKeyDown(true)}
           onKeyUp={() => setUpKeyDown(false)}
@@ -85,9 +85,9 @@ const RegisterController = ({ socket }) => {
           tabIndex="0"
         />
       </div>
-      <div className="controller__down">
+      <div className="controller__mid">
         <FaArrowAltCircleLeft
-          size="100"
+          size="12vh"
           color="#022a17"
           onKeyDown={() => setLeftKeyDown(true)}
           onKeyUp={() => setLeftKeyDown(false)}
@@ -95,22 +95,25 @@ const RegisterController = ({ socket }) => {
           onTouchEnd={() => setLeftKeyDown(false)}
           tabIndex="0"
         />
-        <FaArrowAltCircleDown
-          size="100"
-          color="#022a17"
-          onKeyDown={() => setDownKeyDown(true)}
-          onKeyUp={() => setDownKeyDown(false)}
-          onTouchStart={() => setDownKeyDown(true)}
-          onTouchEnd={() => setDownKeyDown(false)}
-          tabIndex="0"
-        />
+        <div style={{ width: "88px", height: "111" }}></div>
         <FaArrowAltCircleRight
-          size="100"
+          size="12vh"
           color="#022a17"
           onKeyDown={() => setRightKeyDown(true)}
           onKeyUp={() => setRightKeyDown(false)}
           onTouchStart={() => setRightKeyDown(true)}
           onTouchEnd={() => setRightKeyDown(false)}
+          tabIndex="0"
+        />
+      </div>
+      <div className="controller__down">
+        <FaArrowAltCircleDown
+          size="12vh"
+          color="#022a17"
+          onKeyDown={() => setDownKeyDown(true)}
+          onKeyUp={() => setDownKeyDown(false)}
+          onTouchStart={() => setDownKeyDown(true)}
+          onTouchEnd={() => setDownKeyDown(false)}
           tabIndex="0"
         />
       </div>
