@@ -99,23 +99,23 @@ class followTheCarrot(Node):
 
         # 백에서 넘어오는 trigger
         self.triggers = {
-            'data': [
-                {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
-                {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
-            ], 
-            'mode': 100  
             # 'data': [
-            #     {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -2.57, 'plant_position_y': 3.77},
-            #     {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -3.47, 'plant_position_y': 3.66}
-            # ],
-            # 'mode': 200,
-            # 'sunSpots': [
-            #     {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
-            #     {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
-            #     {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
-            #     {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
-            #     {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
-            # ]
+            #     {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
+            #     {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
+            # ], 
+            # 'mode': 100  
+            'data': [
+                {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
+                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
+            ],
+            'mode': 200,
+            'sunSpots': [
+                {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
+                {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
+                {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
+                {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
+                {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
+            ]
         }
         
         # trigger 정보
@@ -125,6 +125,8 @@ class followTheCarrot(Node):
         self.palnt_number = 0
         self.triggers_idx = 0   # 현위치에서 가까운 화분의 인덱스
         self.visited = set()
+        self.sun_spot_x = 0
+        self.sun_spot_y = 0
        
        # yolo에서 받아온 정보
         self.yolo_msg = Detection()
@@ -135,48 +137,42 @@ class followTheCarrot(Node):
 
         # 물주기 기능에 사용되는 변수
         self.pickture = set()   # 사진은 한번만
-        self.water_time = 0
+        self.water_time = 0     # 물 주는 동안 기다림
+        self.check_stop = 0     # 멈췄는 지 확인 하는 함수
+        self.is_finish = False  # 물주기 끝내는 변수
 
-
-        # handcontrol에 모드를 보냄
-        self.hand_control_msg = Int16()
-        
-        # 멈췄는 지 확인 하는 함수
-        self.check_stop = 0
-
-
-        # 물주기 끝내는 변수
-        self.is_finish = False
-
+        # 화분 이동 기능에 사용되는 변수
+        self.hand_control_msg = Int16() # handcontrol에 모드를 보냄       
+        self.is_lift = False    # 화분을 들고 있는 지 확인
+        self.lift_time = 0
     def timer_callback(self):
         # 백에서 트리거가 실행되면
         if self.is_trigger:
             self.mode = self.triggers['mode']
             # 모든 화분을 갔다면
-            if len(self.visited) == len(self.triggers['data']):
-                self.goal_x = -5.818
-                self.goal_y = 6.398
-                self.is_finish = True
-                
-            else:
-                # 가까이에 있는 좌표 찾기
-                x1 = self.robot_pose_x
-                y1 = self.robot_pose_y
-                min_dis = float('inf')
-                for i in range(len(self.triggers)):
-                    x2 = self.triggers['data'][i]['plant_position_x']
-                    y2 = self.triggers['data'][i]['plant_position_y']
-                    dis = sqrt(pow(x1-x2, 2) + pow(y1-y2, 2))
-                    # print(f'{i}번 거리: {dis}')
-                    if dis < min_dis and i not in self.visited:
-                        min_dis = dis
-                        self.triggers_idx = i
-                # print('self.triggers_idx', self.triggers_idx)
-
-                self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
-                self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
-                self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
-                self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
+            if not self.is_lift:
+                if len(self.visited) == len(self.triggers['data']):
+                    self.goal_x = -5.818
+                    self.goal_y = 6.398
+                    self.is_finish = True
+                else:
+                    # 가까이에 있는 좌표 찾기
+                    x1 = self.robot_pose_x
+                    y1 = self.robot_pose_y
+                    min_dis = float('inf')
+                    for i in range(len(self.triggers['data'])):    
+                        x2 = self.triggers['data'][i]['plant_position_x']
+                        y2 = self.triggers['data'][i]['plant_position_y']
+                        dis = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))
+                        # print(f'{i}번 거리: {dis}')
+                        if dis < min_dis and id not in self.visited:
+                            min_dis = dis
+                            self.triggers_idx = i
+                    # print('self.triggers_idx', self.triggers_idx)
+                        self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
+                        self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
+                        self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
+                        self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
 
            
             
@@ -186,9 +182,8 @@ class followTheCarrot(Node):
         self.robot_pose_y = self.odom_msg.pose.pose.position.y
         
         # yolo가 넘어오면
-        if self.is_yolo and not self.is_finish:
+        if self.is_yolo and not self.is_finish and not self.is_lift:
             # print('실행중')
-
                 # print('is_pointed', self.is_pointed)
                 # 화분 앞에 위치하지 않으면
                 if not self.is_pointed:
@@ -223,7 +218,7 @@ class followTheCarrot(Node):
                                             self.cmd_msg.linear.x=0.0
                                             self.cmd_msg.angular.z=0.0
                                             self.check_stop += 1
-                                            print(f'사진 찍기 준비 중 {self.check_stop}%')
+                                            print(f'중앙 정렬 진행도 {self.check_stop}%')
                                             if self.check_stop >= 100:
                                                 self.check_stop = 0
                                                 self.is_pointed = True
@@ -288,27 +283,26 @@ class followTheCarrot(Node):
                                     self.is_pointed = False
                                     self.is_stop = False
                             else:
-                                print('들기')
+                                print('들었다고 치고')
+                                self.is_lift = True
                                 # 들면 a_star로 목적지를 바꿔야 하잖아
-                                self.goal_x = -5
-                                self.goal_y = -5
-                                
+                                self.goal_x = self.triggers['sunSpots'][1]['sunspot_x_position']
+                                self.goal_y = self.triggers['sunSpots'][1]['sunspot_y_position']
+                                self.visited.add(self.triggers_idx)
+                                self.is_pointed = False
+                                self.is_stop = False
                     else:
-                        print('화분에 접근하는 중...')
+                        print('목표에 접근하는 중...')
                         self.cmd_msg.linear.x=0.1
 
                 self.cmd_pub.publish(self.cmd_msg)
-
-        # a_star에 목표 좌표를 보냄      
-        goal = Point()
-        goal.x, goal.y = self.goal_x, self.goal_y
-        self.a_star_goal_pub.publish(goal)
 
         # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때, yolo가 작동 중일때, stop이 아닐때
         # print(self.is_status, self.is_odom, self.is_path, self.is_stop)
         if self.is_status and self.is_odom and self.is_path and not self.is_stop:
 
             # 남은 경로가 1 이상이면
+            # print(self.path_msg.poses)
             if len(self.path_msg.poses)> 1:
                 self.is_look_forward_point = False
                 self.handcontrol_cmd_msg.data = 0
@@ -391,14 +385,20 @@ class followTheCarrot(Node):
                     
                     # 트리거가 안 끝났는데 
                     if not self.is_finish:
-                        # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
-                        try:
-                            if self.yolo_msg.object_class[0] != self.plant_number - 1:
-                                print('목표 화분이 아니야')
+                        if self.is_lift:
+                            self.lift_time += 1
+                            if self.lift_time >= 100:
+                                print('화분 놓기')
+                                self.is_lift = False
+                        else:
+                            # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
+                            try:
+                                if self.yolo_msg.object_class[0] != self.plant_number - 1:
+                                    print('목표 화분이 아니야')
+                                    self.cmd_msg.angular.z=0.3
+                            except:
+                                print('목표 지점에 왔는데 화분이 없어!!')
                                 self.cmd_msg.angular.z=0.3
-                        except:
-                            print('목표 지점에 왔는데 화분이 없어!!')
-                            self.cmd_msg.angular.z=0.3
                         
                 else:
                     # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
@@ -411,8 +411,12 @@ class followTheCarrot(Node):
                 self.cmd_msg.linear.x=-0.1
                 self.cmd_msg.angular.z = 0.0
             
-            
-            self.cmd_pub.publish(self.cmd_msg)
+         # a_star에 목표 좌표를 보냄      
+        goal = Point()
+        goal.x, goal.y = self.goal_x, self.goal_y
+        # print(goal)
+        self.a_star_goal_pub.publish(goal)   
+        self.cmd_pub.publish(self.cmd_msg)
             
 
     def odom_callback(self, msg):
