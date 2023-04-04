@@ -56,23 +56,24 @@ const RegisterCamera = ({ socket }) => {
           className="camera__screen"
           src={cameraSource}
           alt=""
-        />
+          />
       </div>
+      <h4 className="camera__title" >화분을 화면 중앙에 맞춰주세요</h4>
       <div className="camera-buttons">
-        <button className="camera-button" onClick={handleLiftUp}>
+        {/* <button className="camera-button" onClick={handleLiftUp}>
           들기
-        </button>
-        <button className="camera-button">
+        </button> */}
+        {/* <button className="camera-button">
           <BsCameraFill
             size="32"
             className="camera-button__img"
             // color="#022a17"
             onClick={handleCapture}
           />
-        </button>
-        <button className="camera-button" onClick={handleLiftDown}>
+        </button> */}
+        {/* <button className="camera-button" onClick={handleLiftDown}>
           놓기
-        </button>
+        </button> */}
       </div>
     </div>
   );

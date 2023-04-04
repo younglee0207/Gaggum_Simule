@@ -30,11 +30,22 @@
   }
 
   .RegisterCamera {
+    position: relative;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    
+    .camera__title {
+      position: absolute;
+      margin: 0;
+      bottom: 4px;
+      left: 50%;
+      margin-left: -25vw;
+      color: white;
+      text-shadow: 1px 1px black;
+    }
 
     .camera__container {
-      height: 45vh;
-      margin-top: 16px;
-      margin-bottom: 16px;
+      height: 40vh;
 
       .camera__screen {
         width: 100%;
