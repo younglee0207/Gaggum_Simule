@@ -58,7 +58,11 @@ const RegisterCamera = ({ socket }) => {
           alt=""
           />
       </div>
-      <h4 className="camera__title" >화분을 화면 중앙에 맞춰주세요</h4>
+      {camera.stream_image ? (
+        <h4 className="camera__title">화분을 화면 중앙에 맞춰주세요</h4>
+      ) : (
+        <h4 className="camera__title">연결된 카메라가 없습니다.</h4>
+      )}
       <div className="camera-buttons">
         {/* <button className="camera-button" onClick={handleLiftUp}>
           들기
