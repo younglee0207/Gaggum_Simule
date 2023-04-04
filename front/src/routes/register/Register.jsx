@@ -9,15 +9,21 @@ import RegisterCamera from "./RegisterCamera";
 import RegisterController from "./RegisterController";
 
 import { io } from "socket.io-client";
+import { useRecoilState } from "recoil";
+
+import { ros2frontData } from "../../store";
 
 // 나중에 배포 주소로 바꿔주기
 // const socket = io("ws://localhost:3001");
 const socket = io("https://j8b310.p.ssafy.io");
 
 const Register = () => {
+  const [cameraData, setCameraData] = useState(null)
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isRegist, setIsRegist] = useState(false);
+  
+  const [registData, setRegistData] = useRecoilState(ros2frontData)
 
   const closeModal = () => {
     Swal.fire({
@@ -62,9 +68,18 @@ const Register = () => {
     }).then((res) => {
       if (res.isConfirmed) {
         // 등록 하기
-
-        // 모달 띄우기
-        setIsModalOpen(true);
+        // if (!cameraData || cameraData.plant_original_name === "none") {
+        //   Swal.fire(
+        //     "식물 인식 불가",
+        //     "가운데에 화분을 놓고 다시 찍어주세요.",
+        //     "error"
+        //   )
+        // } else {
+        //   // 모달 띄우기
+        //   setRegistData(cameraData)
+        //   setIsModalOpen(true);
+        // }
+        setIsModalOpen(true)
       }
     });
 
@@ -89,7 +104,7 @@ const Register = () => {
       {/* hr 위로 */}
       <hr />
       {/* hr밑으로 */}
-      <RegisterCamera socket={socket} />
+      <RegisterCamera setCameraData={setCameraData} socket={socket} />
       <RegisterController socket={socket} />
       {isModalOpen && <RegisterModal onClose={closeModal} setIsModalOpen={setIsModalOpen} />}
     </div>
