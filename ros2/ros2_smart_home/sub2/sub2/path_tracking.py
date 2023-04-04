@@ -99,23 +99,23 @@ class followTheCarrot(Node):
 
         # 백에서 넘어오는 trigger
         self.triggers = {
-                # 'data': [
-                #     {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.0, 'plant_position_y': 4.0},
-                #     {'plant_number': 5, 'plant_original_name': 'plant1', 'plant_position_x': -3.0, 'plant_position_y': 7.0}
-                # ], 
-                # 'mode': 100  
             'data': [
-                {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -2.57, 'plant_position_y': 3.77},
-                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -3.47, 'plant_position_y': 3.66}
-            ],
-            'mode': 200,
-            'sunSpots': [
-                {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
-                {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
-                {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
-                {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
-                {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
-            ]
+                {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
+                {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
+            ], 
+            'mode': 100  
+            # 'data': [
+            #     {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -2.57, 'plant_position_y': 3.77},
+            #     {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -3.47, 'plant_position_y': 3.66}
+            # ],
+            # 'mode': 200,
+            # 'sunSpots': [
+            #     {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
+            #     {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
+            #     {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
+            #     {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
+            #     {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
+            # ]
         }
         
         # trigger 정보
@@ -151,7 +151,7 @@ class followTheCarrot(Node):
     def timer_callback(self):
         # 백에서 트리거가 실행되면
         if self.is_trigger:
-
+            self.mode = self.triggers['mode']
             # 모든 화분을 갔다면
             if len(self.visited) == len(self.triggers['data']):
                 self.goal_x = -5.818
@@ -173,7 +173,6 @@ class followTheCarrot(Node):
                         self.triggers_idx = i
                 # print('self.triggers_idx', self.triggers_idx)
 
-                self.mode = self.triggers['mode']
                 self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
                 self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
                 self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
@@ -236,7 +235,7 @@ class followTheCarrot(Node):
                                 # 목표가 왼쪽에 있으면
                                 else:
                                     print('위치 조정 중...')
-                                    if self.yolo_cx < 130:
+                                    if self.yolo_cx < 155:
                                         self.cmd_msg.angular.z=-0.05
                                         if self.yolo_cx < 280:
                                             self.cmd_msg.angular.z=-0.1
@@ -244,7 +243,7 @@ class followTheCarrot(Node):
                                     # 목표가 오른쪽에 있으면
                                     else:
                                         self.cmd_msg.angular.z=0.05
-                                        if self.yolo_cx > 190:
+                                        if self.yolo_cx > 165:
                                             self.cmd_msg.angular.z = 0.1
 
                                 # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
@@ -366,7 +365,7 @@ class followTheCarrot(Node):
                     # 글로벌 경로를 역행렬 연산 => 로컬 경로를 알아냄   
                     local_forward_point = det_trans_matrix.dot(global_forward_point)
                     # 로봇과 전방주시 포인트간의 차이값 계산
-                    theta = -atan2(local_forward_point[1], local_forward_point[0]) * 0.7
+                    theta = -atan2(local_forward_point[1], local_forward_point[0])
                     
                     # 로직 7. 선속도, 각속도 정하기
                     out_vel = 0.5
@@ -408,9 +407,9 @@ class followTheCarrot(Node):
                     self.cmd_msg.angular.z=0.1
 
             # 전방 장애물 있으면
-            if self.forward_dis <= 0.5:
+            if self.forward_dis <= 0.3:
                 self.cmd_msg.linear.x=-0.1
-                self.cmd_msg.angular.z = -0.1
+                self.cmd_msg.angular.z = 0.0
             
             
             self.cmd_pub.publish(self.cmd_msg)
