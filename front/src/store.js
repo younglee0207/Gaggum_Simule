@@ -39,3 +39,8 @@ export let simulatorInfo = atom({
   key: "simulatorInfo",
   default: {},
 });
+
+export let ros2frontData = atom({
+  key: "ros2frontData",
+  default: null,
+});

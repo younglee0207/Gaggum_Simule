@@ -1,5 +1,5 @@
 import "./Diary.scss";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,6 +16,8 @@ import Swal from "sweetalert2";
 import client from "../../api/client";
 
 const Diary = () => {
+  
+  const location = useLocation()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isPlantModalOpen, setIsPlantModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
@@ -25,6 +27,7 @@ const Diary = () => {
   const [modalPlantButtonName, setModalPlantButtonName] = useState("식물이름");
 
   const [selectedDiary, setSelectedDiary] = useState(null);
+  const diaryImg = "https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png"
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -106,7 +109,12 @@ const Diary = () => {
       });
   };
   useEffect(() => {
-    GetAllDiaries();
+    if (location.state) {
+      GetNameDiaries(location.state.plant_name)
+      setModalPlantButtonName(location.state.plant_name)
+    } else {
+      GetAllDiaries();
+    }
   }, []);
   const GetYearDiaries = (year) => {
     console.log(year);
@@ -174,6 +182,8 @@ const Diary = () => {
   const check = () => {
     console.log(modalButtonName);
   };
+
+  console.log(loadedDiaries)
   return (
     <div className="Diary">
       <div className="center">
@@ -265,7 +275,7 @@ const Diary = () => {
                   <img
                     className="img-plant"
                     // src={item.diary_img}
-                    src={item.diary_img}
+                    src={item ? item.diary_img : diaryImg}
                     alt="식물 이미지"
                   />
                 </div>
@@ -284,10 +294,7 @@ const Diary = () => {
                   >
                     <RxCross2/>
                   </button>
-
-
                 </div>
-
               </div>
             </div>
           ))}

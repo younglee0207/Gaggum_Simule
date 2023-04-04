@@ -42,6 +42,15 @@
 
     .MainPlantList {
 
+      .slider__container {
+
+        .slider__img {
+          width: 100%;
+          height: 100%;
+          border-radius: 16px;
+        }
+      }
+
       .plant__no-plant {
         height: 157px;
         display: flex;
