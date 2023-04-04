@@ -143,10 +143,10 @@ class MoveTurtleBot(Node):
                     y = -100
                     plant = "none"
                 data = {
-                    "stream_image" : self.base64_img,
-                    "plant_x" : x,
-                    "plant_y" : y,
-                    "plant_name" : plant
+                    "plant_img" : self.base64_img,
+                    "plant_position_x" : x,
+                    "plant_position_y" : y,
+                    "plant_original_name" : plant
                 }
                 sio.emit("streaming_image", data)
 
