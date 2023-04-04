@@ -50,9 +50,9 @@ const MainPlantList = () => {
         >
           {needWaterPlant?.map((item) => {
             return (
-              <SwiperSlide key={item.div} onClick={() => handleNavigate(item?.plant_number)} >
+              <SwiperSlide className="slider__container" key={item.div} onClick={() => handleNavigate(item?.plant_number)} >
                 <img
-                  style={{ width: "100%", height: "100%" }}
+                  className="slider__img"
                   src={item.plant_img}
                   alt="식물 사진"
                 />
