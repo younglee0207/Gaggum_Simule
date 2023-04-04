@@ -91,10 +91,14 @@ async function createDiary(body) {
   try {
     var now = new Date();
     var ndate = now.getDate();
-    let plantData = await plants.getPlantByOriginName(body.plant_original_name)
+    var nmonth = now.getMonth() + 1;
+    const plantData = await plants.getPlantByOriginName(
+      body.plant_original_name
+    );
+    console.log("plantData", plantData);
     const rows = await db.query(
       `INSERT INTO diaries(plant_number, diary_title, diary_img, diary_memo, diary_date)
-      values (${plantData.plant_number},"${plantData.plant_name} ${ndate}","","${plantData.plant_name} 물주기",curdate());
+      values (${plantData.data[0].plant_number},"${plantData.data[0].plant_name} ${nmonth}월 ${ndate}일","https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/diary/${plantData.data[0].plant_original_name}/${nmonth}월${ndate}일","${plantData.data[0].plant_name} 물주기",curdate());
       `
     );
     const data = helper.emptyOrRows(rows);

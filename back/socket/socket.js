@@ -59,7 +59,7 @@ function socketStart() {
       if (data.environment.hour == 13) {
         (async () => {
           // db에서 물줘야하는 식물 리스트 가져오기
-          let waterNeedPlants = await plants.getWaterNeedPlant2();
+          let waterNeedPlants = await plants.getWaterNeedPlant();
           console.log("물줘야하는 식물들", waterNeedPlants);
           waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
@@ -81,15 +81,19 @@ function socketStart() {
 
     // 물 주는 동작 완료()
     // plant_original_name, plant_img 두가지를 들고있는 객체들의 리스트를 data에 넣어주세요
-    socket.on("diary_regist",(data)=>{
-      console.log("diary_regist_plants",data)
-      let plantlist = data.plantlist
-      for(let i = 0;i<plantlist.length();i++){
-        s3.uploadDiaryFile(plantlist[i].plant_original_name,plantlist[i].plant_img);
-        diaries.createDiary(plantlist[i]);
-      }
+    socket.on("diary_regist", (data) => {
+      console.log("diary_regist_plants", data);
+      s3.uploadDiaryFile(data.plant_original_name, data.plant_img);
+      diaries.createDiary(data);
+
+      // for (let i = 0; i < data.length(); i++) {
+      //   s3.uploadDiaryFile(
+      //     data[i].plant_original_name,
+      //     data[i].plant_img
+      //   );
+      //   diaries.createDiary(data[i]);
+      // }
     });
-    
 
     // 카메라
     socket.on("streaming_image", (data) => {
