@@ -61,7 +61,7 @@ async function getPlantByNumber(param) {
 async function getPlantByOriginName(param) {
   try {
     const rows = await db.query(
-      `SELECT * from plants WHERE plant_original_name = ${param} AND plant_isdelete = 0`
+      `SELECT * from plants WHERE plant_original_name = '${param}' AND plant_isdelete = 0`
     );
     const data = helper.emptyOrRows(rows);
 

@@ -1,8 +1,12 @@
 import rclpy
+import cv2
 import socketio
+import base64
+
 from rclpy.node import Node
+from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus, Detection
+from ssafy_msgs.msg import TurtlebotStatus, Detection, Tts
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2, pow
@@ -23,9 +27,15 @@ from std_msgs.msg import Int16
 # 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
 # 7. 선속도, 각속도 정하기
 
-global auto_mode_info, is_trigger
+global auto_mode_info, is_trigger, diary_regist, diary_regist_li
+
 auto_mode_info = False
 is_trigger = False
+diary_regist_li = []
+diary_regist = {
+    'plant_original_name' : 'None',
+    'plant_img' : 'None',
+}
 
 # socket 
 sio = socketio.Client()
@@ -44,10 +54,13 @@ def connect_error(data):
 
 # 자동급수, 자동 물주기 정보 들어오는 곳
 @sio.on("auto_move")
-def auto_move(data):
-    # 여기에 어떤 정보를 가공해서 보내야 할까?
+def auto_move(data):    
     global auto_mode_info, is_trigger
+
+    # 소켓에서 들어오는 자동 급수 식물 정보
     auto_mode_info = data
+
+    # 자동 급수 하기위해 필요한 변수
     is_trigger = True
 
     print("auto_move", data)    
@@ -91,16 +104,26 @@ class followTheCarrot(Node):
         # yolo에서 정보를 받아옴
         self.yolo_sub = self.create_subscription(Detection, '/yolo_detected', self.yolo_callback, 10)
 
+        # 카메라에서 이미지 정보를 받아옴
+        self.subs_img = self.create_subscription(CompressedImage, '/image_jpeg/compressed', self.img_callback, 1)
+
+        # 물 주기 완료 후 TTS
+        self.tts_sub = self.create_publisher(Tts, '/tts', 10)
+
         self.is_odom = False
         self.is_path = False
         self.is_status = False
         self.is_forward_approach = False
         self.is_right_approach = False
         self.is_left_approach = False
+
         # 소켓에서 넘어오는 좌표들
         self.is_trigger = False
         self.is_yolo = False
         self.is_pointed = False
+
+        # 카메라 센서 이미지
+        self.original_img = None
 
         self.odom_msg=Odometry()            
         self.robot_yaw=0.0
@@ -176,13 +199,19 @@ class followTheCarrot(Node):
         self.pickture = set()   # 사진은 한번만
         self.water_time = 0     # 물 주는 동안 기다림
         self.check_stop = 0     # 멈췄는 지 확인 하는 함수
-        self.is_finish = False  # 물주기 끝내는 변수
+        self.is_finish = False  # 물주기 끝내는 변수        
 
         # 화분 이동 기능에 사용되는 변수
         self.hand_control_msg = Int16() # handcontrol에 모드를 보냄       
         self.is_lift = False    # 화분을 들고 있는 지 확인
         self.lift_time = 0
         self.lift_idx = 0
+
+        # 물 주기 완료 후 백으로 다시 전달하는 변수
+        self.diary_regist = {
+            'plant_original_name' : 'None',
+            'plant_img' : 'None',
+        }       
 
     def timer_callback(self):
         # 백에서 트리거가 실행되면 소켓을 통해 준 정보를 전역변수에 저장한다.        
@@ -262,7 +291,7 @@ class followTheCarrot(Node):
                                                 self.cmd_msg.angular.z=0.0
                                                 self.check_stop += 1
                                                 print(f'중앙 정렬 진행도 {self.check_stop}%')
-                                                if self.check_stop >= 100:
+                                                if self.check_stop >= 50:
                                                     self.check_stop = 0
                                                     self.is_pointed = True
                                             else:
@@ -308,6 +337,7 @@ class followTheCarrot(Node):
                         if self.mode == 100:
                             if self.plant_number not in self.pickture:
                                 print('사진 찍기')
+                                self.diary_regist['plant_img'] = self.base64_img
                             self.pickture.add(self.plant_number)
 
                         # 전방 접근 상태
@@ -321,7 +351,9 @@ class followTheCarrot(Node):
                                     # 물 다줬으면 다음 좌표로 이동하기
                                     if self.water_time >= 100:
                                         print('{self.plant_original_name} 물 주기 완료')
-                                        # 물을 
+                                        # 물 주는게 완료 되었으면 백에 사진과 화분정보 제공
+                                        self.diary_regist['plant_original_name'] = self.plant_original_name
+                                        sio.emit('diary_regist', self.diary_regist)
                                         self.water_time = 0
                                         self.visited.add(self.triggers_idx)
                                         self.is_pointed = False
@@ -587,9 +619,20 @@ class followTheCarrot(Node):
     #         self.goal_x=msg.pose.position.x
     #         self.goal_y=msg.pose.position.y
 
+    
     def yolo_callback(self, msg):
         self.is_yolo = True
         self.yolo_msg = msg
+    
+    # 카메라에서 이미지를 받아오기 위해 필요한 함수.
+    def img_callback(self, msg):
+        self.original_img = msg.data
+        np_arr = np.frombuffer(self.original_img, np.uint8)
+        cv_img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+        resized_img = cv2.resize(cv_img, (320, 240))
+        _, buffer = cv2.imencode('.jpg', resized_img)
+        b64data = base64.b64encode(buffer)
+        self.base64_img = b64data.decode('utf-8')
 
             
 def main(args=None):
