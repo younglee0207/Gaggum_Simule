@@ -83,16 +83,22 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 30vh;
+    height: 45vh;
 
     .controller__up {
+      height: 15vh;
       text-align: center;
     }
 
-    .controller__down {
-      width: 100%;
+    .controller__mid {
+      height: 15vh;
+
       display: flex;
-      justify-content: space-between;
+    }
+
+    .controller__down {
+      height: 15vh;
+      text-align: center;
     }
 
   }
