@@ -80,6 +80,7 @@ function socketStart() {
     });
 
     // 물 주는 동작 완료()
+    // plant_original_name, plant_img 두가지를 들고있는 객체들의 리스트를 data에 넣어주세요
     socket.on("diary_regist",(data)=>{
       console.log("diary_regist_plants",data)
       let plantlist = data.plantlist
