@@ -106,7 +106,7 @@ class followTheCarrot(Node):
             # 'mode': 100  
             'data': [
                 {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
-                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
+                {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
             ],
             'mode': 200,
             'sunSpots': [
@@ -390,6 +390,7 @@ class followTheCarrot(Node):
                             if self.lift_time >= 100:
                                 print('화분 놓기')
                                 self.is_lift = False
+                                self.lift_time = 0
                         else:
                             # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
                             try:
