@@ -18,12 +18,12 @@ import { ros2frontData } from "../../store";
 const socket = io("https://j8b310.p.ssafy.io");
 
 const Register = () => {
-  const [cameraData, setCameraData] = useState(null)
+  const [cameraData, setCameraData] = useRecoilState(ros2frontData)
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창이 열린 상태인지 여부를 관리하는 상태
-  const [isRegist, setIsRegist] = useState(false);
+  // const [isRegist, setIsRegist] = useState(false);
   
-  const [registData, setRegistData] = useRecoilState(ros2frontData)
+  // const [registData, setRegistData] = useRecoilState(ros2frontData)
 
   const closeModal = () => {
     Swal.fire({
