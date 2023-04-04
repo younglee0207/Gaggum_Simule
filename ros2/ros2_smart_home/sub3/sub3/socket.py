@@ -126,7 +126,8 @@ class SocketClass(Node):
         # run_mapping을 하기위해 만든 함수. msg를 publish해서 run_mapping, wall_tracking을 할 수 있게 한다.
         # map_scan Topic
         msg = MapScan()
-        print("MapOperationList", msg)
+        print("MapOperationList", msg)        
+
 
         if map_scan_end:
             msg.map_scan = 0
