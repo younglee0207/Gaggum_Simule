@@ -58,11 +58,12 @@ const Diary = () => {
       denyButtonText: "아니요",
     }).then((res) => {
       if (res.isConfirmed) {
-        Swal.fire("수정이 취소되었습니다", "", "success");
+        // Swal.fire("수정이 취소되었습니다", "", "success");
         setSelectedDiary(null);
       }
     });
   };
+
 
   const handleSubmitModal = () => {
     Swal.fire({
@@ -270,10 +271,10 @@ const Diary = () => {
           // )
           .map((item) => (
             <div key={item.diary_number}>
-              <div
-                className="MyPlantListItem"
-              >
-                <div className="img-div" onClick={() => setSelectedDiary(item)}>
+              <div className="MyPlantListItem">
+                <div className="img-div"
+                  onClick={() => setSelectedDiary(item)}
+                >
                   <img
                     className="img-plant"
                     // src={item.diary_img}
@@ -282,7 +283,9 @@ const Diary = () => {
                     
                   />
                 </div>
-                <div className="content-div" onClick={() => setSelectedDiary(item)}>
+                <div className="content-div"
+                  onClick={() => setSelectedDiary(item)}
+                >
                   <p className="flex">{item.diary_title}</p>
                   <p className="flex diary-memo">{item.diary_memo}</p>
                   <p className="flex">{item.diary_date.substr(0, 10)}</p>

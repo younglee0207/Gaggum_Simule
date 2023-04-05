@@ -1,6 +1,7 @@
 const db = require("./db");
 const helper = require("../helper");
 const config = require("../config");
+const plants = require("../servies/plant");
 
 async function getDiaries() {
   try {
@@ -86,10 +87,36 @@ async function deleteDiary(body) {
     throw error;
   }
 }
+async function createDiary(body) {
+  try {
+    var now = new Date();
+    var ndate = now.getDate();
+    var nmonth = now.getMonth() + 1;
+    const plantData = await plants.getPlantByOriginName(
+      body.plant_original_name
+    );
+    console.log("plantData", plantData);
+    //await plants.waterPlant(plantData.data[0]);
+    const rows = await db.query(
+      `INSERT INTO diaries(plant_number, diary_title, diary_img, diary_memo, diary_date)
+      values (${plantData.data[0].plant_number},"${plantData.data[0].plant_name} ${nmonth}월 ${ndate}일","https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/diary/${plantData.data[0].plant_original_name}/${nmonth}월${ndate}일","${plantData.data[0].plant_name} 물주기",curdate());
+      `
+    );
+    const data = helper.emptyOrRows(rows);
+    console.log(rows);
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 module.exports = {
   getDiaries,
   getDiariesByDate,
   getDiariesByName,
   editDiary,
   deleteDiary,
+  createDiary,
 };

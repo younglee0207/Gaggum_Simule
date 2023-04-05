@@ -23,6 +23,11 @@
   justify-content: center;
   margin: 16px;
 }
+
+.justify-center {
+  display: flex;
+  justify-content: center;
+}
 .justify {
   display: flex;
   justify-content: space-between;
@@ -114,6 +119,12 @@
     flex: 3;
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
+    padding-left: 8px;
+    
+    p {
+      margin: 0;
+    }
 
     .plant-name {
       margin-top: 0;

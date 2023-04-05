@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const plants = require("../servies/plant");
+const diaries = require("../servies/diary");
+const s3 = require("../aws/s3");
 // 로직 1. WebSocket 서버, WebClient 통신 규약 정의
 const server = require("http").createServer(app);
 
@@ -57,7 +59,7 @@ function socketStart() {
       if (data.environment.hour == 13) {
         (async () => {
           // db에서 물줘야하는 식물 리스트 가져오기
-          let waterNeedPlants = await plants.getWaterNeedPlant2();
+          let waterNeedPlants = await plants.getWaterNeedPlant();
           console.log("물줘야하는 식물들", waterNeedPlants);
           waterNeedPlants.mode = 100;
           // ROS로 급수 필요 식물 리스트 전달
@@ -66,19 +68,32 @@ function socketStart() {
       } else if (data.environment.hour == 15) {
         (async () => {
           // db에서 햇빛이 필요한 식물과 햇빛 위치를 가져오기
-          let sunNeedPlants = await plants.SunNeedPlant();
+          let sunNeedPlants = await plants.getSunNeedPlant();
           let sunSpots = await plants.getSunSpot();
           console.log("햇빛 필요 식물들", sunNeedPlants);
           sunNeedPlants.mode = 200;
           sunNeedPlants.sunSpots = sunSpots.data;
-          // ROS로 급수 필요 식물 리스트 전달
+          // ROS로 햇빛 필요 식물 리스트 전달
           socket.to(roomName).emit("auto_move", sunNeedPlants);
         })();
       }
     });
 
     // 물 주는 동작 완료()
-    // socket.on("watering");
+    // plant_original_name, plant_img 두가지를 들고있는 객체들의 리스트를 data에 넣어주세요
+    socket.on("diary_regist", (data) => {
+      console.log("diary_regist_plants", data);
+      s3.uploadDiaryFile(data.plant_original_name, data.plant_img);
+      diaries.createDiary(data);
+
+      // for (let i = 0; i < data.length(); i++) {
+      //   s3.uploadDiaryFile(
+      //     data[i].plant_original_name,
+      //     data[i].plant_img
+      //   );
+      //   diaries.createDiary(data[i]);
+      // }
+    });
 
     // 카메라
     socket.on("streaming_image", (data) => {
