@@ -66,9 +66,9 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
           <AiOutlineCheck onClick={submitHandler} size="24" color="#022a17" />
         </div>
         <div className={classes.pageTitle}>식물 일지 수정</div>
-
-        <img className="img-plant" src={item.diary_img} alt="식물 사진" />
-
+        <div className="justify-center">
+        <img className="img-plant" src={item.diary_img} alt="식물 사진"  />
+        </div>
         <div className={classes.writeTitle}>제목</div>
 
         <div className={classes.note}>
