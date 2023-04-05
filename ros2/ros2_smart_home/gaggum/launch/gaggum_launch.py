@@ -33,6 +33,11 @@ def generate_launch_description():
             node_executable='tts',
             node_name='tts'
         ),
+        Node(
+            package='gaggum',
+            node_executable='handcontrol',
+            node_name='handcontrol'
+        ),
     ])
 
 

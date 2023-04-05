@@ -32,6 +32,7 @@ setup(
             'tts = gaggum.tts:main',
             'wall_tracking = gaggum.wall_tracking:main',
             'yolov5 = gaggum.yolov5:main',
+            'handcontrol = gaggum.handcontrol:main',
         ],
     },
 )
