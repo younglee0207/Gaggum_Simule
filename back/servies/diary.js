@@ -23,7 +23,7 @@ async function getDiariesByDate(param) {
     console.log(param);
     const rows = await db.query(
       `SELECT * from diaries WHERE diary_date LIKE "${param}%"
-       AND diary_isdelete = 0`
+       AND diary_isdelete = 0 ORDER BY diary_date DESC`
     );
     const data = helper.emptyOrRows(rows);
     console.log(rows);
@@ -41,7 +41,7 @@ async function getDiariesByName(param) {
     const rows = await db.query(
       `select * from
       diaries d join plants p ON d.plant_number = p.plant_number
-      WHERE p.plant_name LIKE "${param}%" AND diary_isdelete = 0`
+      WHERE p.plant_name LIKE "${param}%" AND diary_isdelete = 0 ORDER BY diary_date DESC`
     );
     const data = helper.emptyOrRows(rows);
     console.log(rows);
