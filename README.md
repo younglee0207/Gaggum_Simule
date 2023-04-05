@@ -93,15 +93,15 @@ SSAFY 8기 특화 프로젝트
 
 ### 요구사항 명세서
 
-https://lemon-letter-aac.notion.site/b656bf777c004df1bd5944334ea15ccf
+https://j8b310.notion.site/b656bf777c004df1bd5944334ea15ccf
 
 ### ERD
 
-https://lemon-letter-aac.notion.site/ERD-aa49a5ed8c8f45a3953428515e6be682
+https://j8b310.notion.site/ERD-0e435c2328064d6a87edf7f7517a0196
 
 ### API 명세서
 
-https://lemon-letter-aac.notion.site/API-7d4dc19be1994bbaa1ea0e641d1b826b
+https://j8b310.notion.site/API-75fa67f8e514482c8c268dee0517140d
 
 ### 와이어 프레임
 
@@ -109,7 +109,7 @@ https://www.figma.com/file/bJj1vEB1RWQ0dVShCkFPyV/B310?node-id=0%3A1&t=Xemtrqym1
 
 ### 포팅 매뉴얼
 
-https://lemon-letter-aac.notion.site/8701deb361604d30abb754d51c7c4320
+https://j8b310.notion.site/8701deb361604d30abb754d51c7c4320
 
 ## 🌱 프로젝트 파일 구조
 
@@ -184,4 +184,10 @@ https://lemon-letter-aac.notion.site/8701deb361604d30abb754d51c7c4320
  ┣ 📜helper.js
  ┣ 📜package-lock.json
  ┗ 📜package.json
+```
+
+### ROS2
+
+```
+
 ```
