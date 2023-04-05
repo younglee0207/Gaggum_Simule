@@ -182,8 +182,7 @@ const Diary = () => {
   const check = () => {
     console.log(modalButtonName);
   };
-
-  console.log(loadedDiaries)
+  
   return (
     <div className="Diary">
       <div className="center">
