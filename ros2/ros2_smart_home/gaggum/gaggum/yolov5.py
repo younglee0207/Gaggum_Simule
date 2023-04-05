@@ -252,7 +252,7 @@ def main(args=None):
             rclpy.spin_once(g_node)
 
         detections = Detection()
-        if is_img_bgr and is_scan and is_status:
+        if is_img_bgr and is_scan and is_status and is_imu:
             image_process, boxes_detect, classes_pick, info_result = yolov5.inference(img_bgr)
             print("--------------------new_frame--------------------")
             loc_z = 0
