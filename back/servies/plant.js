@@ -28,6 +28,23 @@ async function getWaterNeedPlant() {
     throw error;
   }
 }
+async function updateWaterNeedPlant() {
+  try {
+    const rows = await db.query(
+      `UPDATE plants
+      SET plant_last_watering_date = curdate()
+      WHERE (curdate()-plant_last_watering_date)>=plant_watering_cycle;`
+    );
+    const data = helper.emptyOrRows(rows);
+
+    return {
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 async function getSunNeedPlant() {
   try {
     const rows = await db.query(
@@ -77,7 +94,7 @@ async function waterPlant(body) {
   try {
     const rows = await db.query(
       `UPDATE plants
-        SET plant_last_watering_date = now()
+        SET plant_last_watering_date = curdate()
         WHERE plant_number = ${body.plant_number} AND plant_isdelete = 0`
     );
     const data = helper.emptyOrRows(rows);
@@ -151,4 +168,5 @@ module.exports = {
   createPlant,
   getPlantByOriginName,
   getSunNeedPlant,
+  updateWaterNeedPlant,
 };
