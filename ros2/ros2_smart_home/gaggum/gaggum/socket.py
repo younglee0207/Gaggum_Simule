@@ -64,9 +64,8 @@ def auto_move(data):
     print("auto_move", data['mode'])    
 
     
-ip_server = 'http://localhost:3001'
-# ip_server = "https://j8b310.p.ssafy.io/socket"
-# ip_server = 'http://j8b310.p.ssafy.io:3001'
+# ip_server = 'http://localhost:3001'
+ip_server = "https://j8b310.p.ssafy.io/socket"
 
 
 print("connect ", ip_server)

@@ -65,8 +65,8 @@ def auto_move(data):
 
     print("auto_move", data)    
 
-# ip_server = "https://j8b310.p.ssafy.io/socket"
-ip_server = 'http://localhost:3001'
+ip_server = "https://j8b310.p.ssafy.io/socket"
+# ip_server = 'http://localhost:3001'
 
 print("connect ", ip_server)
 sio.connect(ip_server)
@@ -312,7 +312,7 @@ class followTheCarrot(Node):
                                                     self.is_pointed = True
                                             else:
                                                 # 너무 가까우면 후진하기
-                                                if self.yolo_distance <= 0.58:
+                                                if self.yolo_distance < 0.55:
                                                     self.cmd_msg.linear.x=-0.1
                                                     self.cmd_msg.angular.z=0.0
                                     # 목표가 왼쪽에 있으면
