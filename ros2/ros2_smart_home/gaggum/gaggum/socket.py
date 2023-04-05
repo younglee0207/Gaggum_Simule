@@ -90,6 +90,7 @@ class SocketClass(Node):
 
         # 물 주기 소켓 통신 한번만 하기 위한 변수
         self.water_cnt = 0
+        self.sunny_cnt = 0
 
         self.timer_period = 1
         self.timer = self.create_timer(self.timer_period, self.timer_callback)       
@@ -157,7 +158,10 @@ class SocketClass(Node):
         if info["environment"]["hour"] == 13 and self.water_cnt == 0:
             self.water_cnt = 1
             sio.emit("simulator_info", info)
-            
+
+        elif info["environment"]["hour"] == 15 and self.sunny_cnt == 0:
+            self.sunny_cnt = 1
+            sio.emit("simulator_info", info)
 
 
         
