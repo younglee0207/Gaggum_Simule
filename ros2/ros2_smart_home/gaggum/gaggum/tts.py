@@ -37,11 +37,11 @@ class TTS(Node):
         if msg.water_mode or msg.sunny_mode:
             print('tts시작')
             if msg.water_mode:
-                # data = '화분에 물 주는 중입니다.'
+                data = '화분에 물 주는 중입니다.'
                 tts_file = 'water.mp3'
                 playsound(f'{tts_path}/{tts_file}')
             elif msg.sunny_mode:
-                # data = '화분을 옮기는 중입니다.'
+                data = '화분을 옮기는 중입니다.'
                 tts_file = 'sunny.mp3'
                 playsound(f'{tts_path}/{tts_file}')
             

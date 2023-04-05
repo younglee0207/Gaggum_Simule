@@ -236,12 +236,18 @@ class followTheCarrot(Node):
                         self.visited = set()                        
                         self.is_trigger = False
                         is_trigger = False
+                        self.is_yolo_finish = False
+
                         if self.mode == 100:
                             print("물 종료 되었습니다")
                             sio.emit("watering_finish", "finish")
+                            self.is_yolo_finish = False
+                            
                         if self.mode == 200:
                             print("화분 이동 종료")
+                            self.is_yolo_finish = False
 
+                        
             
                 else:
                     # 가까이에 있는 좌표 찾기
@@ -270,10 +276,13 @@ class followTheCarrot(Node):
             self.robot_pose_y = self.odom_msg.pose.pose.position.y
             
             # yolo가 넘어오면
+            print('yolo가 넘어오면', self.is_yolo, self.is_yolo_finish, self.is_lift)
             if self.is_yolo and not self.is_yolo_finish and not self.is_lift:
                 # print('실행중')
                     # print('is_pointed', self.is_pointed)
                     # 화분 앞에 위치하지 않으면
+                    # 
+                    
                     if not self.is_pointed:
                         try:
                             idx = self.yolo_msg.object_class.index(self.plant_number - 1)
@@ -292,14 +301,17 @@ class followTheCarrot(Node):
                                 if  self.cmd_msg.linear.x >= 0.05:
                                     self.check_stop=0
 
+                                # print("화분일치 들어가기 전", self.yolo_number, self.plant_number)
                                 # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
                                 if  self.yolo_number == self.plant_number - 1:   
+                                    # print("화분일치?", self.yolo_number, self.plant_number)
                                     self.is_stop = True
                                     # 중앙 맞추기 160
-                                    if 150 <= self.yolo_cx <= 170:
+                                    if 130 <= self.yolo_cx <= 190:
                                         # 중간에 있으면 천천히 전진
                                         self.cmd_msg.angular.z=0.0
                                         self.cmd_msg.linear.x=0.1
+
                                         if self.yolo_distance <= 1:
                                             self.cmd_msg.linear.x=0.1
                                             if 0.55 <= self.yolo_distance <= 0.6:
@@ -318,17 +330,13 @@ class followTheCarrot(Node):
                                     # 목표가 왼쪽에 있으면
                                     else:
                                         print('위치 조정 중...')
-                                        if self.yolo_cx < 155:
-                                            self.cmd_msg.angular.z=-0.05
-                                            if self.yolo_cx <= 100:
-                                                self.cmd_msg.angular.z=-0.1
+                                        if self.yolo_cx < 130:
+                                            self.cmd_msg.angular.z=-0.05                            
 
                                         # 목표가 오른쪽에 있으면
                                         else:
                                             self.cmd_msg.angular.z=0.05
-                                            if self.yolo_cx >= 200:
-                                                self.cmd_msg.angular.z=0.1
-
+                                
                                 else:
                                     # 목표 화분이 아니면 회피해서 목표 지점으로 가기
                                     # print('목표 화분 아님')
@@ -360,14 +368,14 @@ class followTheCarrot(Node):
                             self.cmd_msg.linear.x=0.0
                             if self.mode == 100:
                                 self.water_time += 1
-                                print(f'물 주기 {self.water_time * 2} %')
+                                print(f'물 주기 {self.water_time} %')
                                 #물 주는 신호 TTS(한번만 실행)
                                 water_msg = Tts()
                                 if self.water_time == 1:                                        
                                     water_msg.water_mode = True
                                     self.tts_pub.publish(water_msg)
                                 # 물 다줬으면 다음 좌표로 이동하기
-                                if self.water_time >= 50:
+                                if self.water_time >= 100:
                                     print('{self.plant_original_name} 물 주기 완료')
                                     # 물 주기 완료 TTS 실행
                                     water_msg.water_mode_end = True
