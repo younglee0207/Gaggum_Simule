@@ -106,7 +106,7 @@ class followTheCarrot(Node):
             # 'mode': 100  
             'data': [
                 {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
-                {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
+                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
             ],
             'mode': 200,
             'sunSpots': [
@@ -488,7 +488,7 @@ class followTheCarrot(Node):
             # #print('전방', self.forward_dis)
             # #print('후방', backward_dis)
             # #print('좌측', left_dis)       
-            # #print('우측', right_dis)a
+            # #print('우측', right_dis)
 
             # 근접 감지
             if self.forward_dis < 0.2:
@@ -513,32 +513,6 @@ class followTheCarrot(Node):
             #     self.is_approach = False
             #     #print('후방 근접')
 
-    # def goal_callback(self, msg):
-    #     if msg.header.frame_id=='map':
-    #         # #print(msg)
-    #         # {
-    #         #     'data': [
-    #         #         {
-    #         #             'plant_number': 1, 
-    #         #             'plant_original_name': 'plant1', 
-    #         #             'plant_position_x': -2.57, 
-    #         #             'plant_position_y': 3.77
-    #         #         },
-    #         #         {
-    #         #             'plant_number': 2, 
-    #         #             'plant_original_name': 'plant2', 
-    #         #             'plant_position_x': -5.57, 
-    #         #             'plant_position_y': 5.77
-    #         #         },
-    #         #     ], 
-    #         #     'mode': 100
-    #         # }
-    #         '''
-    #         로직 6. goal_pose 메시지 수신하여 목표 위치 설정
-    #         ''' 
-    #         self.goal_poses = []
-    #         self.goal_x=msg.pose.position.x
-    #         self.goal_y=msg.pose.position.y
 
     def yolo_callback(self, msg):
         self.is_yolo = True

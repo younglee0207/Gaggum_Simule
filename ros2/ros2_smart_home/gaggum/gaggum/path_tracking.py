@@ -213,6 +213,8 @@ class followTheCarrot(Node):
             'plant_img' : 'None',
         }       
 
+        self.count = 0
+
     def timer_callback(self):
         # 백에서 트리거가 실행되면 소켓을 통해 준 정보를 전역변수에 저장한다.        
         global auto_mode_info, is_trigger
