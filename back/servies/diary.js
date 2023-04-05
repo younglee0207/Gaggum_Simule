@@ -96,6 +96,7 @@ async function createDiary(body) {
       body.plant_original_name
     );
     console.log("plantData", plantData);
+    await plants.waterPlant(plantData.data[0].plant_number);
     const rows = await db.query(
       `INSERT INTO diaries(plant_number, diary_title, diary_img, diary_memo, diary_date)
       values (${plantData.data[0].plant_number},"${plantData.data[0].plant_name} ${nmonth}월 ${ndate}일","https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/diary/${plantData.data[0].plant_original_name}/${nmonth}월${ndate}일","${plantData.data[0].plant_name} 물주기",curdate());
