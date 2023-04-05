@@ -1,7 +1,12 @@
 import rclpy
+import cv2
+import socketio
+import base64
+
 from rclpy.node import Node
+from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus, Detection
+from ssafy_msgs.msg import TurtlebotStatus, Detection, Tts
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2, pow
@@ -21,6 +26,50 @@ from std_msgs.msg import Int16
 # 5. 전방 주시 포인트 설정
 # 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
 # 7. 선속도, 각속도 정하기
+
+global auto_mode_info, is_trigger
+
+auto_mode_info = False
+is_trigger = False
+diary_regist_li = []
+diary_regist = {
+    'plant_original_name' : 'None',
+    'plant_img' : 'None',
+}
+
+# socket 
+sio = socketio.Client()
+
+@sio.event
+def connect():
+    print('connection ROS')        
+    
+@sio.event
+def disconnect():
+    print('disconnected ROS from server')
+    
+@sio.event
+def connect_error(data):
+    print("connect_error!", data)
+
+# 자동급수, 자동 물주기 정보 들어오는 곳
+@sio.on("auto_move")
+def auto_move(data):    
+    global auto_mode_info, is_trigger
+
+    # 소켓에서 들어오는 자동 급수 식물 정보
+    auto_mode_info = data
+
+    # 자동 급수 하기위해 필요한 변수
+    is_trigger = True
+
+    print("auto_move", data)    
+
+ip_server = "https://j8b310.p.ssafy.io/socket"
+# ip_server = 'http://localhost:3001'
+
+print("connect ", ip_server)
+sio.connect(ip_server)
 
 class followTheCarrot(Node):
     def __init__(self):
@@ -54,6 +103,14 @@ class followTheCarrot(Node):
 
         # yolo에서 정보를 받아옴
         self.yolo_sub = self.create_subscription(Detection, '/yolo_detected', self.yolo_callback, 10)
+
+        # 카메라에서 이미지 정보를 받아옴
+        self.subs_img = self.create_subscription(CompressedImage, '/image_jpeg/compressed', self.img_callback, 1)
+
+        # 물 주기 완료 후 TTS
+        self.tts_pub = self.create_publisher(Tts, '/tts', 10)
+
+
 
         self.is_odom = False
         self.is_path = False
@@ -98,25 +155,25 @@ class followTheCarrot(Node):
         self.robot_pose_y = 0
 
         # 백에서 넘어오는 trigger
-        self.triggers = {
-            # 'data': [
-            #     {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
-            #     {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
-            # ], 
-            # 'mode': 100  
-            'data': [
-                {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
-                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
-            ],
-            'mode': 200,
-            'sunSpots': [
-                {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
-                {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
-                {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
-                {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
-                {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
-            ]
-        }
+        # self.triggers = {
+        #     # 'data': [
+        #     #     {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
+        #     #     {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
+        #     # ], 
+        #     # 'mode': 100  
+        #     'data': [
+        #         {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
+        #         {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
+        #     ],
+        #     'mode': 200,
+        #     'sunSpots': [
+        #         {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
+        #         {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
+        #         {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
+        #         {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
+        #         {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
+        #     ]
+        # }
         
         # trigger 정보
         self.goal_x = 0
@@ -135,6 +192,9 @@ class followTheCarrot(Node):
         self.yolo_cx = 0
         self.yolo_cy = 0
 
+        # 카메라 센서 이미지
+        self.original_img = None
+
         # 물주기 기능에 사용되는 변수
         self.pickture = set()   # 사진은 한번만
         self.water_time = 0     # 물 주는 동안 기다림
@@ -149,8 +209,17 @@ class followTheCarrot(Node):
         self.is_close = False
         self.is_put_wait = False
 
+        # 물 주기 완료 후 백으로 다시 전달하는 변수
+        self.diary_regist = {
+            'plant_original_name' : 'None',
+            'plant_img' : 'None',
+        }   
+
     def timer_callback(self):
-        print(self.is_trigger, self.is_lift, len(self.visited) == len(self.triggers['data']))
+        # 백에서 트리거가 실행되면 소켓을 통해 준 정보를 전역변수에 저장한다.        
+        global auto_mode_info, is_trigger
+        self.triggers = auto_mode_info  
+        self.is_trigger = is_trigger          
         
         # 백에서 트리거가 실행되면
         if self.is_trigger:
@@ -160,11 +229,20 @@ class followTheCarrot(Node):
                 if len(self.visited) == len(self.triggers['data']):
                     self.goal_x = -5.818
                     self.goal_y = 6.398
+                    # self.is_finish = True
                     self.is_yolo_finish = True
-                    if -6.3 <= self.robot_pose_x <= -5.5 and 6.34 <= self.robot_pose_y <= 6.44:
-                        print('gkgkg')
-                        self.visited = set()
+
+                    if -6.0 <= self.robot_pose_x <= -5.7 and 6.2 <= self.robot_pose_y <= 6.5:
+                        self.visited = set()                        
                         self.is_trigger = False
+                        is_trigger = False
+                        if self.mode == 100:
+                            print("물 종료 되었습니다")
+                            sio.emit("watering_finish", "finish")
+                        if self.mode == 200:
+                            print("화분 이동 종료")
+
+            
                 else:
                     # 가까이에 있는 좌표 찾기
                     x1 = self.robot_pose_x
@@ -218,7 +296,7 @@ class followTheCarrot(Node):
                                 if  self.yolo_number == self.plant_number - 1:   
                                     self.is_stop = True
                                     # 중앙 맞추기 160
-                                    if 155 <= self.yolo_cx <= 165:
+                                    if 150 <= self.yolo_cx <= 170:
                                         # 중간에 있으면 천천히 전진
                                         self.cmd_msg.angular.z=0.0
                                         self.cmd_msg.linear.x=0.1
@@ -234,7 +312,7 @@ class followTheCarrot(Node):
                                                     self.is_pointed = True
                                             else:
                                                 # 너무 가까우면 후진하기
-                                                if self.yolo_distance <= 0.58:
+                                                if self.yolo_distance < 0.55:
                                                     self.cmd_msg.linear.x=-0.1
                                                     self.cmd_msg.angular.z=0.0
                                     # 목표가 왼쪽에 있으면
@@ -273,6 +351,7 @@ class followTheCarrot(Node):
                         if self.mode == 100:
                             if self.plant_number not in self.pickture:
                                 print('사진 찍기')
+                                self.diary_regist['plant_img'] = self.base64_img
                             self.pickture.add(self.plant_number)
 
                         # 전방 접근 상태
@@ -282,9 +361,20 @@ class followTheCarrot(Node):
                             if self.mode == 100:
                                 self.water_time += 1
                                 print(f'물 주기 {self.water_time * 2} %')
+                                #물 주는 신호 TTS(한번만 실행)
+                                water_msg = Tts()
+                                if self.water_time == 1:                                        
+                                    water_msg.water_mode = True
+                                    self.tts_pub.publish(water_msg)
                                 # 물 다줬으면 다음 좌표로 이동하기
                                 if self.water_time >= 50:
                                     print('{self.plant_original_name} 물 주기 완료')
+                                    # 물 주기 완료 TTS 실행
+                                    water_msg.water_mode_end = True
+                                    self.tts_pub.publish(water_msg)
+                                    # 물 주는게 완료 되었으면 백에 사진과 화분정보 제공
+                                    self.diary_regist['plant_original_name'] = self.plant_original_name
+                                    sio.emit('diary_regist', self.diary_regist)
                                     self.water_time = 0
                                     self.visited.add(self.triggers_idx)
                                     self.is_pointed = False
@@ -510,8 +600,8 @@ class followTheCarrot(Node):
                     pcd_msg.points.append(global_point)
 
             # 전/후방, 좌/우측 충돌 감지
-            forward_left = self.lidar_msg.ranges[0:2]
-            forward_right = self.lidar_msg.ranges[358:360]
+            forward_left = self.lidar_msg.ranges[0:1]
+            forward_right = self.lidar_msg.ranges[359:360]
             forward = forward_left + forward_right
             backward = self.lidar_msg.ranges[170:191]
             left = self.lidar_msg.ranges[20:31]
@@ -555,6 +645,14 @@ class followTheCarrot(Node):
         self.is_yolo = True
         self.yolo_msg = msg
 
+    def img_callback(self, msg):
+        self.original_img = msg.data
+        np_arr = np.frombuffer(self.original_img, np.uint8)
+        cv_img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+        resized_img = cv2.resize(cv_img, (320, 240))
+        _, buffer = cv2.imencode('.jpg', resized_img)
+        b64data = base64.b64encode(buffer)
+        self.base64_img = b64data.decode('utf-8')
             
 def main(args=None):
     rclpy.init(args=args)

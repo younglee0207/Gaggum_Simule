@@ -33,7 +33,7 @@ const uploadDiaryFile = (name, base64) => {
   var ndate = now.getDate();
   var nmonth = now.getMonth() + 1;
 
-  console.log("uploadDiaryFile", name, base64);
+  // console.log("uploadDiaryFile", name, base64);
   const base64Data = new Buffer.from(base64, "base64");
   const params = {
     Bucket: "ssafybucket",
