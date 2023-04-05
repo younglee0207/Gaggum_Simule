@@ -73,6 +73,7 @@ print("connect ", ip_server)
 sio.connect(ip_server)
 
 
+
 class SocketClass(Node):
 
     def __init__(self):
@@ -86,7 +87,9 @@ class SocketClass(Node):
         self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.env_callback, 1000)
         # 터틀봇 정보
         self.turtle_bot_sub = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.turtlebot_callback, 1000)
-        
+
+        # 물 주기 소켓 통신 한번만 하기 위한 변수
+        self.water_cnt = 0
 
         self.timer_period = 1
         self.timer = self.create_timer(self.timer_period, self.timer_callback)       
@@ -151,7 +154,10 @@ class SocketClass(Node):
 
             
         # envir_status 정보를 socket 통신을 통해 백에 전달.
-        sio.emit("simulator_info", info)
+        if info["environment"]["hour"] == 13 and self.water_cnt == 0:
+            self.water_cnt = 1
+            sio.emit("simulator_info", info)
+            
 
 
         

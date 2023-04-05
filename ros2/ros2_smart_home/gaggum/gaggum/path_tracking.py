@@ -27,7 +27,7 @@ from std_msgs.msg import Int16
 # 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
 # 7. 선속도, 각속도 정하기
 
-global auto_mode_info, is_trigger, diary_regist, diary_regist_li
+global auto_mode_info, is_trigger
 
 auto_mode_info = False
 is_trigger = False
@@ -65,8 +65,8 @@ def auto_move(data):
 
     print("auto_move", data)    
 
-ip_server = "https://j8b310.p.ssafy.io/socket"
-# ip_server = 'http://localhost:3001'
+# ip_server = "https://j8b310.p.ssafy.io/socket"
+ip_server = 'http://localhost:3001'
 
 print("connect ", ip_server)
 sio.connect(ip_server)
@@ -216,9 +216,10 @@ class followTheCarrot(Node):
     def timer_callback(self):
         # 백에서 트리거가 실행되면 소켓을 통해 준 정보를 전역변수에 저장한다.        
         global auto_mode_info, is_trigger
-        self.triggers = auto_mode_info         
+        self.triggers = auto_mode_info  
+        self.is_trigger = is_trigger      
 
-        if is_trigger:
+        if self.is_trigger:
             self.mode = self.triggers['mode']
             # 모든 화분을 갔다면
             if not self.is_lift:
@@ -226,6 +227,18 @@ class followTheCarrot(Node):
                     self.goal_x = -5.818
                     self.goal_y = 6.398
                     self.is_finish = True
+
+                    if -6.0 <= self.robot_pose_x <= -5.7 and 6.2 <= self.robot_pose_y <= 6.5:
+                        self.visited = set()
+                        self.cmd_msg.linear.x=0.0
+                        self.cmd_msg.angular.z=0.0
+                        self.is_trigger = False
+                        is_trigger = False
+                        print("물 종료 되었습니다")
+                        sio.emit("watering_finish", "finish")
+
+
+
                 else:
                     # 가까이에 있는 좌표 찾기
                     x1 = self.robot_pose_x

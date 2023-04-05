@@ -24,7 +24,7 @@ class TTS(Node):
     
     def tts_callback(self,msg):
         # tts 사운드 상대경로 설정
-        print('tts')
+        print('tts', msg)    
         os_file_path = os.path.abspath(__file__)        
         tts_path = os_file_path.replace('install\\gaggum\\Lib\\site-packages\\gaggum\\tts.py', 
                                         'ros2_smart_home\\gaggum\\sound')     
@@ -37,18 +37,19 @@ class TTS(Node):
         if msg.water_mode or msg.sunny_mode:
             print('tts시작')
             if msg.water_mode:
-                data = '화분에 물 주는 중입니다.'
+                # data = '화분에 물 주는 중입니다.'
                 tts_file = 'water.mp3'
+                playsound(f'{tts_path}/{tts_file}')
             elif msg.sunny_mode:
-                data = '화분을 옮기는 중입니다.'
+                # data = '화분을 옮기는 중입니다.'
                 tts_file = 'sunny.mp3'
+                playsound(f'{tts_path}/{tts_file}')
             
 
-            sp = gTTS( lang='ko', text=data, slow=False )
+            # sp = gTTS( lang='ko', text=data, slow=False )
+            # sp.save(f'{tts_path}/{tts_file}')
 
-            sp.save(f'{tts_path}/{tts_file}')
-
-            playsound(f'{tts_path}/{tts_file}')
+            # playsound(f'{tts_path}/{tts_file}')
 
             # 다시 변수 초기화
             msg.water_mode = False
@@ -60,18 +61,19 @@ class TTS(Node):
             print("이동 종료")
 
             if msg.water_mode_end:
-                data = '급수가 종료 되었습니다.'
+                # data = '급수가 종료 되었습니다.'
                 tts_file = 'waterEnd.mp3'
+                playsound(f'{tts_path}/{tts_file}')
             elif msg.sunny_mode_end:
                 data = '화분 옮기기가 종료 되었습니다.'
                 tts_file = 'sunny_end.mp3'
             
 
-            ending = gTTS( lang='ko', text=data, slow=False )
+            # ending = gTTS( lang='ko', text=data, slow=False )
 
-            ending.save(f'{tts_path}/{tts_file}')
+            # ending.save(f'{tts_path}/{tts_file}')
 
-            playsound(f'{tts_path}/{tts_file}')
+            # playsound(f'{tts_path}/{tts_file}')
 
             msg.water_mode_end = False
             msg.sunny_mode_end = False

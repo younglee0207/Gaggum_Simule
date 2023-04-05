@@ -79,20 +79,24 @@ function socketStart() {
       }
     });
 
-    // 물 주는 동작 완료()
+    // 물 준 후 일지 등록
     // plant_original_name, plant_img 두가지를 들고있는 객체들의 리스트를 data에 넣어주세요
     socket.on("diary_regist", (data) => {
-      console.log("diary_regist_plants", data);
+      console.log("diary_regist_plants");
+
       s3.uploadDiaryFile(data.plant_original_name, data.plant_img);
       diaries.createDiary(data);
 
-      // for (let i = 0; i < data.length(); i++) {
-      //   s3.uploadDiaryFile(
-      //     data[i].plant_original_name,
-      //     data[i].plant_img
-      //   );
+      // for (let i = 0; i < data.length; i++) {
+      //   s3.uploadDiaryFile(data[i].plant_original_name, data[i].plant_img);
       //   diaries.createDiary(data[i]);
       // }
+    });
+
+    // 식물 정보 최신화
+    socket.on("watering_finish", (data) => {
+      console.log("watering_finish");
+      plants.updateWaterNeedPlant();
     });
 
     // 카메라
