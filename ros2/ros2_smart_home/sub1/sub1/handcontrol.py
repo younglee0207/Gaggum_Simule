@@ -88,8 +88,8 @@ class Handcontrol(Node):
         => can_put 이 false 이면 publish 요청을 보내서 빨간색으로 바뀜
         '''
         self.hand_control_msg.control_mode = 1
-        self.hand_control_msg.put_distance = 0.5
-        self.hand_control_msg.put_height = 0.5
+        self.hand_control_msg.put_distance = 0.3
+        self.hand_control_msg.put_height = 0.3
 
         while (not self.turtlebot_status_msg.can_put):
             self.hand_control.publish(self.hand_control_msg)

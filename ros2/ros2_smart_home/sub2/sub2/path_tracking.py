@@ -147,19 +147,24 @@ class followTheCarrot(Node):
         self.lift_time = 0
         self.lift_idx = 0
         self.is_close = False
+        self.is_put_wait = False
 
     def timer_callback(self):
-
+        print(self.is_trigger, self.is_lift, len(self.visited) == len(self.triggers['data']))
+        
         # 백에서 트리거가 실행되면
         if self.is_trigger:
             self.mode = self.triggers['mode']
-            # 모든 화분을 갔다면
             if not self.is_lift:
+                # 모든 화분을 갔다면
                 if len(self.visited) == len(self.triggers['data']):
                     self.goal_x = -5.818
                     self.goal_y = 6.398
                     self.is_yolo_finish = True
-                    self.visited = set()
+                    if -6.3 <= self.robot_pose_x <= -5.5 and 6.34 <= self.robot_pose_y <= 6.44:
+                        print('gkgkg')
+                        self.visited = set()
+                        self.is_trigger = False
                 else:
                     # 가까이에 있는 좌표 찾기
                     x1 = self.robot_pose_x
@@ -223,7 +228,7 @@ class followTheCarrot(Node):
                                                 self.cmd_msg.linear.x=0.0
                                                 self.cmd_msg.angular.z=0.0
                                                 self.check_stop += 1
-                                                print(f'중앙 정렬 진행도 {self.check_stop}%')
+                                                print(f'중앙 정렬 진행도 {self.check_stop * 2}%')
                                                 if self.check_stop >= 50:
                                                     self.check_stop = 0
                                                     self.is_pointed = True
@@ -237,14 +242,15 @@ class followTheCarrot(Node):
                                         print('위치 조정 중...')
                                         if self.yolo_cx < 155:
                                             self.cmd_msg.angular.z=-0.05
-                                            if self.yolo_cx < 280:
+                                            if self.yolo_cx <= 100:
                                                 self.cmd_msg.angular.z=-0.1
 
                                         # 목표가 오른쪽에 있으면
                                         else:
                                             self.cmd_msg.angular.z=0.05
-                                            if self.yolo_cx > 165:
-                                                self.cmd_msg.angular.z = 0.1
+                                            if self.yolo_cx >= 200:
+                                                self.cmd_msg.angular.z=0.1
+
                                 else:
                                     # 목표 화분이 아니면 회피해서 목표 지점으로 가기
                                     # print('목표 화분 아님')
@@ -275,7 +281,7 @@ class followTheCarrot(Node):
                             self.cmd_msg.linear.x=0.0
                             if self.mode == 100:
                                 self.water_time += 1
-                                print(f'물 주기 {self.water_time}%')
+                                print(f'물 주기 {self.water_time * 2} %')
                                 # 물 다줬으면 다음 좌표로 이동하기
                                 if self.water_time >= 50:
                                     print('{self.plant_original_name} 물 주기 완료')
@@ -316,7 +322,7 @@ class followTheCarrot(Node):
             # print(self.is_status, self.is_odom, self.is_path, self.is_stop)
             if self.is_status and self.is_odom and self.is_path and not self.is_stop:
 
-                # 남은 경로가 1 이상이면
+                # 남은 경로가 1 초과 이면
                 # print(self.path_msg.poses)
                 if len(self.path_msg.poses)> 1:
                     self.is_look_forward_point = False
@@ -389,28 +395,25 @@ class followTheCarrot(Node):
             
                         self.cmd_msg.linear.x = out_vel
                         self.cmd_msg.angular.z = out_rad_vel
-                # 남은 경로가 1 미만
                 else:
                     # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
                     if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
-                        #print('목표 지점에 도착')
+                        print('목표 지점에 도착')
                         # 도착 후 멈추기
                         self.cmd_msg.linear.x=0.0
                         self.cmd_msg.angular.z=0.0
                         
                         # 트리거가 안 끝났는데 
                         if not self.is_yolo_finish:
-                            # 화분 내려 놓기
+                            # 화분 들고 있으면
                             if self.is_lift:
-                                self.lift_time += 1
-                                self.hand_control_msg.data = 3
-                                self.hand_control_pub.publish(self.hand_control_msg)
-                                self.is_lift = False
-                                if self.lift_time >= 10:
-                                    self.lift_time = 0
+                                print(self.lift_time)
+                                if not (0.997 <= self.odom_msg.pose.pose.orientation.w <= 0.999):
+                                    self.cmd_msg.angular.z=0.15
                                 else:
-                                    self.cmd_msg.linear.x=-0.3
-
+                                    self.hand_control_msg.data = 3
+                                    self.hand_control_pub.publish(self.hand_control_msg)
+                                    self.is_put_wait = True
                             else:
                                 # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
                                 try:
@@ -427,10 +430,19 @@ class followTheCarrot(Node):
                             self.cmd_msg.linear.x=-0.1
                             self.cmd_msg.angular.z=0.1
 
-                # 전방 장애물 있으면
-                if self.forward_dis <= 0.3:
-                    self.cmd_msg.linear.x=-0.1
-                    self.cmd_msg.angular.z = 0.0
+                # 놓고 기다리는 상태
+                if self.is_put_wait:
+                    self.lift_time += 1
+                    # 다 기다렸으면
+                    if self.lift_time >= 50:
+                        self.is_lift = False
+                        self.lift_time = 0
+                        self.is_put_wait = False
+                else:
+                    # 전방 장애물 있으면
+                    if self.forward_dis <= 0.2:
+                        self.cmd_msg.linear.x=-0.1
+                        self.cmd_msg.angular.z = 0.0
                 
             # a_star에 목표 좌표를 보냄      
             goal = Point()
@@ -438,9 +450,12 @@ class followTheCarrot(Node):
             # print(goal)
             self.a_star_goal_pub.publish(goal)  
 
-            # 터틀봇 제어 명령 
-            self.cmd_pub.publish(self.cmd_msg)
-            
+        else:
+            self.cmd_msg.linear.x=0.0
+            self.cmd_msg.angular.z=0.0
+
+        # 터틀봇 제어 명령 
+        self.cmd_pub.publish(self.cmd_msg)
 
     def odom_callback(self, msg):
         self.is_odom=True

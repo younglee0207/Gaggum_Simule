@@ -242,10 +242,10 @@ class followTheCarrot(Node):
                             min_dis = dis
                             self.triggers_idx = i
                     # print('self.triggers_idx', self.triggers_idx)
-                        self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
-                        self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
-                        self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
-                        self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
+                    self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
+                    self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
+                    self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
+                    self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
 
            
             
@@ -313,9 +313,6 @@ class followTheCarrot(Node):
                                             self.cmd_msg.angular.z=0.05
                                             if self.yolo_cx > 165:
                                                 self.cmd_msg.angular.z = 0.1
-
-                                    # 목표 화분이면 mode에 맞춰서 handcontrol 작동시기키
-                                    self.hand_control_pub.publish(self.hand_control_msg)
                                 else:
                                     # 목표 화분이 아니면 회피해서 목표 지점으로 가기
                                     # print('목표 화분 아님')
@@ -475,7 +472,7 @@ class followTheCarrot(Node):
                         if not self.is_finish:
                             if self.is_lift:
                                 self.lift_time += 1
-                                if self.lift_time >= 100:
+                                if self.lift_time >= 10:
                                     print('화분 놓기')
                                     self.is_lift = False
                                     self.lift_time = 0
