@@ -29,10 +29,8 @@ const App = () => {
           {/* 시작화면 */}
           <Route path="/" element={<StartPage />} />
           {/* 메인화면 */}
-          <Route path="/home" element={<MainPage />} />
-
-          
-          {/* <Route
+          {/* <Route path="/home" element={<MainPage />} /> */}
+          <Route
             path="/home"
             element={
               isLoggedIn ? (
@@ -41,11 +39,10 @@ const App = () => {
                 <Navigate to="/" replace={true} />
               )
             }
-          /> */}
+          />
           {/* 로딩화면 */}
           {/* <Route path="/loading" element={<LoadingPage />} /> */}
 
-          
           <Route
             path="/loading"
             element={
@@ -57,7 +54,7 @@ const App = () => {
             }
           />
           {/* 내 식물 */}
-          <Route path="/plant" element={<PlantListPage />} />
+          {/* <Route path="/plant" element={<PlantListPage />} /> */}
 
           <Route
             path="/plant"
@@ -71,7 +68,7 @@ const App = () => {
           />
 
           {/* 식물 디테일 */}
-          <Route path="/plant/:id" element={<PlantDetailPage />} />
+          {/* <Route path="/plant/:id" element={<PlantDetailPage />} /> */}
 
           <Route
             path="/plant/:id"
