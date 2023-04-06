@@ -1,6 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const turtles = require('../servies/turtle');
+const s3 = require("../aws/s3");
+const turtles = require("../servies/turtle");
 
 /* GET turtle. */
 router.get("/", async function (req, res, next) {

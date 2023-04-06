@@ -15,34 +15,6 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { useNavigate } from "react-router";
 
-const dummy = [
-  {
-    id: 1,
-    plant_img: cardImg,
-    plant_name: "1번 식물"
-  },
-  {
-    id: 2,
-    plant_img: cardImg,
-    plant_name: "2번 식물"
-  },
-  {
-    id: 3,
-    plant_img: cardImg,
-    plant_name: "3번 식물"
-  },
-  {
-    id: 4,
-    plant_img: cardImg,
-    plant_name: "4번 식물"
-  },
-  {
-    id: 5,
-    plant_img: cardImg,
-    plant_name: "5번 식물"
-  },
-]
-
 const MainPlantList = () => {
 
   const navigate = useNavigate()
