@@ -5,8 +5,8 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='gaggum',
-            node_executable='odom',
-            node_name='odom'
+            node_executable='path_tracking',
+            node_name='path_tracking'
         ),
         Node(
             package='gaggum',
