@@ -33,6 +33,7 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
   const navigate = useNavigate();
 
   function submitHandler(event) {
+    console.log("이건", item);
     event.preventDefault();
     const enteredContent = contentInputRef.current.value;
     const enteredTitle = titleInputRef.current.value;
@@ -42,11 +43,17 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
       diary_title: enteredTitle,
       diary_memo: enteredContent,
     };
+    console.log(diaryInfo);
     // props.onAddInfo(userInfo);
 
     client
       .post("diary/edit", diaryInfo)
       .then((response) => {
+        console.log(response);
+        //then 대신에 asynce나 await가능
+        // alert("일지 수정 성공.");
+        // navigate.replace("/diary");
+        // window.location.reload();
         handleItemClick();
         onSubmit();
       })
@@ -117,6 +124,7 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
               overflow: "auto",
             }}
             className="note__textarea"
+            // placeholder="Write your note here"
           />
         </div>
       </div>

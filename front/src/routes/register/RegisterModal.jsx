@@ -131,6 +131,7 @@ const RegisterModal = ({ onClose, setIsModalOpen }) => {
         <div className={classes.pageTitle}>나의 식물 등록</div>
         <div 
           style={{ display: "flex", justifyContent: "center" }}>
+        <img className="img-plant" src={plantImg} alt="식물 사진" />
         </div>
         <div className={classes.writeTitle}>식물 이름</div>
         <input

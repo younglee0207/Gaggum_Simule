@@ -38,7 +38,6 @@ const Register = () => {
       }
     });
   };
-
   // const handleItemClick = (itemName) => {
   //   setModalButtonName(itemName);
   //   closeModal();
@@ -93,7 +92,7 @@ const Register = () => {
           <AiOutlineArrowLeft
             size="32"
             color="#022a17"
-            onClick={handleCancel}
+            onClick={() => navigate("/home")}
           />
         </div>
         <h2 className="register__header__title">식물 등록</h2>
