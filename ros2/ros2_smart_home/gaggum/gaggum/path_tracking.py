@@ -331,7 +331,7 @@ class followTheCarrot(Node):
                                     # 목표가 왼쪽에 있으면
                                     else:
                                         print('위치 조정 중...')
-                                        if self.yolo_cx < 140:
+                                        if self.yolo_cx < 150:
                                             self.cmd_msg.angular.z=-0.05                            
 
                                         # 목표가 오른쪽에 있으면
