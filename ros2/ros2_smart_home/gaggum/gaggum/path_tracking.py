@@ -331,7 +331,7 @@ class followTheCarrot(Node):
                                     # 목표가 왼쪽에 있으면
                                     else:
                                         print('위치 조정 중...')
-                                        if self.yolo_cx < 140:
+                                        if self.yolo_cx < 150:
                                             self.cmd_msg.angular.z=-0.05                            
 
                                         # 목표가 오른쪽에 있으면
@@ -364,7 +364,7 @@ class followTheCarrot(Node):
                                 photo_msg.shutter = True
                                 self.tts_pub.publish(photo_msg) 
                                 self.diary_regist['plant_img'] = self.base64_img
-                            self.pickture.add(self.plant_number)
+                                self.pickture.add(self.plant_number)
 
                         # 전방 접근 상태
                         # print(f'접근했니? : {self.is_forward_approach}, {self.forward_dis}')
