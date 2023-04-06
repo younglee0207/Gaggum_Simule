@@ -36,12 +36,14 @@ const PlantDetailPage = () => {
       showDenyButton: true,
       confirmButtonText: "네",
       denyButtonText: "아니오"
-    }).then(() => {
-      client
-        .post('plant/water', data)
-        .then(() => {
-          getPlantDetail(id)
-        })
+    }).then((res) => {
+      if (res.isConfirmed) {
+        client
+          .post('plant/water', data)
+          .then(() => {
+            getPlantDetail(id)
+          })
+      }
     })
   };
 
