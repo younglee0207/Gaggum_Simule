@@ -47,36 +47,43 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
   };
   
   useEffect(() => {
-    switch (plantWateringAmount) {
-      case 100:
+    switch (Math.floor(plantWateringAmount / 100)) {
+      case 0:
         setWateringAmount1(blueColor)
         setWateringAmount2(grayColor)
         setWateringAmount3(grayColor)
         setWateringAmount4(grayColor)
         setWateringAmount5(grayColor)
         break
-      case 200:
+      case 1:
+        setWateringAmount1(blueColor)
+        setWateringAmount2(grayColor)
+        setWateringAmount3(grayColor)
+        setWateringAmount4(grayColor)
+        setWateringAmount5(grayColor)
+        break
+      case 2:
         setWateringAmount1(blueColor)
         setWateringAmount2(blueColor)
         setWateringAmount3(grayColor)
         setWateringAmount4(grayColor)
         setWateringAmount5(grayColor)
         break
-      case 300:
+      case 3:
         setWateringAmount1(blueColor)
         setWateringAmount2(blueColor)
         setWateringAmount3(blueColor)
         setWateringAmount4(grayColor)
         setWateringAmount5(grayColor)
         break
-      case 400:
+      case 4:
         setWateringAmount1(blueColor)
         setWateringAmount2(blueColor)
         setWateringAmount3(blueColor)
         setWateringAmount4(blueColor)
         setWateringAmount5(grayColor)
         break
-      case 500:
+      case 5:
         setWateringAmount1(blueColor)
         setWateringAmount2(blueColor)
         setWateringAmount3(blueColor)

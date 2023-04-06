@@ -26,13 +26,11 @@ const StartPage = () => {
       window.location.href = KAKAO_AUTH_URL;
     }
   };
-  const setToken = () => {
-    localStorage.setItem("turtle_number", 1);
-  };
+
   return (
     <div className="StartPage">
       <div className="start-content">
-        <img className="start__logo" src={logoImg} />
+        <img className="start__logo" src={logoImg} alt="가꿈 로고"/>
         <img
           className="button-content"
           src={loginImg}
