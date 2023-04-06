@@ -95,13 +95,6 @@ const Diary = () => {
     });
   };
 
-  // const openModalMonth = () => {
-  //   setIsWriteModalOpen(true);
-  // };
-  // const closeModalMonth = () => {
-  //   setIsWriteModalOpen(false);
-  // };
-
   const handleItemClick = (itemName) => {
     setModalButtonName(itemName);
     closeModal();
@@ -159,9 +152,6 @@ const Diary = () => {
           };
           plants.push(plant);
         }
-        //then 대신에 asynce나 await가능
-        // alert("정보로딩 성공.");
-        // navigate.replace("/diary");
         setLoadedPlants(plants);
       })
       .catch((error) => {
@@ -199,8 +189,6 @@ const Diary = () => {
       <div className="center">
         <div className="diary-item">
           <h1 style={{ margin: 0 }}>나의 식물 일지</h1>
-          {/* <button onClick={check}>겟</button> */}
-          {/* <button onClick={GetPlants}>hi</button> */}
         </div>
         <div></div>
       </div>
