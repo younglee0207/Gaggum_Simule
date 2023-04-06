@@ -1,3 +1,5 @@
+/* 시작 페이지 */
+
 .StartPage {
   text-align: center;
   height: 100vh;
@@ -20,4 +22,40 @@
     margin-top: 35vh;
     cursor: pointer;
   }
+}
+
+/* 터틀봇 페이지 */
+
+.Turtlebot-Page {
+  text-align: center;
+  height: 100vh;
+  background-image: url("../../assets/start/start_background_tulip.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .turtlebot__content {
+
+    h1 {
+      margin: 0;
+    }
+
+    .turtlebot__input {
+      padding: 8px;
+      border: none;
+      margin-right: 8px;
+    }
+
+    .turtlebot__btn {
+      background-color: #30C7A4;
+      color: white;
+      border: none;
+  
+      padding: 8px;
+    }
+  }
+
 }

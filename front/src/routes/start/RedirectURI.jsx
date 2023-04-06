@@ -75,13 +75,13 @@ const RedirectURI = () => {
   }, []);
 
   return (
-    <div className="StartPage">
-      <div className="start-content">
+    <div className="Turtlebot-Page">
+      <div className="turtlebot__content">
         <h1>{name}님 안녕하세요</h1>
-        <h2>가꿈을 이용해주셔서 감사합니다.</h2>
-        <h2>제품 박스에 동봉된 인증키를 입력해주세요.</h2>
-        <input type="text" onChange={handleInputChange} />
-        <button onClick={numberCheck}>입력</button>
+        <h2>인증키를 입력해주세요.</h2>
+        <input className="turtlebot__input" type="text" onChange={handleInputChange} />
+        <button className="turtlebot__btn" onClick={numberCheck}>입력</button>
+        <h4>인증키는 제품 박스에 동봉되어 있습니다.</h4>
       </div>
     </div>
   );
