@@ -218,7 +218,7 @@ class followTheCarrot(Node):
                                 if  self.yolo_number == self.plant_number - 1:   
                                     self.is_stop = True
                                     # 중앙 맞추기 160
-                                    if 155 <= self.yolo_cx <= 165:
+                                    if 130 <= self.yolo_cx <= 190:
                                         # 중간에 있으면 천천히 전진
                                         self.cmd_msg.angular.z=0.0
                                         self.cmd_msg.linear.x=0.1
@@ -240,16 +240,12 @@ class followTheCarrot(Node):
                                     # 목표가 왼쪽에 있으면
                                     else:
                                         print('위치 조정 중...')
-                                        if self.yolo_cx < 155:
+                                        if self.yolo_cx < 130:
                                             self.cmd_msg.angular.z=-0.05
-                                            if self.yolo_cx <= 100:
-                                                self.cmd_msg.angular.z=-0.1
 
                                         # 목표가 오른쪽에 있으면
                                         else:
                                             self.cmd_msg.angular.z=0.05
-                                            if self.yolo_cx >= 200:
-                                                self.cmd_msg.angular.z=0.1
 
                                 else:
                                     # 목표 화분이 아니면 회피해서 목표 지점으로 가기

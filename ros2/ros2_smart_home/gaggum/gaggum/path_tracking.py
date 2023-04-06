@@ -63,7 +63,8 @@ def auto_move(data):
     # 자동 급수 하기위해 필요한 변수
     is_trigger = True
 
-    print("auto_move", data)    
+    for plant in data['data']:
+        print(plant['plant_name'])
 
 ip_server = "https://j8b310.p.ssafy.io/socket"
 # ip_server = 'http://localhost:3001'
@@ -267,7 +268,7 @@ class followTheCarrot(Node):
                         self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
                         self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
                         self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
-
+                        self.plant_name = self.triggers['data'][self.triggers_idx]['plant_name']
            
             
 
@@ -276,7 +277,7 @@ class followTheCarrot(Node):
             self.robot_pose_y = self.odom_msg.pose.pose.position.y
             
             # yolo가 넘어오면
-            print('yolo가 넘어오면', self.is_yolo, self.is_yolo_finish, self.is_lift)
+            # print('yolo가 넘어오면', self.is_yolo, self.is_yolo_finish, self.is_lift)
             if self.is_yolo and not self.is_yolo_finish and not self.is_lift:
                 # print('실행중')
                     # print('is_pointed', self.is_pointed)
@@ -307,14 +308,14 @@ class followTheCarrot(Node):
                                     # print("화분일치?", self.yolo_number, self.plant_number)
                                     self.is_stop = True
                                     # 중앙 맞추기 160
-                                    if 130 <= self.yolo_cx <= 190:
+                                    if 150 <= self.yolo_cx <= 170:
                                         # 중간에 있으면 천천히 전진
                                         self.cmd_msg.angular.z=0.0
                                         self.cmd_msg.linear.x=0.1
 
                                         if self.yolo_distance <= 1:
                                             self.cmd_msg.linear.x=0.1
-                                            if 0.55 <= self.yolo_distance <= 0.6:
+                                            if 0.5 <= self.yolo_distance <= 0.6:
                                                 self.cmd_msg.linear.x=0.0
                                                 self.cmd_msg.angular.z=0.0
                                                 self.check_stop += 1
@@ -330,7 +331,7 @@ class followTheCarrot(Node):
                                     # 목표가 왼쪽에 있으면
                                     else:
                                         print('위치 조정 중...')
-                                        if self.yolo_cx < 130:
+                                        if self.yolo_cx < 140:
                                             self.cmd_msg.angular.z=-0.05                            
 
                                         # 목표가 오른쪽에 있으면
@@ -359,6 +360,9 @@ class followTheCarrot(Node):
                         if self.mode == 100:
                             if self.plant_number not in self.pickture:
                                 print('사진 찍기')
+                                photo_msg = Tts()
+                                photo_msg.shutter = True
+                                self.tts_pub.publish(photo_msg) 
                                 self.diary_regist['plant_img'] = self.base64_img
                             self.pickture.add(self.plant_number)
 
@@ -376,7 +380,7 @@ class followTheCarrot(Node):
                                     self.tts_pub.publish(water_msg)
                                 # 물 다줬으면 다음 좌표로 이동하기
                                 if self.water_time >= 100:
-                                    print('{self.plant_original_name} 물 주기 완료')
+                                    print(f'{self.plant_original_name} 물 주기 완료')
                                     # 물 주기 완료 TTS 실행
                                     water_msg.water_mode_end = True
                                     self.tts_pub.publish(water_msg)
@@ -388,7 +392,7 @@ class followTheCarrot(Node):
                                     self.is_pointed = False
                                     self.is_stop = False
                             else:
-                                print('화분 들기')
+                                print('화분 드는 중')
                                 self.lift_time += 1
                                 if self.lift_time >= 50:
                                     self.hand_control_msg.data = 2
@@ -404,7 +408,7 @@ class followTheCarrot(Node):
                                             self.goal_y = self.triggers['sunSpots'][i]['sunspot_y_position']
                                             self.triggers['sunSpots'][i]['sunspot_isplant'] = 1
                                             break
-                                    print(self.goal_x, self.goal_y)
+                                    # print(self.goal_x, self.goal_y)
                                     self.visited.add(self.triggers_idx)
                                     self.is_pointed = False
                                     self.is_stop = False
@@ -505,7 +509,8 @@ class followTheCarrot(Node):
                         if not self.is_yolo_finish:
                             # 화분 들고 있으면
                             if self.is_lift:
-                                print(self.lift_time)
+                                print('화분 내려 놓는 중')
+                                print(f'진행률 {self.lift_time * 2 + 2}%')
                                 if not (0.997 <= self.odom_msg.pose.pose.orientation.w <= 0.999):
                                     self.cmd_msg.angular.z=0.15
                                 else:

@@ -33,6 +33,10 @@ class TTS(Node):
         # pot_name = msg.pot_name
         # pot_name = "경섭"    # 변수 명으로 바꿔야함      
         # data = pot_name + ' 화분에 물 주는 중입니다.'
+        if msg.shutter:
+            tts_file = 'shutter.mp3'
+            playsound(f'{tts_path}/{tts_file}')    
+            msg.shutter = False
 
         if msg.water_mode or msg.sunny_mode:
             print('tts시작')
