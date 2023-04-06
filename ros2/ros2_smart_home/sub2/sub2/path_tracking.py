@@ -1,15 +1,14 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point, Point32, Pose, PoseStamped
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, Detection
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
-from math import pi,cos,sin,sqrt,atan2
+from math import pi,cos,sin,sqrt,atan2, pow
 import numpy as np
 from sensor_msgs.msg import LaserScan, PointCloud
-from std_msgs.msg import String
-import time
-import random
+from std_msgs.msg import Int16
+
 # path_tracking 노드는 로봇의 위치(/odom), 로봇의 속도(/turtlebot_status), 주행 경로(/local_path)를 받아서, 주어진 경로를 따라가게 하는 제어 입력값(/cmd_vel)을 계산합니다.
 # 제어입력값은 선속도와 각속도로 두가지를 구합니다. 
 
@@ -25,24 +24,18 @@ import random
 
 class followTheCarrot(Node):
     def __init__(self):
-        super().__init__('path_tracking')
+        super().__init__('path_tracking') 
 
         # 로봇을 움직이게 하는 부분
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        # 장애물 확인
-        self.obs_pub = self.create_publisher(String, 'obs_msg', 1)
-
-        # goal_pose 통신 subscribe
-        self.goal_sub = self.create_subscription(PoseStamped,'goal_pose', self.goal_callback,1)
-
         # 로봇의 현재 위치
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
- 
+
         # 경로 받아오기
         self.path_sub = self.create_subscription(Path,'/local_path',self.path_callback,10)
-  
+
         # 라이다 데이터 구독
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
 
@@ -50,25 +43,35 @@ class followTheCarrot(Node):
         time_period=0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
 
+        # handcontrol node에 제어 메시지를 보냄
+        self.hand_control_pub = self.create_publisher(Int16, '/hand_control_cmd', 10)
+
+        # 목표 좌표를 가지고 옴
+        # self.goal_sub = self.create_subscription(PoseStamped,'/goal_pose',self.goal_callback, 1)
+
+        # a_star에 목표 좌표를 보냄
+        self.a_star_goal_pub = self.create_publisher(Point, '/a_star_goal', 10)
+
+        # yolo에서 정보를 받아옴
+        self.yolo_sub = self.create_subscription(Detection, '/yolo_detected', self.yolo_callback, 10)
+
         self.is_odom = False
         self.is_path = False
-        self.is_goal = False
-        self.path_exists = False
         self.is_status = False
-        self.forward = 999
-        self.backward = 999
-        self.collision_forward = False
-        self.collision_backward = False
-        self.collision_forward_cnt = 0
-        self.collision_backward_cnt = 0
-        self.forward_obs = False
-        self.backward_obs = False
+        self.is_forward_approach = False
+        self.is_right_approach = False
+        self.is_left_approach = False
+        self.is_trigger = True
+        self.is_yolo = False
+        self.is_pointed = False
 
         self.odom_msg=Odometry()            
         self.robot_yaw=0.0
         self.turtle_yaw = 0.0
         self.path_msg=Path()
         self.cmd_msg=Twist()
+
+        self.handcontrol_cmd_msg = Int16()
 
         # 로직 2. 파라미터 설정(전방주시거리)
         self.lfd=0.1
@@ -77,7 +80,7 @@ class followTheCarrot(Node):
 
         # 터틀봇이 정지해있는지 판단
         self.stop_cnt = 0 # 터틀봇이 멈춰 있는지 판단하는 간격을 정하기 위한 변수
-        self.is_stop = True # 터틀봇의 정지 여부 판단
+        self.is_stop = False # 터틀봇의 정지 여부 판단
         self.out_vel = 0.0 # 탈출을 계속하기 위해 필요함
         self.out_rad_vel = 0.0
 
@@ -85,235 +88,390 @@ class followTheCarrot(Node):
         self.go_cnt = 0
         self.back_cnt = 0
 
-        self.state = 1
+        # 라이다 주변 접근 정보
+        self.forward_dis = 0
+        self.left_dis = 0
+        self.right_dis = 0
 
-        # goal 전용
-        self.map_size_x=350
-        self.map_size_y=350
-        self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+         # 터틀봇의 현재 위치
+        self.robot_pose_x = 0
+        self.robot_pose_y = 0
+
+        # 백에서 넘어오는 trigger
+        self.triggers = {
+            # 'data': [
+            #     {'plant_number': 3, 'plant_original_name': 'plant3', 'plant_position_x': -7.54, 'plant_position_y': 3.53},
+            #     {'plant_number': 5, 'plant_original_name': 'plant5', 'plant_position_x': -3.0, 'plant_position_y': 15.54}
+            # ], 
+            # 'mode': 100  
+            'data': [
+                {'plant_number': 1, 'plant_original_name': 'plant1', 'plant_position_x': -4.87, 'plant_position_y': 3.48},
+                {'plant_number': 2, 'plant_original_name': 'plant2', 'plant_position_x': -2.92, 'plant_position_y': 3.49}
+            ],
+            'mode': 200,
+            'sunSpots': [
+                {'sunspot_number': 0, 'sunspot_isplant': 0, 'sunspot_x_position': 0, 'sunspot_y_position': 0},
+                {'sunspot_number': 2, 'sunspot_isplant': 0, 'sunspot_x_position': -1.99, 'sunspot_y_position': 4.53},
+                {'sunspot_number': 3, 'sunspot_isplant': 0, 'sunspot_x_position': -2.24, 'sunspot_y_position': 6.01},
+                {'sunspot_number': 4, 'sunspot_isplant': 0, 'sunspot_x_position': -2.11, 'sunspot_y_position': 9.34},
+                {'sunspot_number': 5, 'sunspot_isplant': 0, 'sunspot_x_position': -2.07, 'sunspot_y_position': 10.1}
+            ]
+        }
+        
+        # trigger 정보
+        self.goal_x = 0
+        self.goal_y = 0
+        self.plant_original_name = ''
+        self.palnt_number = 0
+        self.triggers_idx = 0   # 현위치에서 가까운 화분의 인덱스
+        self.visited = set()
+        self.sun_spot_x = 0
+        self.sun_spot_y = 0
+       
+       # yolo에서 받아온 정보
+        self.yolo_msg = Detection()
+        self.yolo_distance = 0
+        self.yolo_number = 0
+        self.yolo_cx = 0
+        self.yolo_cy = 0
+
+        # 물주기 기능에 사용되는 변수
+        self.pickture = set()   # 사진은 한번만
+        self.water_time = 0     # 물 주는 동안 기다림
+        self.check_stop = 0     # 멈췄는 지 확인 하는 함수
+        self.is_yolo_finish = False  # 물주기 끝내는 변수
+
+        # 화분 이동 기능에 사용되는 변수
+        self.hand_control_msg = Int16() # handcontrol에 모드를 보냄       
+        self.is_lift = False    # 화분을 들고 있는 지 확인
+        self.lift_time = 0
+        self.lift_idx = 0
+        self.is_close = False
+        self.is_put_wait = False
 
     def timer_callback(self):
-        # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때,
-        if self.is_status and self.is_odom and self.is_path:
-            # 남은 경로가 1 이상이면
-            if len(self.path_msg.poses)> 1:
-                self.is_look_forward_point = False
-                
-                # 로봇의 현재 위치를 나타내는 변수
-                robot_pose_x = self.odom_msg.pose.pose.position.x
-                robot_pose_y = self.odom_msg.pose.pose.position.y
-
-                # 로봇과 가장 가까운 경로점과의 직선거리
-                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-robot_pose_y,2))
-                # print(robot_pose_x,robot_pose_y,lateral_error)
-
-                # 로직 4. 로봇이 주어진 경로점과 떨어진 거리(lateral_error)와 로봇의 선속도를 이용해 전방주시거리 설정
-                
-                self.lfd = (self.status_msg.twist.linear.x + lateral_error) * 0.7
-                
-                # 최대, 최소 전방주시거리 제한 (0.1 ~ 1.0m)
-                if self.lfd < self.min_lfd :
-                    self.lfd=self.min_lfd
-                if self.lfd > self.max_lfd:
-                    self.lfd=self.max_lfd
-
-
-                min_dis=float('inf')
-                
-                # 로직 5. 전방 주시 포인트 설정(lfd만큼 떨어진 경로점을 찾는 부분)
-                for num, waypoint in enumerate(self.path_msg.poses):
-                    self.current_point = waypoint.pose.position
-                    # 로봇과 가장 가까운 경로점과 모든 경로점과의 거리 탐색
-                    dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
-                    if abs(dis-self.lfd) < min_dis:
-                        min_dis = abs(dis-self.lfd)
-                        # 경로점을 넣어준다
-                        self.forward_point = self.current_point
-                        self.is_look_forward_point = True
-                        target_num = num
-
-                if self.is_look_forward_point:
-                    # 전방 주시 포인트
-                    global_forward_point=[self.forward_point.x, self.forward_point.y, 1]
-
-                    '''
-                    로직 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
-                    (테스트) 맵에서 로봇의 위치(robot_pose_x,robot_pose_y)가 (5,5)이고, 헤딩(self.robot_yaw) 1.57 rad 일 때, 선택한 전방포인트(global_forward_point)가 (3,7)일 때
-                    변환행렬을 구해서 전방포인트를 로봇 기준좌표계로 변환을 하면 local_forward_point가 구해지고, atan2를 이용해 선택한 점과의 각도를 구하면
-                    theta는 0.7853 rad 이 나옵니다.
-                    trans_matrix는 로봇좌표계에서 기준좌표계(Map)로 좌표변환을 하기위한 변환 행렬입니다.
-                    det_tran_matrix는 trans_matrix의 역행렬로, 기준좌표계(Map)에서 로봇좌표계로 좌표변환을 하기위한 변환 행렬입니다.  
-                    local_forward_point 는 global_forward_point를 로봇좌표계로 옮겨온 결과를 저장하는 변수입니다.
-                    theta는 로봇과 전방 주시 포인트와의 각도입니다. 
-                    '''
-                    trans_matrix = np.array([       
-                                            [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
-                                            [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
-                                            [0, 0, 1],
-                    ])
-                    # 역행렬 만들기
-                    det_trans_matrix = np.linalg.inv(trans_matrix)
-                    # 글로벌 경로를 역행렬 연산 => 로컬 경로를 알아냄
-                    local_forward_point = det_trans_matrix.dot(global_forward_point)
-                    # 로봇과 전방주시 포인트간의 차이값 계산
-                    theta = -atan2(local_forward_point[1], local_forward_point[0])
-                    
-                    # 로직 7. 선속도, 각속도 정하기
-                    
-                    # 1. normal state(경로를 잘 따라 가는 경우)
-                    if self.state == 1:
-                        # print("state1")
-                        if 0.2 < abs(theta):
-                            self.out_vel = 0.0
-                            self.out_rad_vel = theta * 0.35
-                        else:
-                            self.out_vel = 0.5
-                            self.out_rad_vel = theta * 0.35
-                        
-                    # 전방 충돌 상황
-                    if self.state == 2:
-                        self.out_vel = -0.5
-                        self.out_rad_vel = 0.0
-                        # 일정 거리 이상 충돌로부터 멀어진 경우
-                        if self.forward > 0.5:
-                            self.turn_cnt = 20
-                            self.state = 8 # 회전 조건
-                    # 후방 충돌 상황
-                    if self.state == 3:
-                        self.out_vel = 0.5
-                        self.out_rad_vel = 0.0
-                        # 일정 거리 이상 충돌로부터 멀어진 경우
-                        if self.backward > 0.5:
-                            self.turn_cnt = 20
-                            self.state = 8 # 회전 조건
-
-                    # 오른쪽 방향으로 회전
-                    if self.state == 8 and self.turn_cnt > 0:
-                        self.out_vel = 0.0
-                        self.out_rad_vel = 20* pi / 180
-                        self.turn_cnt -= 1
-                        # 회전 종료 조건
-                        if self.turn_cnt == 0:
-                            print("회전 종료")
-                            self.state = 6 # 직진 조건
-                            self.go_cnt = 30
-                            self.out_rad_vel = 0.0
-                    # 직진
-                    if self.state == 6 and self.go_cnt > 0:
-                        self.out_vel = 1.0
-                        self.out_rad_vel = 0.0
-                        self.go_cnt -= 1
-                        if self.go_cnt == 0:
-                            print("직진 종료")
-                            self.state = 1
-                    # 후진(아직 사용은 안함)
-                    if self.state == 7 and self.go_cnt > 0:
-                        self.out_vel = -0.5
-                        self.out_rad_vel = 0.0
-                        self.back_cnt -= 1
-
-                    self.cmd_msg.linear.x = self.out_vel
-                    self.cmd_msg.angular.z = self.out_rad_vel
-                    self.cmd_pub.publish(self.cmd_msg)
-                    # print("linear.x: ", self.out_vel)
-                    # print("angular.z: ", self.out_rad_vel)
-            # 목적지는 있는데 경로가 만들어지지 않는 경우(터틀봇이 잘못된 위치에 있음)
-            elif self.is_status and self.is_odom and self.is_goal and (self.goal != self.current_pos) and not self.path_exists:
-                print("통과!")
-                # 목적지가 있으면 goal_pose 통신이 이루어진다.
-                # 전방, 후방 lidar distance 확인 후 더 먼 쪽으로 이동한다.
-                if self.forward > self.backward:
-                    self.out_vel = 0.5
-                    self.out_rad_vel = 0.1
+        print(self.is_trigger, self.is_lift, len(self.visited) == len(self.triggers['data']))
+        
+        # 백에서 트리거가 실행되면
+        if self.is_trigger:
+            self.mode = self.triggers['mode']
+            if not self.is_lift:
+                # 모든 화분을 갔다면
+                if len(self.visited) == len(self.triggers['data']):
+                    self.goal_x = -5.818
+                    self.goal_y = 6.398
+                    self.is_yolo_finish = True
+                    if -6.3 <= self.robot_pose_x <= -5.5 and 6.34 <= self.robot_pose_y <= 6.44:
+                        print('gkgkg')
+                        self.visited = set()
+                        self.is_trigger = False
                 else:
-                    self.out_vel = -0.5
-                    self.out_rad_vel = 0.1
-                self.cmd_msg.linear.x = self.out_velㅔ
-                self.cmd_msg.angular.z = self.out_rad_vel
-                self.cmd_pub.publish(self.cmd_msg)
-                print("x", self.out_vel)
-                print("angular", self.out_rad_vel)
+                    # 가까이에 있는 좌표 찾기
+                    x1 = self.robot_pose_x
+                    y1 = self.robot_pose_y
+                    min_dis = float('inf')
+                    for i in range(len(self.triggers['data'])):    
+                        x2 = self.triggers['data'][i]['plant_position_x']
+                        y2 = self.triggers['data'][i]['plant_position_y']
+                        dis = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))
+                        # print(f'{i}번 거리: {dis}')
+                        if dis < min_dis and i not in self.visited:
+                            min_dis = dis
+                            self.triggers_idx = i
+                    # print('self.triggers_idx', self.triggers_idx)
+                        self.goal_x = self.triggers['data'][self.triggers_idx]['plant_position_x']
+                        self.goal_y = self.triggers['data'][self.triggers_idx]['plant_position_y']
+                        self.plant_original_name = self.triggers['data'][self.triggers_idx]['plant_original_name']
+                        self.plant_number = self.triggers['data'][self.triggers_idx]['plant_number']
 
-            # 경로가 없을 때
-            else:
-                print("no found forward point")
-                self.is_stop = True
-                self.is_path = False
-                self.cmd_msg.linear.x=0.0
-                self.cmd_msg.angular.z=0.0
-                self.cmd_pub.publish(self.cmd_msg)
-            if random.randint(0, 31) > 27:
-                self.out_vel = 0.5
-                self.out_rad_vel = 0.3
-                self.cmd_msg.linear.x = self.out_vel
-                self.cmd_msg.angular.z = self.out_rad_vel
-                self.cmd_pub.publish(self.cmd_msg)
-            elif random.randint(0, 30) < 3:
-                self.out_vel = -0.5
-                self.out_rad_vel = -0.3
-                self.cmd_msg.linear.x = self.out_vel
-                self.cmd_msg.angular.z = self.out_rad_vel
-                self.cmd_pub.publish(self.cmd_msg)
+           
+            
+
+            # 로봇의 현재 위치를 나타내는 변수
+            self.robot_pose_x = self.odom_msg.pose.pose.position.x
+            self.robot_pose_y = self.odom_msg.pose.pose.position.y
+            
+            # yolo가 넘어오면
+            if self.is_yolo and not self.is_yolo_finish and not self.is_lift:
+                # print('실행중')
+                    # print('is_pointed', self.is_pointed)
+                    # 화분 앞에 위치하지 않으면
+                    if not self.is_pointed:
+                        try:
+                            idx = self.yolo_msg.object_class.index(self.plant_number - 1)
+                            self.yolo_distance = self.yolo_msg.distance[idx]
+                            self.yolo_number = self.yolo_msg.object_class[idx]
+                            self.yolo_cx = self.yolo_msg.cx[idx]
+                            self.yolo_cy = self.yolo_msg.cy[idx]
+                            # print(idx, self.yolo_distance, self.yolo_number, self.yolo_cx, self.yolo_cy)
+                            
+                            # 거리가 1이하이면
+                            if self.yolo_distance <= 1:
+                                self.cmd_msg.linear.x=0.0
+                                self.cmd_msg.angular.z=0.0
+
+                                # 조금이라도 움직이면 멈춤확인 초기화
+                                if  self.cmd_msg.linear.x >= 0.05:
+                                    self.check_stop=0
+
+                                # 목표 화분인지 확인하고(화분 번호는 백에서는 1번 부터 시작,yolo는 0번 부터 시작)
+                                if  self.yolo_number == self.plant_number - 1:   
+                                    self.is_stop = True
+                                    # 중앙 맞추기 160
+                                    if 130 <= self.yolo_cx <= 190:
+                                        # 중간에 있으면 천천히 전진
+                                        self.cmd_msg.angular.z=0.0
+                                        self.cmd_msg.linear.x=0.1
+                                        if self.yolo_distance <= 1:
+                                            self.cmd_msg.linear.x=0.1
+                                            if 0.55 <= self.yolo_distance <= 0.6:
+                                                self.cmd_msg.linear.x=0.0
+                                                self.cmd_msg.angular.z=0.0
+                                                self.check_stop += 1
+                                                print(f'중앙 정렬 진행도 {self.check_stop * 2}%')
+                                                if self.check_stop >= 50:
+                                                    self.check_stop = 0
+                                                    self.is_pointed = True
+                                            else:
+                                                # 너무 가까우면 후진하기
+                                                if self.yolo_distance <= 0.58:
+                                                    self.cmd_msg.linear.x=-0.1
+                                                    self.cmd_msg.angular.z=0.0
+                                    # 목표가 왼쪽에 있으면
+                                    else:
+                                        print('위치 조정 중...')
+                                        if self.yolo_cx < 130:
+                                            self.cmd_msg.angular.z=-0.05
+
+                                        # 목표가 오른쪽에 있으면
+                                        else:
+                                            self.cmd_msg.angular.z=0.05
+
+                                else:
+                                    # 목표 화분이 아니면 회피해서 목표 지점으로 가기
+                                    # print('목표 화분 아님')
+                                    self.is_stop = False 
+                                #print('x', self.cmd_msg.linear.x, 'z', self.cmd_msg.angular.z)
+                            
+                            # 1미터 밖에 있으면 경로따라 가기
+                            else:
+                                self.is_stop = False
+                        except IndexError:
+                            # print('화분 없음')
+                            pass
+                            
+                        except ValueError:
+                            # print('1미터 이내 목표 화분이 yolo에 없음')
+                            self.is_stop = False
+                            # 화분 앞에서 정지한 상태
+                    else:
+                        # 물 줄때는 사진 찍기
+                        if self.mode == 100:
+                            if self.plant_number not in self.pickture:
+                                print('사진 찍기')
+                            self.pickture.add(self.plant_number)
+
+                        # 전방 접근 상태
+                        # print(f'접근했니? : {self.is_forward_approach}, {self.forward_dis}')
+                        if self.is_forward_approach:
+                            self.cmd_msg.linear.x=0.0
+                            if self.mode == 100:
+                                self.water_time += 1
+                                print(f'물 주기 {self.water_time * 2} %')
+                                # 물 다줬으면 다음 좌표로 이동하기
+                                if self.water_time >= 50:
+                                    print('{self.plant_original_name} 물 주기 완료')
+                                    self.water_time = 0
+                                    self.visited.add(self.triggers_idx)
+                                    self.is_pointed = False
+                                    self.is_stop = False
+                            else:
+                                print('화분 들기')
+                                self.lift_time += 1
+                                if self.lift_time >= 50:
+                                    self.hand_control_msg.data = 2
+                                    self.hand_control_pub.publish(self.hand_control_msg)
+                                    
+                                    self.is_lift = True
+                                    self.lift_time = 0
+                                    # 들면 a_star로 목적지를 바꿔야 하잖아
+                                    for i in range(1, len(self.triggers['sunSpots'])):
+                                        # 그 자리에 화분이 없으면
+                                        if self.triggers['sunSpots'][i]['sunspot_isplant'] == 0:
+                                            self.goal_x = self.triggers['sunSpots'][i]['sunspot_x_position']
+                                            self.goal_y = self.triggers['sunSpots'][i]['sunspot_y_position']
+                                            self.triggers['sunSpots'][i]['sunspot_isplant'] = 1
+                                            break
+                                    print(self.goal_x, self.goal_y)
+                                    self.visited.add(self.triggers_idx)
+                                    self.is_pointed = False
+                                    self.is_stop = False
+                                
+                        elif self.hand_control_msg.data != 2:
+                            print('목표에 접근하는 중...')
+                            self.cmd_msg.linear.x=0.1
+
+                    self.cmd_pub.publish(self.cmd_msg)
+                    self.hand_control_msg.data = 0
+
+            # 1. turtlebot이 연결되어 있고, odom이 작동하며, 경로가 있을 때, yolo가 작동 중일때, stop이 아닐때
+            # print(self.is_status, self.is_odom, self.is_path, self.is_stop)
+            if self.is_status and self.is_odom and self.is_path and not self.is_stop:
+
+                # 남은 경로가 1 초과 이면
+                # print(self.path_msg.poses)
+                if len(self.path_msg.poses)> 1:
+                    self.is_look_forward_point = False
+                    self.handcontrol_cmd_msg.data = 0
+
+                    # 로봇과 가장 가까운 경로점과의 직선거리
+                    lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x-self.robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y-self.robot_pose_y,2))
+                    # #print(self.robot_pose_x,self.robot_pose_y,lateral_error)
+
+                    # 로직 4. 로봇이 주어진 경로점과 떨어진 거리(lateral_error)와 로봇의 선속도를 이용해 전방주시거리 설정
+
+                    self.lfd = (self.status_msg.twist.linear.x + lateral_error) * 0.7
+
+                    # 최대, 최소 전방주시거리 제한 (0.1 ~ 1.0m)
+                    if self.lfd < self.min_lfd :
+                        self.lfd=self.min_lfd
+                    if self.lfd > self.max_lfd:
+                        self.lfd=self.max_lfd
+
+                    min_dis=float('inf')
+
+                    # 로직 5. 전방 주시 포인트 설정(lfd만큼 떨어진 경로점을 찾는 부분)
+                    for num, waypoint in enumerate(self.path_msg.poses):
+                        self.current_point = waypoint.pose.position
+                        # 로봇과 가장 가까운 경로점과 모든 경로점과의 거리 탐색
+                        dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
+                        if abs(dis-self.lfd) < min_dis:
+                            min_dis = abs(dis-self.lfd)
+                            # 경로점을 넣어준다
+                            self.forward_point = self.current_point
+                            self.is_look_forward_point = True
+                            target_num = num
+
+                    if self.is_look_forward_point: 
+                        # 전방 주시 포인트
+                        global_forward_point=[self.forward_point.x, self.forward_point.y, 1]
+
+                        '''
+                        로직 6. 전방 주시 포인트와 로봇 헤딩과의 각도 계산
+                        (테스트) 맵에서 로봇의 위치(self.robot_pose_x,self.robot_pose_y)가 (5,5)이고, 헤딩(self.robot_yaw) 1.57 rad 일 때, 선택한 전방포인트(global_forward_point)가 (3,7)일 때
+                        변환행렬을 구해서 전방포인트를 로봇 기준좌표계로 변환을 하면 local_forward_point가 구해지고, atan2를 이용해 선택한 점과의 각도를 구하면
+                        theta는 0.7853 rad 이 나옵니다.
+                        trans_matrix는 로봇좌표계에서 기준좌표계(Map)로 좌표변환을 하기위한 변환 행렬입니다.
+                        det_tran_matrix는 trans_matrix의 역행렬로, 기준좌표계(Map)에서 로봇좌표계로 좌표변환을 하기위한 변환 행렬입니다.  
+                        local_forward_point 는 global_forward_point를 로봇좌표계로 옮겨온 결과를 저장하는 변수입니다.
+                        theta는 로봇과 전방 주시 포인트와의 각도입니다. 
+                        '''
+                        trans_matrix = np.array([       
+                                                [cos(self.robot_yaw), -sin(self.robot_yaw), self.robot_pose_x],
+                                                [sin(self.robot_yaw), cos(self.robot_yaw), self.robot_pose_y],
+                                                [0, 0, 1],
+                        ])
+                        # 역행렬 만들기
+                        det_trans_matrix = np.linalg.inv(trans_matrix)
+                        # 글로벌 경로를 역행렬 연산 => 로컬 경로를 알아냄   
+                        local_forward_point = det_trans_matrix.dot(global_forward_point)
+                        # 로봇과 전방주시 포인트간의 차이값 계산
+                        theta = -atan2(local_forward_point[1], local_forward_point[0])
+                        
+                        # 로직 7. 선속도, 각속도 정하기
+                        out_vel = 0.5
+                        out_rad_vel = theta
+                        # 10이내의 거리에서 선속도를 줄이고 각속도를 높여서 목표 지점을 지나치지 않도록 함
+                        if len(self.path_msg.poses) < 20:
+                            out_vel = 0.3
+                            # 5 이내의 거리에서는 정밀한 제어를 위해 완전히 속도를 줄임
+                            if len(self.path_msg.poses) < 10:
+                                out_vel = 0.1
+                            out_rad_vel = theta
+            
+                        self.cmd_msg.linear.x = out_vel
+                        self.cmd_msg.angular.z = out_rad_vel
+                else:
+                    # 현재 위치가 목표 좌표 1 영역 이내에 들어왔으면
+                    if self.goal_x - 1 <= self.robot_pose_x <= self.goal_x + 1 and self.goal_y - 1 <= self.robot_pose_y <= self.goal_y + 1:
+                        print('목표 지점에 도착')
+                        # 도착 후 멈추기
+                        self.cmd_msg.linear.x=0.0
+                        self.cmd_msg.angular.z=0.0
+                        
+                        # 트리거가 안 끝났는데 
+                        if not self.is_yolo_finish:
+                            # 화분 들고 있으면
+                            if self.is_lift:
+                                print(self.lift_time)
+                                if not (0.997 <= self.odom_msg.pose.pose.orientation.w <= 0.999):
+                                    self.cmd_msg.angular.z=0.15
+                                else:
+                                    self.hand_control_msg.data = 3
+                                    self.hand_control_pub.publish(self.hand_control_msg)
+                                    self.is_put_wait = True
+                            else:
+                                # 목표로 왔는데 화분이 없다 그럼 제자리에서 돌기
+                                try:
+                                    if self.yolo_msg.object_class[0] != self.plant_number - 1:
+                                        print('목표 화분이 아니야')
+                                        self.cmd_msg.angular.z=0.3
+                                except:
+                                    print('목표 지점에 왔는데 화분이 없어!!')
+                                    self.cmd_msg.angular.z=0.3
+                                
+                        else:
+                            # 목표 좌표를 찾을 수 없으면 초록색 영역(127) 안에 있다는 말 빠져나오기 위해 후진을 해야함
+                            #print("no found forward point")
+                            self.cmd_msg.linear.x=-0.1
+                            self.cmd_msg.angular.z=0.1
+
+                # 놓고 기다리는 상태
+                if self.is_put_wait:
+                    self.lift_time += 1
+                    # 다 기다렸으면
+                    if self.lift_time >= 50:
+                        self.is_lift = False
+                        self.lift_time = 0
+                        self.is_put_wait = False
+                else:
+                    # 전방 장애물 있으면
+                    if self.forward_dis <= 0.2:
+                        self.cmd_msg.linear.x=-0.1
+                        self.cmd_msg.angular.z = 0.0
+                
+            # a_star에 목표 좌표를 보냄      
+            goal = Point()
+            goal.x, goal.y = self.goal_x, self.goal_y
+            # print(goal)
+            self.a_star_goal_pub.publish(goal)  
+
+        else:
+            self.cmd_msg.linear.x=0.0
+            self.cmd_msg.angular.z=0.0
+
+        # 터틀봇 제어 명령 
+        self.cmd_pub.publish(self.cmd_msg)
 
     def odom_callback(self, msg):
         self.is_odom=True
-        print("상태: ", self.state)
         self.odom_msg=msg
-        self.current_x, self.current_y = self.pose_to_grid_cell(self.odom_msg.pose.pose.position.x, self.odom_msg.pose.pose.position.y)
-        self.current_pos = [self.current_x, self.current_y]
-        # print("self.state", self.state)
-        # 정지 상태 - 초기값 설정
-        print(self.stop_cnt)
-        if self.stop_cnt <= 0:
-            self.turtle_pos_x = msg.pose.pose.position.x
-            self.turtle_pos_y = msg.pose.pose.position.y
-            self.stop_cnt = 1
-        # stop_cnt가 300 이상이면 완전 정지 상태로 판단
-        elif self.stop_cnt > 300:
-            self.is_stop = True
-            self.state = 2
-            self.stop_cnt = 0
-        else:
-            # stop_cnt가 1에서 300 이하인 경우 현재 멈춰있는지 판단해야 함
-            # 탈출을 시도하기 전 상태, 충돌이 일어난 것이 아닐 때
-            if not self.collision_forward and not self.collision_backward:
-                # 저장해놓은 위치와 현재 위치 사이의 거리를 계산
-                distance = sqrt((self.turtle_pos_x-msg.pose.pose.position.x) ** 2 + \
-                (self.turtle_pos_y-msg.pose.pose.position.y) ** 2)
-                # 거리 차이가 매우 작으면 현재 정지 상태로 판단
-                # print(distance)
-                if distance < 0.0001:
-                    self.stop_cnt += 1 # 정지 상태가 일정 시간 지나면 탈출 로직 작동
-                else:
-                    self.turtle_pos_x = msg.pose.pose.position.x
-                    self.turtle_pos_y = msg.pose.pose.position.y
-                    self.is_stop = False
-                    self.stop_cnt -= 5 # 잠깐이라도 정지 상태가 풀리면 정지 상태 감소,
-                    # 초기화 하고 싶지만 누적 오차때문에 distance가 점점 커지므로 
-                    # 초기화하면 stop_cnt가 특정 값에 도달하지 못해 영영 안 움직일 수 있다.
-                    if self.stop_cnt < 0:
-                        self.stop_cnt = 0
 
         # 로직 3. Quaternion 을 euler angle 로 변환
-        q = Quaternion(msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
+        q = Quaternion(msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, 
+                       msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
         _, _, self.robot_yaw = q.to_euler()
 
-    
+
     def path_callback(self, msg):
         self.is_path=True
         self.path_msg=msg
-        if len(self.path_msg.poses) < 3:
-            self.path_exists = False
-        else:
-            self.path_exists = True
 
 
     def status_callback(self,msg):
         self.is_status=True
         self.status_msg=msg
-        
+
     # 라이다 데이터 수신시 호출되는 콜백함수
     def lidar_callback(self, msg):
         self.is_lidar = True
@@ -336,8 +494,8 @@ class followTheCarrot(Node):
 
                 if 0.0 < r < 12:
                     # 극좌표계를 로봇 기준(로컬) 직교좌표계로
-                    local_x = r*cos(angle*pi/180)
-                    local_y = r*sin(angle*pi/180)
+                    local_x = r * cos(angle * pi / 180)
+                    local_y = r * sin(angle * pi / 180)
                     local_point = np.array([[local_x], [local_y], [1]])
                     # 로컬 직교좌표계를 맵 기준(글로벌) 직교좌표계로
                     global_result = t.dot(local_point)
@@ -347,59 +505,53 @@ class followTheCarrot(Node):
                     # 퍼블리시는 하지 않았지만 확인하고 싶으면 pcd_msg를 퍼블리시해서 rviz에서 확인할 것
                     pcd_msg.points.append(global_point)
 
-            # 전/후방 충돌 감지
-            self.collision = False
-            forward_right = self.lidar_msg.ranges[0:5] # 정면의 라이다 값
-            forward_left = self.lidar_msg.ranges[356:360]
+            # 전/후방, 좌/우측 충돌 감지
+            forward_left = self.lidar_msg.ranges[0:2]
+            forward_right = self.lidar_msg.ranges[358:360]
+            forward = forward_left + forward_right
+            backward = self.lidar_msg.ranges[170:191]
+            left = self.lidar_msg.ranges[20:31]
+            right = self.lidar_msg.ranges[330:341]
 
-            # 만약 앞쪽이 부딪혔다면 forward_right와 forward_left의 평균을 낸 값이 0.1 이하일 것이다.
-            self.forward = (sum(forward_right) + sum(forward_left)) / 9
-            if self.forward < 0.1:
-                self.collision_forward_cnt += 1
-                if self.collision_forward_cnt == 10: # robust하게 만들기 위함
-                    self.collision_forward = True
-                    self.state = 2
-                    self.collision_forward_cnt = 0  # 초기화
-                print("전방 충돌")
+            # 평균 거리 계산
+            self.forward_dis = sum(forward) / len(forward)
+            backward_dis = sum(backward) / len(backward)
+            self.left_dis = sum(left) / len(left)
+            self.right_dis = sum(right) / len(right)
+            # #print('전방', self.forward_dis)
+            # #print('후방', backward_dis)
+            # #print('좌측', left_dis)       
+            # #print('우측', right_dis)
+
+            # 근접 감지
+            if self.forward_dis < 0.2:
+                self.is_forward_approach = True
+                # print('전방 근접')
             else:
-                self.collision_forward = False
+                self.is_forward_approach = False 
 
-            backward = self.lidar_msg.ranges[176:185]
-            self.backward = sum(backward) / 9
-            if self.backward < 0.1:
-                self.collision_backward_cnt += 1
-                if self.collision_backward_cnt == 10:
-                    self.collision_backward = True
-                    self.state = 3
-                    self.collision_backward_cnt = 0 
-                print("후방 충돌")
+            if self.left_dis < 0.2:
+                self.is_right_approach = True
             else:
-                self.collision_backward = False
+                self.is_forward_approach = False
+                #print('좌측 근접')
 
-    def goal_callback(self,msg):
-        self.is_goal = True
-        if msg.header.frame_id=='map':
-            goal_x=msg.pose.position.x
-            goal_y=msg.pose.position.y
-            goal_cell=self.pose_to_grid_cell(goal_x,goal_y)
-            self.goal = [goal_cell[0], goal_cell[1]] 
-            print("목표 지점: ", self.goal)
+            if self.right_dis < 0.2:
+                self.is_left_approach = True
+            else:
+                self.is_forward_approach = False
+                
+                #print('우측 근접')
+            # elif backward_dis < 0.25:
+            #     self.is_approach = False
+            #     #print('후방 근접')
 
-    # goal callback용
-    def pose_to_grid_cell(self,x,y):
 
-        map_point_x=0
-        map_point_y=0  
-        '''
-        로직 4. 위치(x,y)를 map의 grid cell로 변환 
-        (테스트) pose가 (-8,-4)라면 맵의 중앙에 위치하게 된다. 따라서 map_point_x,y 는 map size의 절반인 (175,175)가 된다.
-        pose가 (-16.75,-12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.
-        '''
-        map_point_x= int(( x - self.map_offset_x ) / self.map_resolution)
-        map_point_y= int(( y - self.map_offset_y ) / self.map_resolution)
-        return map_point_x,map_point_y
+    def yolo_callback(self, msg):
+        self.is_yolo = True
+        self.yolo_msg = msg
 
-        
+            
 def main(args=None):
     rclpy.init(args=args)
 

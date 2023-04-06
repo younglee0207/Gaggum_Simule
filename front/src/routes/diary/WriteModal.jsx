@@ -1,26 +1,27 @@
-import Reac, { useState } from "react";
+//수정모달입니다. 이름만 Write임
+
+
+import { useState } from "react";
 import ReactDOM from "react-dom";
 import classes from "./WriteModal.module.scss";
 import {
-  AiOutlineArrowLeft,
-  AiFillPlusCircle,
   AiOutlineClose,
   AiOutlineCheck,
 } from "react-icons/ai";
-import plantImg from "../../assets/plant/mush.gif";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useRef } from "react";
+import client from "../../api/client";
 
-const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
+const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries }) => {
+
   const handleItemClick = () => {
     if (item.plant_name) {
       GetNameDiaries(item.plant_name);
     } else {
       GetYearDiaries(item.diary_date.substr(0, 7));
     }
-  }; //수정 후 일지 초기화
-  console.log("수정아이템", item.diary_date.substr(0, 7));
+  }; 
+  //수정 후 일지 초기화
   const [text, setText] = useState("");
 
   const handleChange = (e) => {
@@ -45,10 +46,8 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
     console.log(diaryInfo);
     // props.onAddInfo(userInfo);
 
-    axios
-      .post("https://j8b310.p.ssafy.io/api/diary/edit", diaryInfo)
-      // console.log("성공")
-      //replace는 뒤로가기 버튼 비활성 이미 양식 제출했으므로
+    client
+      .post("diary/edit", diaryInfo)
       .then((response) => {
         console.log(response);
         //then 대신에 asynce나 await가능
@@ -56,10 +55,9 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
         // navigate.replace("/diary");
         // window.location.reload();
         handleItemClick();
-        onClose();
+        onSubmit();
       })
       .catch((error) => {
-        console.log(error);
         alert("작성에 실패하였습니다.");
       });
   }
@@ -72,10 +70,10 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
 
           <AiOutlineCheck onClick={submitHandler} size="24" color="#022a17" />
         </div>
-        <div className={classes.pageTitle}>식물 일지 등록</div>
-
-        <img className="img-plant" src={item.diary_img} alt="식물 사진" />
-
+        <div className={classes.pageTitle}>식물 일지 수정</div>
+        <div className="justify-center">
+        <img className="img-plant" src={item.diary_img} alt="식물 사진"  />
+        </div>
         <div className={classes.writeTitle}>제목</div>
 
         <div className={classes.note}>
@@ -93,6 +91,7 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
               width: "100%",
               height: "43px",
               border: "1px solid #ccc",
+              borderRadius: "8px",
               fontFamily: "monospace",
               fontSize: "24px",
               fontWeight: "bold",
@@ -118,6 +117,7 @@ const WriteModal = ({ onClose, item, GetNameDiaries, GetYearDiaries }) => {
               width: "100%",
               height: "300px",
               border: "1px solid #ccc",
+              borderRadius: "8px",
               fontFamily: "monospace",
               fontSize: "24px",
               fontWeight: "bold",

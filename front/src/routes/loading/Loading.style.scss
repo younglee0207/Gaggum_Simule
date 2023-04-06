@@ -1,4 +1,5 @@
 .LoadingPage {
+  position: relative;
   min-height: 100vh;
   background-color: #3466AD;
   margin-bottom: 0;
@@ -8,11 +9,48 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
 
-  .loading-content {
-    padding-top: 16px;
-    padding-left: 32px;
-    padding-right: 32px;
+  .loading__header {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+  }
+
+  img {
+    width: 100vw;
+  }
+
+  .loader {
+    width: 72px;
+    height: 72px;
+    border: 5px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  } 
+
+  .loading__dots {
+    padding: 16px;
+  }
+
+  .loading__content {
     text-align: center;
+    margin-top: 24px;
+  }
+
+  .loading__content2 {
+    margin: 0;
   }
 }

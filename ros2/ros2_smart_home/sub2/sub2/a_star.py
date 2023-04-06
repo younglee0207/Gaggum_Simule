@@ -2,11 +2,10 @@ import rclpy
 import numpy as np
 from rclpy.node import Node
 import os
-from geometry_msgs.msg import Pose,PoseStamped
+from geometry_msgs.msg import Pose, PoseStamped, Point
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from math import pi,cos,sin,sqrt
-from collections import deque
 import heapq
 from std_msgs.msg import String
 # a_star 노드는  OccupancyGrid map을 받아 grid map 기반 최단경로 탐색 알고리즘을 통해 로봇이 목적지까지 가는 경로를 생성하는 노드입니다.
@@ -28,12 +27,12 @@ from std_msgs.msg import String
 class a_star(Node):
 
     def __init__(self):
-        super().__init__('a_Star')
+        super().__init__('a_star')
         # 로직 1. publisher, subscriber 만들기
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.obs_sub = self.create_subscription(String, 'obs_msg', self.obs_callback, 1)
-        self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
+        self.a_star_goal_sub = self.create_subscription(Point,'a_star_goal',self.a_star_goal_callback,1)
         self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
         time_period=0.1 
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -51,17 +50,15 @@ class a_star(Node):
         self.map_size_x=350
         self.map_size_y=350
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        self.map_offset_x=-7-8.75
+        self.map_offset_y=10-8.75
     
         self.GRIDSIZE=350 
-
+ 
         ## 주변 그리드를 탐색할 때 사용할 리스트
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]
         self.dCost = [1,1,1,1,1.414,1.414,1.414,1.414]
-
-     
         
 
     def grid_update(self):
@@ -71,7 +68,6 @@ class a_star(Node):
         '''
         map_to_grid=np.array(self.map_msg.data)
         self.grid=np.reshape(map_to_grid, (350,350), order='F')
-
 
 
     def pose_to_grid_cell(self,x,y):
@@ -88,7 +84,6 @@ class a_star(Node):
         return map_point_x,map_point_y
         
 
-
     def grid_cell_to_pose(self,grid_cell):
         '''
         로직 5. map의 grid cell을 위치(x,y)로 변환
@@ -101,89 +96,105 @@ class a_star(Node):
         return [x,y]
         
 
-
     def odom_callback(self,msg):
         self.is_odom=True
         self.odom_msg=msg
+
 
     def map_callback(self,msg):
         self.is_map=True
         self.map_msg=msg
 
+
     def obs_callback(self, msg):
         if self.is_odom:
             print(msg.data)
 
-    def goal_callback(self,msg):
-        if msg.header.frame_id=='map':
-            # print(msg)
-            '''
-            로직 6. goal_pose 메시지 수신하여 목표 위치 설정
-            ''' 
-            goal_x=msg.pose.position.x
-            goal_y=msg.pose.position.y
-            goal_cell=self.pose_to_grid_cell(goal_x,goal_y)
+
+    def a_star_goal_callback(self, msg):
+        goal_x=msg.x
+        goal_y=msg.y
+    
+        goal_cell=self.pose_to_grid_cell(goal_x, goal_y)
+        if goal_cell[0] <= self.map_size_x and goal_cell[1] <= self.map_size_y:
             self.goal = [goal_cell[0], goal_cell[1]]
+        else:
+            print('좌표가 350*350을 벗어났습니다.')
+        print(self.goal)
 
     def timer_callback(self):
-        if self.is_map ==True and self.is_odom==True  :
-            if self.is_grid_update==False :
-                self.grid_update()
+        # 지도 받아왔고 odom 정보도 있는 상태에서 목적지가 정해졌다면
+            if self.is_map ==True and self.is_odom==True  :
+                
+                if self.is_grid_update == False:
+                    self.grid_update()
 
-    
-            self.final_path=[]
+                self.final_path=[]
 
-            x=self.odom_msg.pose.pose.position.x
-            y=self.odom_msg.pose.pose.position.y
-            start_grid_cell=self.pose_to_grid_cell(x,y)
-            # if start_grid_cell[start_grid_cell[0]] == 127 and start_grid_cell[start_grid_cell[1]]:
-                # 현재 위치는 dijkstra가 불가능함을 알리는 pub message를 path_tracking에 전달
+                # 현재 위치
+                x=self.odom_msg.pose.pose.position.x
+                y=self.odom_msg.pose.pose.position.y
+                # 터틀봇의 절대 위치를 그리드 위치로 변환하기 인 것 같다.
+                start_grid_cell = self.pose_to_grid_cell(x,y)
+                start_grid_cell = list(start_grid_cell)
 
-            self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
-            self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
+                # self.GRIDSIZE는 350이다.
+                # 0으로 채워진 350 X 350 행렬 만들기
+                self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
 
-            ## 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-            if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0 and start_grid_cell != self.goal :
-                self.dijkstra(start_grid_cell)
+                # 350 * 350 으로 채워진 350 X 350 행렬 만들기
+                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
 
+                if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0 and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
+                    # 시작점을 넣어주었다.
+                    self.aStar(start_grid_cell)
 
+                self.global_path_msg=Path()
+                self.global_path_msg.header.frame_id='map'
 
-            self.global_path_msg=Path()
-            self.global_path_msg.header.frame_id='map'
-            for grid_cell in reversed(self.final_path) :
-                tmp_pose=PoseStamped()
-                waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
-                tmp_pose.pose.position.x=waypoint_x
-                tmp_pose.pose.position.y=waypoint_y
-                tmp_pose.pose.orientation.w=1.0
-                self.global_path_msg.poses.append(tmp_pose)
+                # 순서 바꿔주고
+                # 각 grid cell에 대해서
+                for grid_cell in reversed(self.final_path) :
+                    tmp_pose=PoseStamped()
+                    waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
+                    tmp_pose.pose.position.x=waypoint_x
+                    tmp_pose.pose.position.y=waypoint_y
+                    tmp_pose.pose.orientation.w=1.0
 
-            if len(self.final_path)!=0 :
-                self.a_star_pub.publish(self.global_path_msg)
+                    # print(tmp_pose)
+                    
+                    # 차곡차곡 담기
+                    self.global_path_msg.poses.append(tmp_pose)
+                    # print('self.global_path_msg.poses', self.global_path_msg.poses)
+
+                # 경로가 존재한다면
+                if len(self.final_path)!=0 :
+                    self.a_star_pub.publish(self.global_path_msg)
+
 
     def heuristics(self, node):
-        # return sqrt((node[0] - self.goal[0])**2+(node[1] - self.goal[1])**2) # 피타고라스
+        # 스마트 홈은 경로상에서 특정한 가중치(교통 혼잡 등)을 생각할 필요가 없어서 맨하탄을 사용
         return (abs(node[0] - self.goal[0]) + abs(node[1] - self.goal[1])) # 맨하탄
             
-    def dijkstra(self,start):
+            
+    def aStar(self,start):
         heap = []
         heapq.heappush(heap,(0,start))
         self.cost[start[0]][start[1]] = 1
-        found = False
         '''
         로직 7. grid 기반 최단경로 탐색
         '''
-        # heap을 쓰는게 더 빠른듯 하여 heap 사용
+        # heap 큐 시간 복잡도는 O(log n) Vs 우선순위 큐 시간 복잡도는 삽입: O(1) 탐색: O(n)
+        # heap 큐를 사용
         while heap:
-            cost,current = heapq.heappop(heap) # heap.leftpop()
+            cost,current = heapq.heappop(heap) 
             if self.goal[0] == current[0] and self.goal[1] == current[1]:
-                found = True
                 break
 
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if next[0] >= 0 and next[1] >= 0 and next[0] < self.GRIDSIZE and next[1] < self.GRIDSIZE:
-                        if self.grid[next[0]][next[1]] < 50: # 50보다 작거나 127인 경우 이동 가능한 것으로 본다.
+                        if self.grid[next[0]][next[1]] <= 50:    # 장애물 확률이 50% 이하면
                             deltaCost = self.dCost[i] + self.heuristics(next)
                             if  self.cost[next[0]][next[1]] > self.cost[current[0]][current[1]] + deltaCost:
                                 self.cost[next[0]][next[1]] = self.cost[current[0]][current[1]] + deltaCost

@@ -2,9 +2,9 @@ import rclpy
 from rclpy.node import Node
 import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, MapScan
 from sensor_msgs.msg import Imu,LaserScan
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Int8MultiArray
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path,OccupancyGrid,MapMetaData
 from math import pi,cos,sin,sqrt
@@ -155,7 +155,6 @@ class Mapping:
 
     def __init__(self, params_map):
 
-        # 로직 3. 맵의 resolution, 중심좌표, occupancy에 대한 threshold 등의 설정들을 받습니다
         self.map_resolution = params_map["MAP_RESOLUTION"]
         self.map_size = np.array(params_map["MAP_SIZE"]) / self.map_resolution
         self.map_center = params_map["MAP_CENTER"]
@@ -167,6 +166,7 @@ class Mapping:
         self.map_vis_resize_scale = params_map["MAPVIS_RESIZE_SCALE"]
 
         self.T_r_l = np.array([[0,-1,0],[1,0,0],[0,0,1]])
+
 
     def update(self, pose, laser):
 
@@ -218,8 +218,7 @@ class Mapping:
         # 로직 12. 종료 시 map 저장
         ## Ros2의 노드가 종료될 때 만들어진 맵을 저장하도록 def __del__과 save_map이 정의되어 있습니다
         self.save_map(())
-
-
+        
     def save_map(self):
         map_clone = self.map.copy()
         cv2.imwrite(self.map_filename, map_clone*255)
@@ -280,11 +279,22 @@ class Mapper(Node):
 
         self.map_msg.info=self.map_meta_data
 
+        # socket에서 받아온 맵 만들기 실행 여부 정보 받기
+        self.create_map_sub = self.create_subscription(MapScan, '/map_scan', self.map_scan_callback, 100)
+
+        # is_map_create 변수가 True면 mapping 시작, std_msg에서 받아온 값으로 확인
+        self.is_map_create = False
+
         # 로직 2 : mapping 클래스 생성
         self.mapping = Mapping(params_map)
 
 
-    def scan_callback(self,msg):
+    def map_scan_callback(self, msg):
+        self.is_map_create = msg.map_scan
+        print("runmapping의 데이터 값", msg)
+
+
+    def scan_callback(self, msg):
         
         """
         # 로직 4 : laser scan 메시지 안의 ground truth pose 받기
@@ -293,41 +303,29 @@ class Mapper(Node):
         heading = 
         """
 
-        """
-        # 로직 5 : lidar scan 결과 수신
-        Distance= 
-        x = 
-        y = 
-        laser =
-        """
+        pose = np.array([[pose_x],[pose_y],[heading]])
 
-        # 로직 6 : map 업데이트 실행(4,5번이 완성되면 바로 주석처리된 것을 해제하고 쓰시면 됩니다.)
-        # pose = np.array([[pose_x],[pose_y],[heading]])
-        # self.mapping.update(pose, laser)
+        # 소켓에서 들어온 map_create 변수가 1일 경우에만 lidar 이용해 mapping시작 
+        if self.is_map_create:
+            self.mapping.update(pose, laser)
 
-        # np_map_data=self.mapping.map.reshape(1,self.map_size) 
-        # list_map_data=np_map_data.tolist()
+            np_map_data=self.mapping.map.reshape(1,self.map_size) 
+            list_map_data=np_map_data.tolist()
+            for i in range(self.map_size):
+                list_map_data[0][i]=100-int(list_map_data[0][i]*100)
+                if list_map_data[0][i] >100 :
+                    list_map_data[0][i]=100
+    
+                if list_map_data[0][i] <0 :
+                    list_map_data[0][i]=0
+    
 
-        # for i in range(self.map_size):
-        #     list_map_data[0][i]=100-int(list_map_data[0][i]*100)
-        #     if list_map_data[0][i] >100 :
-        #         list_map_data[0][i]=100
- 
-        #     if list_map_data[0][i] <0 :
-        #         list_map_data[0][i]=0
-
-        """
-        로직 11 : 업데이트 중인 map publish(#으로 주석처리된 것을 해제하고 쓰시고, 나머지 부분은 직접 완성시켜 실행하십시오)
-
-        # self.map_msg.header.stamp =rclpy.clock.Clock().now().to_msg()
-        self.map_msg.data=
-        # self.map_pub.publish(self.map_msg)
-
-        """
+            self.map_msg.header.stamp =rclpy.clock.Clock().now().to_msg()
+            self.map_msg.data=list_map_data[0]
+            self.map_pub.publish(self.map_msg)
 
 def save_map(node,file_path):
 
-    # 로직 12 : 맵 저장
     pkg_path =os.getcwd()
     back_folder='..'
     folder_name='map'
@@ -342,6 +340,9 @@ def save_map(node,file_path):
     f.write(data) 
     f.close()
 
+    # 맵을 저장한 이후 원래 변수 값을 초기화 시켜준다.
+    
+
         
 def main(args=None):    
     rclpy.init(args=args)
@@ -354,7 +355,10 @@ def main(args=None):
 
     except :
         save_map(run_mapping,'map.txt')
+ 
 
 
 if __name__ == '__main__':
     main()
+
+  

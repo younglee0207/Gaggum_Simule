@@ -1,17 +1,16 @@
 import PlantListItem from "./PlantListItem";
-import plantImg from "../../assets/plant/mokoko_01.gif"
-import axios from "axios";
 import { useRecoilState } from "recoil";
 import { useEffect } from "react";
 import { getAllPlantListState } from "../../store";
+import client from "../../api/client";
 
 const PlantList = () => {
 
   const [plantList, setPlantList] = useRecoilState(getAllPlantListState)
 
   const getPlantList = () => {
-    axios
-      .get('https://j8b310.p.ssafy.io/api/plant')
+    client
+      .get('plant')
       .then((res) => {
         setPlantList(res.data.data)
       })
