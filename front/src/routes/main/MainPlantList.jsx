@@ -49,7 +49,7 @@ const MainPlantList = () => {
         >
           {needWaterPlant?.map((item) => {
             return (
-              <SwiperSlide className="slider__container" key={item.div} onClick={() => handleNavigate(item?.plant_number)} >
+              <SwiperSlide className="slider__container" key={item.plant_number} onClick={() => handleNavigate(item?.plant_number)} >
                 <img
                   className="slider__img"
                   src={item.plant_img}
