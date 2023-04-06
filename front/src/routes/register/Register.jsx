@@ -46,8 +46,8 @@ const Register = () => {
 
   const handleCancel = () => {
     Swal.fire({
-      title: "등록 취소",
-      text: "등록을 취소하시겠습니까?",
+      title: "등록 종료",
+      text: "등록을 종료하시겠습니까?",
       showDenyButton: true,
       confirmButtonText: "네",
       denyButtonText: "아니오",
