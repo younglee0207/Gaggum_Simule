@@ -364,7 +364,7 @@ class followTheCarrot(Node):
                                 photo_msg.shutter = True
                                 self.tts_pub.publish(photo_msg) 
                                 self.diary_regist['plant_img'] = self.base64_img
-                            self.pickture.add(self.plant_number)
+                                self.pickture.add(self.plant_number)
 
                         # 전방 접근 상태
                         # print(f'접근했니? : {self.is_forward_approach}, {self.forward_dis}')
