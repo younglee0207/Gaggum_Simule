@@ -35,7 +35,7 @@ SSAFY 8기 특화 프로젝트
 
 ### 집안 내부 탐색을 통한 맵 정보 저장
 
-### 물이 필요한 식물들의 주기를 파악하여 필요한 양만큼 자동 급수
+### 물이 필요한 식물들의 급수 주기를 파악하여 필요한 양만큼 자동 급수
 
 ### 정해진 시간에 햇빛이 필요한 식물을 햇빛이 잘 드는 곳으로 이동
 
@@ -43,7 +43,7 @@ SSAFY 8기 특화 프로젝트
 
 - 라이더 센서를 이용한 장애물 인식
 - A* 알고리즘을 통한 최적 경로 계산(Path Tracking)
-- Yolo모델을 사용해서 화분 객체 탐지
+- YOLO모델을 사용해서 화분 객체 탐지
 - 탐지된 화분 좌표 추정 알고리즘 개발
 
 
@@ -98,15 +98,15 @@ SSAFY 8기 특화 프로젝트
 
 ### 요구사항 명세서
 
-https://lemon-letter-aac.notion.site/b656bf777c004df1bd5944334ea15ccf
+https://j8b310.notion.site/b656bf777c004df1bd5944334ea15ccf
 
 ### ERD
 
-https://lemon-letter-aac.notion.site/ERD-aa49a5ed8c8f45a3953428515e6be682
+https://j8b310.notion.site/ERD-0e435c2328064d6a87edf7f7517a0196
 
 ### API 명세서
 
-https://lemon-letter-aac.notion.site/API-7d4dc19be1994bbaa1ea0e641d1b826b
+https://j8b310.notion.site/API-75fa67f8e514482c8c268dee0517140d
 
 ### 와이어 프레임
 
@@ -114,7 +114,7 @@ https://www.figma.com/file/bJj1vEB1RWQ0dVShCkFPyV/B310?node-id=0%3A1&t=Xemtrqym1
 
 ### 포팅 매뉴얼
 
-https://lemon-letter-aac.notion.site/8701deb361604d30abb754d51c7c4320
+https://j8b310.notion.site/8701deb361604d30abb754d51c7c4320
 
 ## 🌱 프로젝트 파일 구조
 
