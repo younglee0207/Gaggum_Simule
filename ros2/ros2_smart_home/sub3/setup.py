@@ -35,8 +35,8 @@ setup(
             'socket = sub3.socket:main',
             'move_turtle = sub3.move_turtle:main',
             'yolov5_distance = sub3.yolov5_distance:main',
-            'tts = sub3.tts:main'
-
+            'tts = sub3.tts:main',
+            'yolov5_single = sub3.yolov5_single:main',
         ],
     },
 )
