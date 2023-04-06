@@ -35,7 +35,6 @@ const LoadingPage = () => {
 
     socket.on("run_mapping", (data) => {
       if (data === -1) {
-        console.log("종료조건", data);
         navigate("/home");
       }
     });

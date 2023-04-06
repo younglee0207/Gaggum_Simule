@@ -64,6 +64,21 @@ const Diary = () => {
     });
   };
 
+  const handleDeleteModal = (item) => {
+    Swal.fire({
+      title: "삭제 확인",
+      text: "삭제 하시겠습니까?",
+      showDenyButton: true,
+      confirmButtonText: "네",
+      denyButtonText: "아니요",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        // Swal.fire("수정이 취소되었습니다", "", "success");
+        deleteDiary(item);
+      }
+    });
+  };
+
 
   const handleSubmitModal = () => {
     Swal.fire({
@@ -101,11 +116,9 @@ const Diary = () => {
     client
       .get("diary")
       .then((response) => {
-        // console.log("이거", response.data.data);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
-        console.log(error);
         alert("로딩에 실패하였습니다.");
       });
   };
@@ -118,15 +131,12 @@ const Diary = () => {
     }
   }, []);
   const GetYearDiaries = (year) => {
-    console.log(year);
     client
       .get(`diary/date?diaryDate=${year}`)
       .then((response) => {
-        // console.log("이거년도", response.data.data);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
-        console.log(error);
         alert("로딩에 실패하였습니다.");
       });
   };
@@ -135,7 +145,6 @@ const Diary = () => {
       .get(`plant`)
       .then((response) => {
         const plants = [];
-        // console.log("이거전체식물", response);
         for (const key in response.data.data) {
           const plant = {
             id: key,
@@ -146,7 +155,6 @@ const Diary = () => {
         setLoadedPlants(plants);
       })
       .catch((error) => {
-        console.log(error);
         alert("작성에 실패하였습니다.");
       });
   };
@@ -155,36 +163,27 @@ const Diary = () => {
     client
       .get(`diary/name?plantName=${plant_name}`)
       .then((response) => {
-        console.log("이거이름로드", response);
         setLoadedDiaries(response.data.data);
       })
       .catch((error) => {
-        console.log(error);
         alert("작성에 실패하였습니다.");
       });
   };
 
   const deleteDiary = (number) => {
-    console.log("넘버", number);
     const deleteInfo = {
       diary_number: number,
     };
     client
       .post(`diary/delete`, deleteInfo)
       .then((response) => {
-        alert("삭제 성공");
         GetYearDiaries(2023);
       })
       .catch((error) => {
-        console.log(error);
         alert("삭제에 실패하였습니다.");
       });
   };
-  const check = () => {
-    console.log(modalButtonName);
-  };
 
-  console.log(loadedDiaries);
   return (
     <div className="Diary">
       <div className="center">
@@ -295,7 +294,7 @@ const Diary = () => {
                   <button
                     className={"modify-button"}
                     onClick={() => {
-                      deleteDiary(item.diary_number);
+                      handleDeleteModal(item.diary_number);
                     }}
                   >
                     <RxCross2 />

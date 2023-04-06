@@ -86,8 +86,7 @@ const RegisterModal = ({ onClose, setIsModalOpen }) => {
         plant_position_y: registedData ? registedData.plant_position_y : 0,
         plant_original_name: registedData && registedData.plant_original_name !== "none" ? registedData.plant_original_name : ""
       }
-      console.log(registData)
-  
+      
       Swal.fire({
         title: "식물 등록",
         text: "등록 하시겠습니까?",

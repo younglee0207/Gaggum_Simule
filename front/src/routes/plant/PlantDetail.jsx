@@ -16,7 +16,6 @@ const PlantDetail = ({ item, handleWatering }) => {
   const diff = (nowDate - registDate) / (1000 * 60 * 60 * 24) // 일(day) 단위로 계산
   const daysDiff = Math.floor(diff) // 소수점 이하 절사 
   const backgroundImage = item?.plant_img || 'https://ssafybucket.s3.ap-northeast-2.amazonaws.com/image/planticon.png'
-  console.log(item)
 
   const handleChange = () => {
     setChecked(!checked)
@@ -27,7 +26,6 @@ const PlantDetail = ({ item, handleWatering }) => {
   };
 
   const handleDelete = () => {
-    console.log("delete")
     Swal.fire({
       title: "식물 삭제",
       text: "식물을 삭제 하시겠습니까?", 

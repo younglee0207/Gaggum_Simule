@@ -10,8 +10,6 @@ let todayMonth = now.getMonth() + 1;
 let todayDay = now.getDate();
 
 const TodayFlower = () => {
-  
-  console.log(todayMonth, todayDay)
 
   const [flowerName, setFlowerName] = useState(null)
   const [flowerMean, setFlowerMean] = useState(null)
@@ -27,7 +25,6 @@ const TodayFlower = () => {
           }
         })
         .then((res) => {
-          console.log("오늘의 꽃 불러오기 성공")
           const dataSet = new XMLParser().parseFromString(res.data)
           setFlowerName(dataSet?.children[0].children[3].children[3].value)
           setFlowerMean(dataSet?.children[0].children[3].children[6].value)
@@ -36,7 +33,6 @@ const TodayFlower = () => {
           )
         })
     } catch (error) {
-      console.log(error)
     }
   }
 

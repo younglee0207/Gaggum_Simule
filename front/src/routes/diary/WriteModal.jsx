@@ -13,7 +13,7 @@ import { useRef } from "react";
 import client from "../../api/client";
 
 const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries }) => {
-  // console.log('이건 다이어리 넘버',item.diary_number)
+
   const handleItemClick = () => {
     if (item.plant_name) {
       GetNameDiaries(item.plant_name);
@@ -22,7 +22,6 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
     }
   }; 
   //수정 후 일지 초기화
-  // console.log("수정아이템", item.diary_date.substr(0, 7));
   const [text, setText] = useState("");
 
   const handleChange = (e) => {
@@ -52,7 +51,6 @@ const WriteModal = ({ onClose, onSubmit, item, GetNameDiaries, GetYearDiaries })
         onSubmit();
       })
       .catch((error) => {
-        console.log(error);
         alert("작성에 실패하였습니다.");
       });
   }

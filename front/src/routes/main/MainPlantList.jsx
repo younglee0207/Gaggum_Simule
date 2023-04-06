@@ -25,7 +25,6 @@ const MainPlantList = () => {
     client
       .get('plant/needwater')
       .then((res) => {
-        console.log("물이 필요한 식물들 불러오기 성공")
         setNeedWaterPlant(res.data.data)
       })
   }

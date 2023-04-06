@@ -25,11 +25,9 @@ const RedirectURI = () => {
       user_number: userNumber,
       turtle_key: inputValue,
     };
-    console.log("인포", info);
     axios
       .post(`https://j8b310.p.ssafy.io/api/turtle`, turtle_key)
       .then((res) => {
-        console.log('밸리드확인',res)
         if (res.data.data[0].valid === 0) {
           Swal.fire({
             title: "인증키 오류",
@@ -41,7 +39,6 @@ const RedirectURI = () => {
             .post("https://j8b310.p.ssafy.io/api/user/turtle", info)
             .then(navigate("/home")); //유저넘버, 터틀키
         }
-        console.log("터틀키", res);
       });
   };
 
@@ -50,9 +47,6 @@ const RedirectURI = () => {
     let code = params.get("code"); // 인가코드 받는 부분
     let grant_type = "authorization_code";
     let client_id = "58acce2e1c5607a9310ef74870273737";
-    console.log("파라미터스", params);
-    console.log("인가코드", code);
-    console.log("인풋밸류", inputValue);
     axios
       .get(
         `https://j8b310.p.ssafy.io/api/user/kakao/code?code=${code}`,
@@ -64,7 +58,6 @@ const RedirectURI = () => {
         }
       )
       .then((res) => {
-        console.log("사용자정보", res); 
         setName(res.data.data[0].user_name);
         setUserNumber(res.data.data[0].user_number);
         localStorage.setItem('turtle_number',res.data.data[0].turtle_number)

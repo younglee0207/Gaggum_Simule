@@ -14,7 +14,6 @@ const RegisterController = ({ socket }) => {
   const [RightKeyDown, setRightKeyDown] = useState(false);
 
   const logKeyDown = (direction, number) => {
-    console.log(`${direction} Key is down`, number);
     socket.emit(`go_${direction}`, { name: `go ${direction}`, data: number });
   };
 

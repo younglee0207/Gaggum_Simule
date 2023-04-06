@@ -38,10 +38,6 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
         client
           .post("plant/delete", { plant_number: plantId })
           .then((res) => {
-            console.log("삭제되었습니다.")
-          })
-          .catch((error) => {
-            console.log(error)
           })
       }
     });

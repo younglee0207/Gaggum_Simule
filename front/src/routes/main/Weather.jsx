@@ -51,8 +51,6 @@ const Weather = () => {
           },
         )
         .then((res) => {
-          console.log("날씨 최신화")
-
           const location = res.data.documents[0].address
           setDoLocation(location.region_1depth_name)
           setGuLocation(location.region_2depth_name)

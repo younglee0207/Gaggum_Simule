@@ -1,5 +1,4 @@
 import "./Register.style.scss";
-import { BsCameraFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import noCameraImg from "../../assets/register/Camera-not-Working.png"
 
@@ -19,33 +18,6 @@ const RegisterCamera = ({ setCameraData, socket }) => {
       socket.off("streaming_image");
     };
   }, []);
-
-  const handleLiftUp = () => {
-    console.log("들기");
-    // Socket 통신으로 들기 명령 보내기
-    socket.emit("liftUp", {
-      name: "lift up",
-      data: "",
-    });
-  };
-
-  const handleLiftDown = () => {
-    console.log("놓기");
-    // Socket 통신으로 놓기 명령 보내기
-    socket.emit("liftDown", {
-      name: "lift down",
-      data: "",
-    });
-  };
-
-  const handleCapture = () => {
-    console.log("캡쳐");
-    // Socket 통신으로 캡쳐 명령 보내기
-    socket.emit("capture", {
-      name: "capture",
-      data: "",
-    });
-  };
 
   socket.on();
 

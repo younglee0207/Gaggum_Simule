@@ -15,7 +15,6 @@ const NavBar = () => {
       <div 
         className={["nav-items", "nav-item1"].join(" ")}
         onClick={() => {
-          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
           navigate("/home");
         }}
         // onClick={() => {navigate("/")}}
@@ -26,7 +25,6 @@ const NavBar = () => {
       <div 
         className={["nav-items", "nav-item2"].join(" ")}
         onClick={() => {
-          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
           navigate("/plant");
         }}
         // onClick={() => {navigate("/")}}
@@ -37,7 +35,6 @@ const NavBar = () => {
       <div 
         className={["nav-items", "nav-item3"].join(" ")}
         onClick={() => {
-          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
           navigate("/diary");
         }}
         // onClick={() => {navigate("/")}}
@@ -48,7 +45,6 @@ const NavBar = () => {
       <div 
         className={["nav-items", "nav-item4"].join(" ")}
         onClick={() => {
-          console.log("Turtle Number:", localStorage.getItem("turtle_number"));
           navigate("/register");
         }}
         // onClick={() => {navigate("/")}}
