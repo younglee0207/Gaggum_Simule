@@ -39,6 +39,9 @@ const PlantListItem = ({ item, plantId, plantImg, plantName, plantSpecies, plant
           .post("plant/delete", { plant_number: plantId })
           .then((res) => {
           })
+          .catch((err) => {
+            
+          } )
       }
     });
   };
