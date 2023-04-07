@@ -4,7 +4,7 @@
 
 ---
 
-## 🌱 소개 영상 보기 : Youtube URL
+## 🌱 소개 영상 보기 : [Youtube URL](https://youtu.be/vD8l-o3K8iA)
 
 ---
 
