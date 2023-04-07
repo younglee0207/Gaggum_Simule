@@ -168,7 +168,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'test@test.com','김싸피',0,1),(3,'subsub1221@gmail.com','김경섭',0,1),(4,'sp0674@naver.com','이영재',0,1),(5,'chl7tkd4@naver.com','최상원',0,1),(6,'wnsgh0672@naver.com','이준호',0,1),(7,'kkang15794@naver.com','윤동민',0,1),(8,'rxplus2019rxplus2019@gmail.com','John Doe',0,0),(9,'yyh6290@naver.com','유영훈',0,0),(10,'undefined','이상민',0,0),(11,'cjsdks518@naver.com','은지',0,0),(12,'luis.jeong@kakao.com','정용기',0,0);
+INSERT INTO `users` VALUES (1,'test@test.com','김싸피',0,1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
