@@ -20,7 +20,7 @@ SSAFY 8기 특화 프로젝트
 
 ---
 
-![특화프로젝트 팀원](https://user-images.githubusercontent.com/109258146/230269654-b33505f0-a6f7-4940-a1ad-afaa7b744206.png)
+![특화프로젝트 팀원](https://user-images.githubusercontent.com/109258146/230269654-b33505f0-a6f7-4940-a1ad-afaa7b7332152.png)
 
 
 ## 🌱 프로젝트 개요
